@@ -2,41 +2,77 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Habify Design System - Apple-inspired with modern gradients and smooth animations */
 
 @layer base {
   :root {
+    /* Core Brand Colors */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 220 18% 20%;
 
+    /* Card System */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 220 18% 20%;
+    --card-hover: 220 20% 98%;
 
+    /* Popover */
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 220 18% 20%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary Brand - Modern Blue/Purple Gradient */
+    --primary: 239 84% 67%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 242 90% 76%;
+    --primary-dark: 236 75% 60%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary - Soft Accents */
+    --secondary: 220 20% 97%;
+    --secondary-foreground: 220 18% 20%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted Tones */
+    --muted: 220 20% 97%;
+    --muted-foreground: 220 10% 50%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent - Success Green */
+    --accent: 142 76% 36%;
+    --accent-foreground: 0 0% 100%;
+    --accent-light: 142 76% 46%;
+    
+    /* Success States */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 142 50% 90%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Warning States */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --warning-light: 38 90% 95%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --radius: 0.5rem;
+    /* Borders and Inputs */
+    --border: 220 20% 92%;
+    --input: 220 20% 95%;
+    --ring: 239 84% 67%;
+
+    /* Spacing & Borders */
+    --radius: 0.75rem;
+    --radius-sm: 0.5rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary-light)), hsl(var(--primary-dark)));
+    --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--accent-light)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card-hover)));
+
+    /* Shadows */
+    --shadow-soft: 0 2px 8px -2px hsl(var(--foreground) / 0.1);
+    --shadow-medium: 0 4px 16px -4px hsl(var(--foreground) / 0.15);
+    --shadow-strong: 0 8px 32px -8px hsl(var(--foreground) / 0.2);
+    --shadow-glow: 0 0 20px hsl(var(--primary) / 0.3);
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +136,104 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
   }
+}
+
+/* Custom Components */
+@layer components {
+  /* Habit Card Styles */
+  .habit-card {
+    @apply bg-gradient-to-br from-card to-card-hover rounded-xl border border-border/50 
+           shadow-soft hover:shadow-medium transition-all duration-300 
+           hover:scale-[1.02] hover:border-primary/20;
+  }
+
+  .habit-card-completed {
+    @apply bg-gradient-to-br from-success-light to-success/10 border-success/30 
+           shadow-glow;
+  }
+
+  /* Gradient Button Variants */
+  .btn-gradient {
+    @apply bg-gradient-to-r from-primary-light to-primary-dark text-primary-foreground 
+           shadow-medium hover:shadow-strong transition-all duration-300 
+           hover:scale-105 active:scale-95;
+  }
+
+  /* Streak Counter */
+  .streak-badge {
+    @apply bg-gradient-to-r from-success to-accent-light text-success-foreground 
+           rounded-full px-3 py-1 text-sm font-semibold shadow-soft;
+  }
+
+  /* Progress Ring */
+  .progress-ring {
+    @apply transform transition-transform duration-500 ease-out;
+  }
+
+  /* Smooth Animations */
+  .animate-slide-up {
+    @apply animate-[slideUp_0.4s_ease-out];
+  }
+
+  .animate-fade-in-up {
+    @apply animate-[fadeInUp_0.6s_ease-out];
+  }
+
+  .animate-bounce-soft {
+    @apply animate-[bounceSoft_0.8s_ease-out];
+  }
+}
+
+/* Custom Keyframes */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceSoft {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-muted;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/30 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/50;
 }
