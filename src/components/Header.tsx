@@ -13,9 +13,10 @@ import {
 
 interface HeaderProps {
   onCalendarClick?: () => void;
+  onSettingsClick?: () => void;
 }
 
-export const Header = ({ onCalendarClick }: HeaderProps) => {
+export const Header = ({ onCalendarClick, onSettingsClick }: HeaderProps) => {
   const [notifications] = useState(2);
   
   return (
@@ -69,7 +70,7 @@ export const Header = ({ onCalendarClick }: HeaderProps) => {
             </Button>
 
             {/* Settings */}
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={onSettingsClick}>
               <Settings className="w-4 h-4" />
             </Button>
 
