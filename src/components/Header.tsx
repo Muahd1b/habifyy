@@ -11,7 +11,11 @@ import {
   Crown
 } from 'lucide-react';
 
-export const Header = () => {
+interface HeaderProps {
+  onCalendarClick?: () => void;
+}
+
+export const Header = ({ onCalendarClick }: HeaderProps) => {
   const [notifications] = useState(2);
   
   return (
@@ -33,7 +37,12 @@ export const Header = () => {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center gap-6">
-            <Button variant="ghost" size="sm" className="gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="gap-2"
+              onClick={onCalendarClick}
+            >
               <Calendar className="w-4 h-4" />
               Calendar
             </Button>

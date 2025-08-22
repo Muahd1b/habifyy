@@ -6,6 +6,7 @@ import { HabitCard } from '@/components/HabitCard';
 import { HabitForm } from '@/components/HabitForm';
 import { StatsOverview } from '@/components/StatsOverview';
 import { Header } from '@/components/Header';
+import { HabitCalendar } from '@/components/HabitCalendar';
 
 export interface Habit {
   id: string;
@@ -63,6 +64,7 @@ const Index = () => {
   ]);
   
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
 
   const handleAddHabit = (newHabit: Omit<Habit, 'id' | 'completed' | 'currentStreak' | 'longestStreak' | 'completedToday' | 'createdAt'>) => {
     const habit: Habit = {
@@ -114,7 +116,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header onCalendarClick={() => setShowCalendar(true)} />
       
       <main className="container mx-auto px-4 py-8 space-y-8">
         {/* Welcome Section */}
@@ -201,6 +203,14 @@ const Index = () => {
         <HabitForm 
           onSubmit={handleAddHabit}
           onCancel={() => setShowAddForm(false)}
+        />
+      )}
+
+      {/* Calendar Modal */}
+      {showCalendar && (
+        <HabitCalendar 
+          habits={habits}
+          onClose={() => setShowCalendar(false)}
         />
       )}
     </div>
