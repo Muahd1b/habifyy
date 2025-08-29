@@ -8,6 +8,7 @@ import { StatsOverview } from '@/components/StatsOverview';
 import { Header } from '@/components/Header';
 import { HabitCalendar } from '@/components/HabitCalendar';
 import { Settings } from '@/components/Settings';
+import Community from '@/components/Community';
 
 export interface Habit {
   id: string;
@@ -67,6 +68,7 @@ const Index = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showCommunity, setShowCommunity] = useState(false);
 
   const handleAddHabit = (newHabit: Omit<Habit, 'id' | 'completed' | 'currentStreak' | 'longestStreak' | 'completedToday' | 'createdAt'>) => {
     const habit: Habit = {
@@ -121,6 +123,7 @@ const Index = () => {
       <Header 
         onCalendarClick={() => setShowCalendar(true)} 
         onSettingsClick={() => setShowSettings(true)}
+        onCommunityClick={() => setShowCommunity(true)}
       />
       
       <main className="container mx-auto px-4 py-8 space-y-8">
@@ -223,6 +226,13 @@ const Index = () => {
       {showSettings && (
         <Settings 
           onClose={() => setShowSettings(false)}
+        />
+      )}
+
+      {/* Community Modal */}
+      {showCommunity && (
+        <Community 
+          onClose={() => setShowCommunity(false)}
         />
       )}
     </div>

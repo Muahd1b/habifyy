@@ -9,7 +9,8 @@ import {
   MessageSquare,
   Calendar,
   ChevronRight,
-  Zap
+  Zap,
+  X
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,7 +24,11 @@ import MarketplaceSection from './community/MarketplaceSection';
 import AchievementsSection from './community/AchievementsSection';
 import MapSection from './community/MapSection';
 
-const Community = () => {
+interface CommunityProps {
+  onClose: () => void;
+}
+
+const Community = ({ onClose }: CommunityProps) => {
   const { 
     profile, 
     friends, 
@@ -224,6 +229,9 @@ const Community = () => {
             <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground font-semibold">
               {profile?.display_name?.[0] || profile?.username?.[0] || 'U'}
             </div>
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 

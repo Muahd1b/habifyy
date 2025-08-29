@@ -14,9 +14,10 @@ import {
 interface HeaderProps {
   onCalendarClick?: () => void;
   onSettingsClick?: () => void;
+  onCommunityClick?: () => void;
 }
 
-export const Header = ({ onCalendarClick, onSettingsClick }: HeaderProps) => {
+export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick }: HeaderProps) => {
   const [notifications] = useState(2);
   
   return (
@@ -47,7 +48,12 @@ export const Header = ({ onCalendarClick, onSettingsClick }: HeaderProps) => {
               <Calendar className="w-4 h-4" />
               Calendar
             </Button>
-            <Button variant="ghost" size="sm" className="gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="gap-2"
+              onClick={onCommunityClick}
+            >
               <Users className="w-4 h-4" />
               Community
             </Button>
