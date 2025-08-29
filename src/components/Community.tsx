@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { useCommunity } from '@/hooks/useCommunity';
 import FriendsSection from './community/FriendsSection';
 import CompetitionsSection from './community/CompetitionsSection';
@@ -26,9 +27,10 @@ import MapSection from './community/MapSection';
 
 interface CommunityProps {
   onClose: () => void;
+  open: boolean;
 }
 
-const Community = ({ onClose }: CommunityProps) => {
+const Community = ({ onClose, open }: CommunityProps) => {
   const { 
     profile, 
     friends, 
@@ -44,20 +46,34 @@ const Community = ({ onClose }: CommunityProps) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5 p-6">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <Skeleton className="h-12 w-64" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-32" />
-            ))}
+      <Dialog open={open} onOpenChange={onClose}>
+        <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Users className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold">Community</h1>
+                </div>
+              </div>
+            </div>
+          </DialogHeader>
+          <div className="space-y-6">
+            <Skeleton className="h-12 w-64" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="h-32" />
+              ))}
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <Skeleton className="h-96 lg:col-span-2" />
+              <Skeleton className="h-96" />
+            </div>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Skeleton className="h-96 lg:col-span-2" />
-            <Skeleton className="h-96" />
-          </div>
-        </div>
-      </div>
+        </DialogContent>
+      </Dialog>
     );
   }
 
@@ -213,83 +229,82 @@ const Community = ({ onClose }: CommunityProps) => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5">
-      <div className="max-w-7xl mx-auto p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">Community</h1>
-            <p className="text-muted-foreground">Connect, compete, and grow together</p>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <Badge variant="secondary" className="px-3 py-1">
-              Level {profile?.level || 1}
-            </Badge>
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground font-semibold">
-              {profile?.display_name?.[0] || profile?.username?.[0] || 'U'}
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Community</h1>
+              <p className="text-muted-foreground">Connect, compete, and grow together</p>
             </div>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
+            
+            <div className="flex items-center gap-4">
+              <Badge variant="secondary" className="px-3 py-1">
+                Level {profile?.level || 1}
+              </Badge>
+              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground font-semibold">
+                {profile?.display_name?.[0] || profile?.username?.[0] || 'U'}
+              </div>
+            </div>
           </div>
+
+          {/* Navigation Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList className="grid w-full grid-cols-6">
+              <TabsTrigger value="overview" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Overview
+              </TabsTrigger>
+              <TabsTrigger value="friends" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Friends
+              </TabsTrigger>
+              <TabsTrigger value="competitions" className="flex items-center gap-2">
+                <Trophy className="h-4 w-4" />
+                Competitions
+              </TabsTrigger>
+              <TabsTrigger value="marketplace" className="flex items-center gap-2">
+                <ShoppingBag className="h-4 w-4" />
+                Marketplace
+              </TabsTrigger>
+              <TabsTrigger value="achievements" className="flex items-center gap-2">
+                <Award className="h-4 w-4" />
+                Achievements
+              </TabsTrigger>
+              <TabsTrigger value="map" className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                Map
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview" className="space-y-6">
+              {renderOverview()}
+            </TabsContent>
+
+            <TabsContent value="friends">
+              <FriendsSection />
+            </TabsContent>
+
+            <TabsContent value="competitions">
+              <CompetitionsSection />
+            </TabsContent>
+
+            <TabsContent value="marketplace">
+              <MarketplaceSection />
+            </TabsContent>
+
+            <TabsContent value="achievements">
+              <AchievementsSection />
+            </TabsContent>
+
+            <TabsContent value="map">
+              <MapSection />
+            </TabsContent>
+          </Tabs>
         </div>
-
-        {/* Navigation Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="friends" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Friends
-            </TabsTrigger>
-            <TabsTrigger value="competitions" className="flex items-center gap-2">
-              <Trophy className="h-4 w-4" />
-              Competitions
-            </TabsTrigger>
-            <TabsTrigger value="marketplace" className="flex items-center gap-2">
-              <ShoppingBag className="h-4 w-4" />
-              Marketplace
-            </TabsTrigger>
-            <TabsTrigger value="achievements" className="flex items-center gap-2">
-              <Award className="h-4 w-4" />
-              Achievements
-            </TabsTrigger>
-            <TabsTrigger value="map" className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              Map
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-6">
-            {renderOverview()}
-          </TabsContent>
-
-          <TabsContent value="friends">
-            <FriendsSection />
-          </TabsContent>
-
-          <TabsContent value="competitions">
-            <CompetitionsSection />
-          </TabsContent>
-
-          <TabsContent value="marketplace">
-            <MarketplaceSection />
-          </TabsContent>
-
-          <TabsContent value="achievements">
-            <AchievementsSection />
-          </TabsContent>
-
-          <TabsContent value="map">
-            <MapSection />
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

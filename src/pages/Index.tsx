@@ -232,6 +232,7 @@ const Index = () => {
       {/* Community Modal */}
       {showCommunity && (
         <Community 
+          open={showCommunity}
           onClose={() => setShowCommunity(false)}
         />
       )}
