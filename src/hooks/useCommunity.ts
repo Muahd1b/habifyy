@@ -96,7 +96,7 @@ export const useCommunity = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setMarketplaceItems(data || []);
+      setMarketplaceItems((data || []) as MarketplaceItem[]);
     } catch (error: any) {
       console.error('Error fetching marketplace items:', error);
     }
@@ -110,7 +110,7 @@ export const useCommunity = () => {
         .order('points_reward', { ascending: false });
 
       if (error) throw error;
-      setAchievements(data || []);
+      setAchievements((data || []) as Achievement[]);
     } catch (error: any) {
       console.error('Error fetching achievements:', error);
     }
@@ -131,7 +131,7 @@ export const useCommunity = () => {
         .order('earned_at', { ascending: false });
 
       if (error) throw error;
-      setUserAchievements(data || []);
+      setUserAchievements((data || []) as UserAchievement[]);
     } catch (error: any) {
       console.error('Error fetching user achievements:', error);
     }
@@ -143,14 +143,14 @@ export const useCommunity = () => {
         .from('activity_feed')
         .select(`
           *,
-          profile:profiles(*)
+          profiles!activity_feed_user_id_fkey(*)
         `)
         .eq('is_public', true)
         .order('created_at', { ascending: false })
         .limit(20);
 
       if (error) throw error;
-      setActivityFeed(data || []);
+      setActivityFeed((data || []) as ActivityFeed[]);
       setLoading(false);
     } catch (error: any) {
       console.error('Error fetching activity feed:', error);
