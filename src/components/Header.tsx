@@ -8,16 +8,18 @@ import {
   User, 
   Calendar,
   Users,
-  Crown
+  Crown,
+  TrendingUp
 } from 'lucide-react';
 
 interface HeaderProps {
   onCalendarClick?: () => void;
   onSettingsClick?: () => void;
   onCommunityClick?: () => void;
+  onAnalyticsClick?: () => void;
 }
 
-export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick }: HeaderProps) => {
+export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onAnalyticsClick }: HeaderProps) => {
   const [notifications] = useState(2);
   
   return (
@@ -56,6 +58,15 @@ export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick }: H
             >
               <Users className="w-4 h-4" />
               Community
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="gap-2"
+              onClick={onAnalyticsClick}
+            >
+              <TrendingUp className="w-4 h-4" />
+              Analytics
             </Button>
             <Button variant="ghost" size="sm" className="gap-2 text-warning">
               <Crown className="w-4 h-4" />

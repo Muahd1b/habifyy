@@ -258,6 +258,83 @@ export type Database = {
         }
         Relationships: []
       }
+      habit_completions: {
+        Row: {
+          completion_date: string
+          created_at: string
+          habit_id: string
+          id: string
+          notes: string | null
+          progress: number
+          user_id: string
+        }
+        Insert: {
+          completion_date?: string
+          created_at?: string
+          habit_id: string
+          id?: string
+          notes?: string | null
+          progress?: number
+          user_id: string
+        }
+        Update: {
+          completion_date?: string
+          created_at?: string
+          habit_id?: string
+          id?: string
+          notes?: string | null
+          progress?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "habit_completions_habit_id_fkey"
+            columns: ["habit_id"]
+            isOneToOne: false
+            referencedRelation: "habits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      habits: {
+        Row: {
+          category: string | null
+          color: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          target: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          color?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          target?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          color?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          target?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       marketplace_items: {
         Row: {
           category: string
