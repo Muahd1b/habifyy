@@ -231,6 +231,27 @@ export type Database = {
         }
         Relationships: []
       }
+      followers: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
       friends: {
         Row: {
           created_at: string
@@ -405,9 +426,11 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          cover_image_url: string | null
           created_at: string
           display_name: string | null
           id: string
+          is_verified: boolean | null
           latitude: number | null
           level: number | null
           location: string | null
@@ -415,16 +438,22 @@ export type Database = {
           points: number | null
           privacy_location: boolean | null
           privacy_profile: boolean | null
+          status: string | null
+          theme: string | null
+          timezone: string | null
           updated_at: string
           user_id: string
           username: string | null
+          website: string | null
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          cover_image_url?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
+          is_verified?: boolean | null
           latitude?: number | null
           level?: number | null
           location?: string | null
@@ -432,16 +461,22 @@ export type Database = {
           points?: number | null
           privacy_location?: boolean | null
           privacy_profile?: boolean | null
+          status?: string | null
+          theme?: string | null
+          timezone?: string | null
           updated_at?: string
           user_id: string
           username?: string | null
+          website?: string | null
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          cover_image_url?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
+          is_verified?: boolean | null
           latitude?: number | null
           level?: number | null
           location?: string | null
@@ -449,9 +484,46 @@ export type Database = {
           points?: number | null
           privacy_location?: boolean | null
           privacy_profile?: boolean | null
+          status?: string | null
+          theme?: string | null
+          timezone?: string | null
           updated_at?: string
           user_id?: string
           username?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      social_links: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          is_verified: boolean | null
+          platform: string
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          is_verified?: boolean | null
+          platform: string
+          updated_at?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          is_verified?: boolean | null
+          platform?: string
+          updated_at?: string
+          url?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -515,6 +587,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_records: {
+        Row: {
+          achieved_at: string
+          category: string
+          created_at: string
+          habit_id: string | null
+          id: string
+          record_type: string
+          record_value: number
+          user_id: string
+        }
+        Insert: {
+          achieved_at?: string
+          category: string
+          created_at?: string
+          habit_id?: string | null
+          id?: string
+          record_type: string
+          record_value: number
+          user_id: string
+        }
+        Update: {
+          achieved_at?: string
+          category?: string
+          created_at?: string
+          habit_id?: string | null
+          id?: string
+          record_type?: string
+          record_value?: number
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {

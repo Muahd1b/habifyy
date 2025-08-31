@@ -17,9 +17,10 @@ interface HeaderProps {
   onSettingsClick?: () => void;
   onCommunityClick?: () => void;
   onAnalyticsClick?: () => void;
+  onProfileClick?: () => void;
 }
 
-export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onAnalyticsClick }: HeaderProps) => {
+export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onAnalyticsClick, onProfileClick }: HeaderProps) => {
   const [notifications] = useState(2);
   
   return (
@@ -92,7 +93,7 @@ export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onA
             </Button>
 
             {/* Profile */}
-            <Button variant="outline" size="sm" className="gap-2">
+            <Button variant="outline" size="sm" className="gap-2" onClick={onProfileClick}>
               <div className="w-6 h-6 rounded-full bg-gradient-primary flex items-center justify-center">
                 <User className="w-3 h-3 text-primary-foreground" />
               </div>

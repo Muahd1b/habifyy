@@ -10,6 +10,7 @@ import { HabitCalendar } from '@/components/HabitCalendar';
 import { Settings } from '@/components/Settings';
 import Community from '@/components/Community';
 import { Analytics } from '@/components/Analytics';
+import { ProfileModal } from '@/components/ProfileModal';
 
 export interface Habit {
   id: string;
@@ -71,6 +72,7 @@ const Index = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showCommunity, setShowCommunity] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   const handleAddHabit = (newHabit: Omit<Habit, 'id' | 'completed' | 'currentStreak' | 'longestStreak' | 'completedToday' | 'createdAt'>) => {
     const habit: Habit = {
@@ -127,6 +129,7 @@ const Index = () => {
         onSettingsClick={() => setShowSettings(true)}
         onCommunityClick={() => setShowCommunity(true)}
         onAnalyticsClick={() => setShowAnalytics(true)}
+        onProfileClick={() => setShowProfile(true)}
       />
       
       <main className="container mx-auto px-4 py-8 space-y-8">
@@ -235,8 +238,16 @@ const Index = () => {
       {/* Community Modal */}
       {showCommunity && (
         <Community 
-          open={showCommunity}
-          onClose={() => setShowCommunity(false)}
+          open={showCommunity} 
+          onClose={() => setShowCommunity(false)} 
+        />
+      )}
+
+      {/* Profile Modal */}
+      {showProfile && (
+        <ProfileModal 
+          open={showProfile} 
+          onClose={() => setShowProfile(false)} 
         />
       )}
 
