@@ -12,16 +12,21 @@ import {
   Smartphone, 
   ChevronRight,
   Check,
-  X
+  X,
+  LogOut
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 interface SettingsProps {
   onClose: () => void;
 }
 
 export const Settings = ({ onClose }: SettingsProps) => {
+  const { signOut } = useAuth();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('profile');
   const [notifications, setNotifications] = useState({
     habits: true,
@@ -36,6 +41,23 @@ export const Settings = ({ onClose }: SettingsProps) => {
   });
   const [theme, setTheme] = useState('light');
   const [isPremium, setIsPremium] = useState(false);
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to sign out. Please try again.",
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Signed out",
+        description: "You've been successfully signed out.",
+      });
+      onClose();
+    }
+  };
 
   const ToggleSwitch = ({ enabled, onChange, label }: { enabled: boolean; onChange: () => void; label: string }) => (
     <div className="flex items-center justify-between py-3">
@@ -122,6 +144,16 @@ export const Settings = ({ onClose }: SettingsProps) => {
             <span className="text-foreground font-medium">Backup & Sync</span>
             <ChevronRight size={18} className="text-muted-foreground" />
           </button>
+          <Button 
+            variant="outline" 
+            className="w-full justify-between" 
+            onClick={handleSignOut}
+          >
+            <span className="flex items-center gap-2">
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </span>
+          </Button>
           <button className="flex items-center justify-between w-full py-3 text-left text-destructive hover:bg-destructive/10 rounded-lg px-2 transition-colors">
             <span className="font-medium">Delete Account</span>
             <ChevronRight size={18} className="text-destructive/70" />
