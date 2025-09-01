@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import { NotificationCenter } from './NotificationCenter';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface HeaderProps {
   onCalendarClick?: () => void;
@@ -25,6 +26,7 @@ interface HeaderProps {
 export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onAnalyticsClick, onProfileClick }: HeaderProps) => {
   const { stats } = useNotifications();
   const [isNotificationCenterOpen, setIsNotificationCenterOpen] = useState(false);
+  const isMobile = useIsMobile();
   
   return (
     <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-40">
@@ -43,40 +45,42 @@ export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onA
             </div>
           </div>
 
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="gap-2"
-              onClick={onCalendarClick}
-            >
-              <Calendar className="w-4 h-4" />
-              Calendar
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="gap-2"
-              onClick={onCommunityClick}
-            >
-              <Users className="w-4 h-4" />
-              Community
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="gap-2"
-              onClick={onAnalyticsClick}
-            >
-              <TrendingUp className="w-4 h-4" />
-              Analytics
-            </Button>
-            <Button variant="ghost" size="sm" className="gap-2 text-warning">
-              <Crown className="w-4 h-4" />
-              Premium
-            </Button>
-          </nav>
+          {/* Desktop Navigation - Hidden on Mobile */}
+          {!isMobile && (
+            <nav className="flex items-center gap-6">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="gap-2"
+                onClick={onCalendarClick}
+              >
+                <Calendar className="w-4 h-4" />
+                Calendar
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="gap-2"
+                onClick={onCommunityClick}
+              >
+                <Users className="w-4 h-4" />
+                Community
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="gap-2"
+                onClick={onAnalyticsClick}
+              >
+                <TrendingUp className="w-4 h-4" />
+                Analytics
+              </Button>
+              <Button variant="ghost" size="sm" className="gap-2 text-warning">
+                <Crown className="w-4 h-4" />
+                Premium
+              </Button>
+            </nav>
+          )}
 
           {/* Actions */}
           <div className="flex items-center gap-2">
@@ -95,10 +99,12 @@ export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onA
               )}
             </Button>
 
-            {/* Settings */}
-            <Button variant="ghost" size="sm" onClick={onSettingsClick}>
-              <Settings className="w-4 h-4" />
-            </Button>
+            {/* Settings - Hidden on Mobile (available in bottom nav) */}
+            {!isMobile && (
+              <Button variant="ghost" size="sm" onClick={onSettingsClick}>
+                <Settings className="w-4 h-4" />
+              </Button>
+            )}
 
             {/* Profile */}
             <Button variant="outline" size="sm" className="gap-2" onClick={onProfileClick}>

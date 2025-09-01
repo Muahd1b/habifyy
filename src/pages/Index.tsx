@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Header } from "@/components/Header";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { HabitCalendar } from "@/components/HabitCalendar";
 import { StatsOverview } from "@/components/StatsOverview";
 import Community from "@/components/Community";
@@ -8,6 +9,7 @@ import { Settings } from "@/components/Settings";
 import { ProfileModal } from "@/components/ProfileModal";
 import { Auth } from "@/components/Auth";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Plus, Target, Flame, Trophy, TrendingUp } from 'lucide-react';
@@ -32,7 +34,8 @@ const Index = () => {
   console.log("Index component rendering");
   const { user, loading, isAuthenticated } = useAuth();
   console.log("Auth state:", { user: !!user, loading, isAuthenticated });
-  const [activeView, setActiveView] = useState("calendar");
+  const isMobile = useIsMobile();
+  const [activeView, setActiveView] = useState("home");
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   
   const [habits, setHabits] = useState<Habit[]>([
@@ -150,11 +153,11 @@ const Index = () => {
           </div>
         );
       case "community":
-        return <Community open={true} onClose={() => setActiveView("calendar")} />;
+        return <Community open={true} onClose={() => setActiveView("home")} />;
       case "analytics":
-        return <Analytics open={true} onClose={() => setActiveView("calendar")} />;
+        return <Analytics open={true} onClose={() => setActiveView("home")} />;
       case "settings":
-        return <Settings onClose={() => setActiveView("calendar")} />;
+        return <Settings onClose={() => setActiveView("home")} />;
       default:
         return (
           <main className="container mx-auto px-4 py-8 space-y-8">
@@ -241,7 +244,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-background ${isMobile ? 'pb-16' : ''}`}>
       <Header 
         onCalendarClick={() => setActiveView("calendar")} 
         onSettingsClick={() => setActiveView("settings")}
@@ -251,6 +254,13 @@ const Index = () => {
       />
       
       {renderActiveView()}
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav 
+        activeView={activeView}
+        onViewChange={setActiveView}
+        onSettingsClick={() => setActiveView("settings")}
+      />
 
       {/* Add Habit Form Modal */}
       {showAddForm && (
