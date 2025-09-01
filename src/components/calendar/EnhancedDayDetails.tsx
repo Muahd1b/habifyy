@@ -21,11 +21,11 @@ import {
   Flame
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { Habit } from '@/pages/Index';
+import { type HabitWithProgress } from '@/hooks/useHabits';
 
 interface EnhancedDayDetailsProps {
   date: Date;
-  habits: Habit[];
+  habits: HabitWithProgress[];
   completedHabits: Array<{
     habitId: string;
     progress: number;

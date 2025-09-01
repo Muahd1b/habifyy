@@ -5,14 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { X, Calendar as CalendarIcon, Flame, Target, Plus, CheckCircle2 } from 'lucide-react';
 import { format, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, subDays } from 'date-fns';
-import type { Habit } from '@/pages/Index';
+import type { HabitWithProgress } from '@/hooks/useHabits';
 import { CalendarToolbar } from './calendar/CalendarToolbar';
 import { DayContextMenu } from './calendar/DayContextMenu';
 import { HabitDayIndicators } from './calendar/HabitDayIndicators';
 import { EnhancedDayDetails } from './calendar/EnhancedDayDetails';
 
 interface HabitCalendarProps {
-  habits: Habit[];
+  habits: HabitWithProgress[];
   onClose: () => void;
   onAddHabit: () => void;
   onEditHabit: (habitId: string) => void;
@@ -66,15 +66,19 @@ export const HabitCalendar = ({
     const days = eachDayOfInterval({ start, end });
 
     return days.map(date => {
+      const dateStr = format(date, 'yyyy-MM-dd');
       const dayHabits = habits.map(habit => {
-        const isCompleted = habit.lastCompleted && isSameDay(habit.lastCompleted, date);
+        // For now, use today's completion status for all dates
+        // This should be replaced with actual completion data from the database
+        const isToday = isSameDay(date, new Date());
+        const isCompleted = isToday && habit.completedToday;
         const progress = isCompleted ? habit.completed : 0;
         
         return {
           id: habit.id,
           name: habit.name,
           color: habit.color,
-          completed: isCompleted || false,
+          completed: isCompleted,
           progress: progress,
           target: habit.target
         };

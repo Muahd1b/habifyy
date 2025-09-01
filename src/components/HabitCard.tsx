@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Flame, Target, Plus, Minus, CheckCircle2 } from 'lucide-react';
-import { Habit } from '@/pages/Index';
+import { type HabitWithProgress } from '@/hooks/useHabits';
 import { cn } from '@/lib/utils';
 
 interface HabitCardProps {
-  habit: Habit;
+  habit: HabitWithProgress;
   onProgressUpdate: (habitId: string, progress: number) => void;
 }
 

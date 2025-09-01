@@ -8,7 +8,13 @@ import { X, Plus } from 'lucide-react';
 import { Habit } from '@/pages/Index';
 
 interface HabitFormProps {
-  onSubmit: (habit: Omit<Habit, 'id' | 'completed' | 'currentStreak' | 'longestStreak' | 'completedToday' | 'createdAt'>) => void;
+  onSubmit: (habit: {
+    name: string;
+    description?: string;
+    color: string;
+    target: number;
+    category?: string;
+  }) => void;
   onCancel: () => void;
 }
 

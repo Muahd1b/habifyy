@@ -16,20 +16,11 @@ import { Card } from '@/components/ui/card';
 import { Plus, Target, Flame, Trophy, TrendingUp } from 'lucide-react';
 import { HabitCard } from '@/components/HabitCard';
 import { HabitForm } from '@/components/HabitForm';
+import { useHabits, type HabitWithProgress } from '@/hooks/useHabits';
+import { useHabitCompletions } from '@/hooks/useHabitCompletions';
 
-export interface Habit {
-  id: string;
-  name: string;
-  description?: string;
-  color: string;
-  target: number;
-  completed: number;
-  currentStreak: number;
-  longestStreak: number;
-  completedToday: boolean;
-  lastCompleted?: Date;
-  createdAt: Date;
-}
+// Re-export for compatibility with existing components
+export interface Habit extends HabitWithProgress {}
 
 const Index = () => {
   console.log("Index component rendering");
@@ -39,52 +30,11 @@ const Index = () => {
   const navigate = useNavigate();
   const [activeView, setActiveView] = useState("home");
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  
-  const [habits, setHabits] = useState<Habit[]>([
-    {
-      id: '1',
-      name: 'Morning Meditation',
-      description: 'Start each day with 10 minutes of mindfulness',
-      color: 'from-purple-500 to-blue-500',
-      target: 1,
-      completed: 1,
-      currentStreak: 12,
-      longestStreak: 25,
-      completedToday: true,
-      lastCompleted: new Date(),
-      createdAt: new Date('2024-01-01')
-    },
-    {
-      id: '2',
-      name: 'Read 30 Pages',
-      description: 'Expand knowledge through daily reading',
-      color: 'from-green-500 to-emerald-500',
-      target: 30,
-      completed: 25,
-      currentStreak: 8,
-      longestStreak: 15,
-      completedToday: false,
-      createdAt: new Date('2024-01-05')
-    },
-    {
-      id: '3',
-      name: 'Exercise',
-      description: 'Stay active with daily workouts',
-      color: 'from-orange-500 to-red-500',
-      target: 1,
-      completed: 0,
-      currentStreak: 0,
-      longestStreak: 7,
-      completedToday: false,
-      createdAt: new Date('2024-01-10')
-    }
-  ]);
-  
   const [showAddForm, setShowAddForm] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [showCommunity, setShowCommunity] = useState(false);
-  const [showAnalytics, setShowAnalytics] = useState(false);
+  
+  // Use database hooks
+  const { habits, loading: habitsLoading, createHabit, updateHabitProgress, deleteHabit } = useHabits();
+  const { updateHabitCompletion } = useHabitCompletions();
 
   const handleProfileClick = () => {
     setIsProfileModalOpen(true);
@@ -94,51 +44,16 @@ const Index = () => {
     navigate('/premium');
   };
 
-  const handleAddHabit = (newHabit: Omit<Habit, 'id' | 'completed' | 'currentStreak' | 'longestStreak' | 'completedToday' | 'createdAt'>) => {
-    const habit: Habit = {
-      ...newHabit,
-      id: Date.now().toString(),
-      completed: 0,
-      currentStreak: 0,
-      longestStreak: 0,
-      completedToday: false,
-      createdAt: new Date()
-    };
-    setHabits([...habits, habit]);
+  const handleAddHabit = async (newHabit: Omit<Habit, 'id' | 'user_id' | 'is_active' | 'created_at' | 'updated_at' | 'completed' | 'currentStreak' | 'longestStreak' | 'completedToday'>) => {
+    await createHabit(newHabit);
     setShowAddForm(false);
   };
 
-  const handleHabitProgress = (habitId: string, progress: number) => {
-    setHabits(habits.map(habit => {
-      if (habit.id === habitId) {
-        const newCompleted = Math.min(progress, habit.target);
-        const wasCompleted = habit.completedToday;
-        const isNowCompleted = newCompleted >= habit.target;
-        
-        let newCurrentStreak = habit.currentStreak;
-        let newLongestStreak = habit.longestStreak;
-        
-        if (!wasCompleted && isNowCompleted) {
-          newCurrentStreak += 1;
-          newLongestStreak = Math.max(newLongestStreak, newCurrentStreak);
-        } else if (wasCompleted && !isNowCompleted) {
-          newCurrentStreak = Math.max(0, newCurrentStreak - 1);
-        }
-        
-        return {
-          ...habit,
-          completed: newCompleted,
-          completedToday: isNowCompleted,
-          currentStreak: newCurrentStreak,
-          longestStreak: newLongestStreak,
-          lastCompleted: isNowCompleted ? new Date() : habit.lastCompleted
-        };
-      }
-      return habit;
-    }));
+  const handleHabitProgress = async (habitId: string, progress: number) => {
+    await updateHabitProgress(habitId, progress);
   };
 
-  if (loading) {
+  if (loading || habitsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
