@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -11,6 +11,8 @@ import {
   Crown,
   TrendingUp
 } from 'lucide-react';
+import { useNotifications } from '@/hooks/useNotifications';
+import { NotificationCenter } from './NotificationCenter';
 
 interface HeaderProps {
   onCalendarClick?: () => void;
@@ -21,7 +23,8 @@ interface HeaderProps {
 }
 
 export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onAnalyticsClick, onProfileClick }: HeaderProps) => {
-  const [notifications] = useState(2);
+  const { stats } = useNotifications();
+  const [isNotificationCenterOpen, setIsNotificationCenterOpen] = useState(false);
   
   return (
     <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-40">
@@ -78,11 +81,16 @@ export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onA
           {/* Actions */}
           <div className="flex items-center gap-2">
             {/* Notifications */}
-            <Button variant="ghost" size="sm" className="relative">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="relative"
+              onClick={() => setIsNotificationCenterOpen(true)}
+            >
               <Bell className="w-4 h-4" />
-              {notifications > 0 && (
+              {stats.unread > 0 && (
                 <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-destructive text-destructive-foreground">
-                  {notifications}
+                  {stats.unread > 99 ? '99+' : stats.unread}
                 </Badge>
               )}
             </Button>
@@ -102,6 +110,11 @@ export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onA
           </div>
         </div>
       </div>
+      
+      <NotificationCenter 
+        isOpen={isNotificationCenterOpen}
+        onClose={() => setIsNotificationCenterOpen(false)}
+      />
     </header>
   );
 };
