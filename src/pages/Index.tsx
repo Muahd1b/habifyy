@@ -29,7 +29,9 @@ export interface Habit {
 }
 
 const Index = () => {
+  console.log("Index component rendering");
   const { user, loading, isAuthenticated } = useAuth();
+  console.log("Auth state:", { user: !!user, loading, isAuthenticated });
   const [activeView, setActiveView] = useState("calendar");
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   
