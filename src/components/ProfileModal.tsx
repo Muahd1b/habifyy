@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -52,7 +52,16 @@ export const ProfileModal = ({ userId, open, onClose }: ProfileModalProps) => {
 
   // Get current user to determine if this is own profile
   const [currentUser, setCurrentUser] = useState<any>(null);
-  supabase.auth.getUser().then(({ data: { user } }) => setCurrentUser(user));
+  const [authLoading, setAuthLoading] = useState(true);
+  
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUser(user);
+      setAuthLoading(false);
+    };
+    getCurrentUser();
+  }, []);
   
   const targetUserId = userId || currentUser?.id;
   const isOwnProfile = currentUser?.id === targetUserId;
@@ -72,10 +81,13 @@ export const ProfileModal = ({ userId, open, onClose }: ProfileModalProps) => {
     updateProfile,
   } = useProfile(targetUserId);
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <Dialog open={open} onOpenChange={onClose}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Loading Profile</DialogTitle>
+          </DialogHeader>
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
@@ -84,10 +96,13 @@ export const ProfileModal = ({ userId, open, onClose }: ProfileModalProps) => {
     );
   }
 
-  if (!profile) {
+  if (!profile && !authLoading && !loading) {
     return (
       <Dialog open={open} onOpenChange={onClose}>
         <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Profile Not Found</DialogTitle>
+          </DialogHeader>
           <div className="text-center py-8">
             <User className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">Profile not found</h3>
