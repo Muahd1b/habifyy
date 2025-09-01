@@ -217,7 +217,7 @@ export const useHabits = () => {
           progress: progress,
           notes: ''
         }, {
-          onConflict: 'habit_id,user_id,completion_date'
+          onConflict: 'habit_id,completion_date'
         });
 
       if (error) throw error;

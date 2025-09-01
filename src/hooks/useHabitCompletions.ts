@@ -92,7 +92,7 @@ export const useHabitCompletions = () => {
           progress: Math.max(0, progress),
           notes: notes || ''
         }, {
-          onConflict: 'habit_id,user_id,completion_date'
+          onConflict: 'habit_id,completion_date'
         });
 
       if (error) throw error;
