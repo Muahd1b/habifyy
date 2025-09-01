@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Settings as SettingsIcon, 
   User, 
@@ -13,11 +13,18 @@ import {
   ChevronRight,
   Check,
   X,
-  LogOut
+  LogOut,
+  Edit3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
+import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
 import { useToast } from "@/hooks/use-toast";
 
 interface SettingsProps {
@@ -25,15 +32,24 @@ interface SettingsProps {
 }
 
 export const Settings = ({ onClose }: SettingsProps) => {
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('profile');
-  const [notifications, setNotifications] = useState({
-    habits: true,
-    streaks: true,
-    challenges: false,
-    social: true
+  
+  // Profile data
+  const { profile, updateProfile, loading: profileLoading } = useProfile(user?.id);
+  const { preferences, updatePreferences, loading: preferencesLoading } = useNotificationPreferences();
+  
+  // Edit states
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editForm, setEditForm] = useState({
+    display_name: '',
+    bio: '',
+    location: '',
+    website: '',
   });
+
+  // Privacy settings based on profile
   const [privacy, setPrivacy] = useState({
     profilePublic: true,
     showProgress: true,
@@ -41,6 +57,23 @@ export const Settings = ({ onClose }: SettingsProps) => {
   });
   const [theme, setTheme] = useState('light');
   const [isPremium, setIsPremium] = useState(false);
+
+  // Update form when profile loads
+  useEffect(() => {
+    if (profile) {
+      setEditForm({
+        display_name: profile.display_name || '',
+        bio: profile.bio || '',
+        location: profile.location || '',
+        website: profile.website || '',
+      });
+      setPrivacy({
+        profilePublic: !profile.privacy_profile,
+        showProgress: profile.privacy_location || true,
+        allowFriendRequests: true // Add this to profile schema if needed
+      });
+    }
+  }, [profile]);
 
   const handleSignOut = async () => {
     const { error } = await signOut();
@@ -116,23 +149,105 @@ export const Settings = ({ onClose }: SettingsProps) => {
     </div>
   );
 
+  const handleUpdateProfile = async () => {
+    await updateProfile(editForm);
+    setIsEditingProfile(false);
+  };
+
+  const handleUpdatePrivacy = async (updates: Partial<typeof privacy>) => {
+    const newPrivacy = { ...privacy, ...updates };
+    setPrivacy(newPrivacy);
+    
+    // Update profile with privacy settings
+    await updateProfile({
+      privacy_profile: !newPrivacy.profilePublic,
+      privacy_location: !newPrivacy.showProgress,
+    });
+  };
+
   const renderProfileSettings = () => (
     <div className="space-y-4">
-      <SettingsSection title="Profile Information">
-        <div className="flex items-center space-x-4 py-3">
-          <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center text-primary-foreground text-xl font-bold">
-            JD
+      {isEditingProfile ? (
+        <SettingsSection title="Edit Profile">
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="display_name">Display Name</Label>
+              <Input
+                id="display_name"
+                value={editForm.display_name}
+                onChange={(e) => setEditForm({ ...editForm, display_name: e.target.value })}
+                placeholder="Enter your display name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="bio">Bio</Label>
+              <Textarea
+                id="bio"
+                value={editForm.bio}
+                onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
+                placeholder="Tell us about yourself..."
+                rows={3}
+              />
+            </div>
+            <div>
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
+                value={editForm.location}
+                onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                placeholder="Enter your location"
+              />
+            </div>
+            <div>
+              <Label htmlFor="website">Website</Label>
+              <Input
+                id="website"
+                type="url"
+                value={editForm.website}
+                onChange={(e) => setEditForm({ ...editForm, website: e.target.value })}
+                placeholder="https://yourwebsite.com"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleUpdateProfile}>Save Changes</Button>
+              <Button variant="outline" onClick={() => setIsEditingProfile(false)}>
+                Cancel
+              </Button>
+            </div>
           </div>
-          <div className="flex-1">
-            <h4 className="font-semibold text-foreground">John Doe</h4>
-            <p className="text-muted-foreground text-sm">john.doe@email.com</p>
-            <p className="text-primary text-sm font-medium">Member since Jan 2024</p>
+        </SettingsSection>
+      ) : (
+        <SettingsSection title="Profile Information">
+          <div className="flex items-center space-x-4 py-3">
+            <Avatar className="w-16 h-16">
+              <AvatarImage src={profile?.avatar_url || ''} />
+              <AvatarFallback className="text-xl font-bold">
+                {profile?.display_name?.[0] || profile?.username?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <h4 className="font-semibold text-foreground">
+                {profile?.display_name || profile?.username || 'Anonymous User'}
+              </h4>
+              <p className="text-muted-foreground text-sm">{user?.email}</p>
+              <p className="text-primary text-sm font-medium">
+                Member since {new Date(profile?.created_at || user?.created_at || Date.now()).toLocaleDateString()}
+              </p>
+              {profile?.bio && (
+                <p className="text-sm text-muted-foreground mt-1">{profile.bio}</p>
+              )}
+            </div>
+            <Button 
+              variant="ghost" 
+              className="text-primary hover:text-primary-dark"
+              onClick={() => setIsEditingProfile(true)}
+            >
+              <Edit3 className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
           </div>
-          <Button variant="ghost" className="text-primary hover:text-primary-dark">
-            Edit
-          </Button>
-        </div>
-      </SettingsSection>
+        </SettingsSection>
+      )}
 
       <SettingsSection title="Account Settings">
         <div className="space-y-3">
@@ -167,14 +282,18 @@ export const Settings = ({ onClose }: SettingsProps) => {
     <div className="space-y-4">
       <SettingsSection title="Habit Reminders">
         <ToggleSwitch
-          enabled={notifications.habits}
-          onChange={() => setNotifications(prev => ({ ...prev, habits: !prev.habits }))}
+          enabled={preferences?.habit_reminders ?? true}
+          onChange={() => updatePreferences({ habit_reminders: !preferences?.habit_reminders })}
           label="Daily Habit Reminders"
         />
         <div className="border-t border-border pt-3">
           <button className="flex items-center justify-between w-full py-3 text-left hover:bg-muted/50 rounded-lg px-2 transition-colors">
             <span className="text-foreground font-medium">Reminder Times</span>
-            <span className="text-muted-foreground text-sm">9:00 AM, 6:00 PM</span>
+            <span className="text-muted-foreground text-sm">
+              {preferences?.quiet_hours_start && preferences?.quiet_hours_end
+                ? `Quiet: ${preferences.quiet_hours_start} - ${preferences.quiet_hours_end}`
+                : 'Configure times'}
+            </span>
             <ChevronRight size={18} className="text-muted-foreground" />
           </button>
         </div>
@@ -182,31 +301,39 @@ export const Settings = ({ onClose }: SettingsProps) => {
 
       <SettingsSection title="Progress & Social">
         <ToggleSwitch
-          enabled={notifications.streaks}
-          onChange={() => setNotifications(prev => ({ ...prev, streaks: !prev.streaks }))}
+          enabled={preferences?.streak_milestones ?? true}
+          onChange={() => updatePreferences({ streak_milestones: !preferences?.streak_milestones })}
           label="Streak Milestones"
         />
         <ToggleSwitch
-          enabled={notifications.challenges}
-          onChange={() => setNotifications(prev => ({ ...prev, challenges: !prev.challenges }))}
+          enabled={preferences?.competition_updates ?? true}
+          onChange={() => updatePreferences({ competition_updates: !preferences?.competition_updates })}
           label="Challenge Updates"
         />
         <ToggleSwitch
-          enabled={notifications.social}
-          onChange={() => setNotifications(prev => ({ ...prev, social: !prev.social }))}
+          enabled={preferences?.friend_activities ?? true}
+          onChange={() => updatePreferences({ friend_activities: !preferences?.friend_activities })}
           label="Friend Activities"
         />
       </SettingsSection>
 
       <SettingsSection title="Notification Channels">
-        <div className="space-y-3">
+        <ToggleSwitch
+          enabled={preferences?.push_enabled ?? true}
+          onChange={() => updatePreferences({ push_enabled: !preferences?.push_enabled })}
+          label="Push Notifications"
+        />
+        <ToggleSwitch
+          enabled={preferences?.email_enabled ?? true}
+          onChange={() => updatePreferences({ email_enabled: !preferences?.email_enabled })}
+          label="Email Notifications"
+        />
+        <div className="border-t border-border pt-3">
           <div className="flex items-center justify-between py-3">
-            <span className="text-foreground font-medium">Push Notifications</span>
-            <span className="text-success text-sm font-medium">Enabled</span>
-          </div>
-          <div className="flex items-center justify-between py-3">
-            <span className="text-foreground font-medium">Email Notifications</span>
-            <span className="text-muted-foreground text-sm">Weekly Summary</span>
+            <span className="text-foreground font-medium">Timezone</span>
+            <span className="text-muted-foreground text-sm">
+              {preferences?.timezone || 'UTC'}
+            </span>
           </div>
         </div>
       </SettingsSection>
@@ -218,17 +345,17 @@ export const Settings = ({ onClose }: SettingsProps) => {
       <SettingsSection title="Profile Visibility">
         <ToggleSwitch
           enabled={privacy.profilePublic}
-          onChange={() => setPrivacy(prev => ({ ...prev, profilePublic: !prev.profilePublic }))}
+          onChange={() => handleUpdatePrivacy({ profilePublic: !privacy.profilePublic })}
           label="Public Profile"
         />
         <ToggleSwitch
           enabled={privacy.showProgress}
-          onChange={() => setPrivacy(prev => ({ ...prev, showProgress: !prev.showProgress }))}
-          label="Show Progress to Friends"
+          onChange={() => handleUpdatePrivacy({ showProgress: !privacy.showProgress })}
+          label="Show Location to Others"
         />
         <ToggleSwitch
           enabled={privacy.allowFriendRequests}
-          onChange={() => setPrivacy(prev => ({ ...prev, allowFriendRequests: !prev.allowFriendRequests }))}
+          onChange={() => handleUpdatePrivacy({ allowFriendRequests: !privacy.allowFriendRequests })}
           label="Allow Friend Requests"
         />
       </SettingsSection>
