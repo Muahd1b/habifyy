@@ -172,17 +172,25 @@
     @apply transform transition-transform duration-500 ease-out;
   }
 
-  /* Smooth Animations */
-  .animate-slide-up {
-    @apply animate-[slideUp_0.4s_ease-out];
-  }
-
-  .animate-fade-in-up {
-    @apply animate-[fadeInUp_0.6s_ease-out];
+  /* Custom animations for calendar */
+  .animate-scale-in {
+    @apply animate-[scaleIn_0.2s_ease-out];
   }
 
   .animate-bounce-soft {
     @apply animate-[bounceSoft_0.8s_ease-out];
+  }
+
+  /* Calendar day enhancements */
+  .calendar-day-indicator {
+    @apply absolute bottom-0 left-1/2 transform -translate-x-1/2 
+           flex gap-0.5 items-center justify-center;
+  }
+
+  /* Context menu styling */
+  .context-menu {
+    @apply bg-popover border border-border shadow-strong rounded-lg 
+           backdrop-blur-sm animate-scale-in;
   }
 }
 
@@ -218,6 +226,17 @@
   }
   60% {
     transform: translateY(-4px);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 

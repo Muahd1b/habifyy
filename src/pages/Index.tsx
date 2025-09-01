@@ -155,7 +155,13 @@ const Index = () => {
       case "calendar":
         return (
           <div className="container mx-auto px-4 py-8 space-y-8">
-            <HabitCalendar habits={habits} onClose={() => setActiveView("home")} />
+            <HabitCalendar 
+              habits={habits} 
+              onClose={() => setActiveView("home")}
+              onAddHabit={() => setShowAddForm(true)}
+              onEditHabit={(habitId) => console.log('Edit habit:', habitId)}
+              onHabitProgress={handleHabitProgress}
+            />
           </div>
         );
       case "community":
