@@ -5,6 +5,7 @@ import {
   Calendar,
   Users,
   TrendingUp,
+  Crown,
   Settings
 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -14,6 +15,7 @@ interface MobileBottomNavProps {
   activeView: string;
   onViewChange: (view: string) => void;
   onSettingsClick: () => void;
+  onPremiumClick: () => void;
 }
 
 const navItems = [
@@ -42,14 +44,14 @@ const navItems = [
     view: 'analytics'
   },
   {
-    id: 'settings',
-    label: 'Settings',
-    icon: Settings,
-    view: 'settings'
+    id: 'premium',
+    label: 'Premium',
+    icon: Crown,
+    view: 'premium'
   }
 ];
 
-export const MobileBottomNav = ({ activeView, onViewChange, onSettingsClick }: MobileBottomNavProps) => {
+export const MobileBottomNav = ({ activeView, onViewChange, onSettingsClick, onPremiumClick }: MobileBottomNavProps) => {
   const isMobile = useIsMobile();
 
   // Don't render on desktop
@@ -58,6 +60,8 @@ export const MobileBottomNav = ({ activeView, onViewChange, onSettingsClick }: M
   const handleItemClick = (item: typeof navItems[0]) => {
     if (item.id === 'settings') {
       onSettingsClick();
+    } else if (item.id === 'premium') {
+      onPremiumClick();
     } else {
       onViewChange(item.view);
     }
@@ -65,7 +69,7 @@ export const MobileBottomNav = ({ activeView, onViewChange, onSettingsClick }: M
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-border">
-      <div className="flex items-center justify-around h-16 px-2">
+      <div className="flex items-center justify-around h-16 px-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeView === item.view || (activeView === 'home' && item.id === 'home');
@@ -79,12 +83,21 @@ export const MobileBottomNav = ({ activeView, onViewChange, onSettingsClick }: M
                 "flex-1 flex-col h-12 gap-1 text-xs font-medium transition-colors",
                 isActive 
                   ? "text-primary bg-primary/10" 
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
+                item.id === 'premium' && "text-warning hover:text-warning/80"
               )}
               onClick={() => handleItemClick(item)}
             >
-              <Icon className={cn("h-5 w-5", isActive && "text-primary")} />
-              <span className={cn("text-[10px]", isActive && "text-primary font-semibold")}>
+              <Icon className={cn(
+                "h-5 w-5", 
+                isActive && "text-primary",
+                item.id === 'premium' && "text-warning"
+              )} />
+              <span className={cn(
+                "text-[10px]", 
+                isActive && "text-primary font-semibold",
+                item.id === 'premium' && "text-warning font-medium"
+              )}>
                 {item.label}
               </span>
             </Button>

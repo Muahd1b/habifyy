@@ -10,6 +10,7 @@ import { ProfileModal } from "@/components/ProfileModal";
 import { Auth } from "@/components/Auth";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useNavigate } from "react-router-dom";
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Plus, Target, Flame, Trophy, TrendingUp } from 'lucide-react';
@@ -35,6 +36,7 @@ const Index = () => {
   const { user, loading, isAuthenticated } = useAuth();
   console.log("Auth state:", { user: !!user, loading, isAuthenticated });
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const [activeView, setActiveView] = useState("home");
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   
@@ -86,6 +88,10 @@ const Index = () => {
 
   const handleProfileClick = () => {
     setIsProfileModalOpen(true);
+  };
+
+  const handlePremiumClick = () => {
+    navigate('/premium');
   };
 
   const handleAddHabit = (newHabit: Omit<Habit, 'id' | 'completed' | 'currentStreak' | 'longestStreak' | 'completedToday' | 'createdAt'>) => {
@@ -250,6 +256,7 @@ const Index = () => {
         onSettingsClick={() => setActiveView("settings")}
         onCommunityClick={() => setActiveView("community")}
         onAnalyticsClick={() => setActiveView("analytics")}
+        onPremiumClick={handlePremiumClick}
         onProfileClick={handleProfileClick}
       />
       
@@ -260,6 +267,7 @@ const Index = () => {
         activeView={activeView}
         onViewChange={setActiveView}
         onSettingsClick={() => setActiveView("settings")}
+        onPremiumClick={handlePremiumClick}
       />
 
       {/* Add Habit Form Modal */}

@@ -20,10 +20,11 @@ interface HeaderProps {
   onSettingsClick?: () => void;
   onCommunityClick?: () => void;
   onAnalyticsClick?: () => void;
+  onPremiumClick?: () => void;
   onProfileClick?: () => void;
 }
 
-export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onAnalyticsClick, onProfileClick }: HeaderProps) => {
+export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onAnalyticsClick, onPremiumClick, onProfileClick }: HeaderProps) => {
   const { stats } = useNotifications();
   const [isNotificationCenterOpen, setIsNotificationCenterOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -75,7 +76,12 @@ export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onA
                 <TrendingUp className="w-4 h-4" />
                 Analytics
               </Button>
-              <Button variant="ghost" size="sm" className="gap-2 text-warning">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="gap-2 text-warning hover:text-warning/80"
+                onClick={onPremiumClick}
+              >
                 <Crown className="w-4 h-4" />
                 Premium
               </Button>
