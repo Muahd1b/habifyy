@@ -422,6 +422,129 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          competition_updates: boolean | null
+          created_at: string | null
+          email_enabled: boolean | null
+          friend_activities: boolean | null
+          habit_reminders: boolean | null
+          id: string
+          push_enabled: boolean | null
+          quiet_hours_end: string | null
+          quiet_hours_start: string | null
+          streak_milestones: boolean | null
+          timezone: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          competition_updates?: boolean | null
+          created_at?: string | null
+          email_enabled?: boolean | null
+          friend_activities?: boolean | null
+          habit_reminders?: boolean | null
+          id?: string
+          push_enabled?: boolean | null
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          streak_milestones?: boolean | null
+          timezone?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          competition_updates?: boolean | null
+          created_at?: string | null
+          email_enabled?: boolean | null
+          friend_activities?: boolean | null
+          habit_reminders?: boolean | null
+          id?: string
+          push_enabled?: boolean | null
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          streak_milestones?: boolean | null
+          timezone?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notification_templates: {
+        Row: {
+          action_data_schema: Json | null
+          created_at: string | null
+          id: string
+          message_template: string
+          template_key: string
+          title_template: string
+        }
+        Insert: {
+          action_data_schema?: Json | null
+          created_at?: string | null
+          id?: string
+          message_template: string
+          template_key: string
+          title_template: string
+        }
+        Update: {
+          action_data_schema?: Json | null
+          created_at?: string | null
+          id?: string
+          message_template?: string
+          template_key?: string
+          title_template?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          action_data: Json | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          is_delivered: boolean | null
+          is_read: boolean | null
+          message: string
+          notification_type: string
+          priority: string | null
+          scheduled_time: string | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          action_data?: Json | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_delivered?: boolean | null
+          is_read?: boolean | null
+          message: string
+          notification_type: string
+          priority?: string | null
+          scheduled_time?: string | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          action_data?: Json | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_delivered?: boolean | null
+          is_read?: boolean | null
+          message?: string
+          notification_type?: string
+          priority?: string | null
+          scheduled_time?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
