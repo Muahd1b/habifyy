@@ -123,7 +123,7 @@ export const Auth = ({ onSuccess }: AuthProps) => {
           <div className="flex items-center justify-center gap-2 text-primary">
             <Zap className="h-8 w-8" />
             <span className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              Habify
+              Habifyy
             </span>
           </div>
           <div>

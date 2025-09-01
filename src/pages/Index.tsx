@@ -176,7 +176,7 @@ const Index = () => {
             {/* Welcome Section */}
             <section className="text-center space-y-4 animate-fade-in-up">
               <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary via-primary-light to-accent bg-clip-text text-transparent">
-                Habify
+                Habifyy
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 Transform your life, one habit at a time. Track your progress, build streaks, and achieve your goals.

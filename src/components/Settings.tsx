@@ -271,7 +271,7 @@ export const Settings = ({ onClose }: SettingsProps) => {
             </div>
             <Check size={24} />
           </div>
-          <p className="opacity-90">Thank you for supporting Habify!</p>
+          <p className="opacity-90">Thank you for supporting Habifyy!</p>
         </div>
       )}
 
@@ -411,7 +411,7 @@ export const Settings = ({ onClose }: SettingsProps) => {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Settings</h1>
-              <p className="text-muted-foreground">Manage your Habify experience</p>
+              <p className="text-muted-foreground">Manage your Habifyy experience</p>
             </div>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose}>
