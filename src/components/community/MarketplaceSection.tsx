@@ -1,16 +1,47 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Zap, Crown, Palette, Shield, Star, Filter } from 'lucide-react';
+import { ShoppingBag, Zap, Crown, Palette, Shield, Star, Filter, Check } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCommunity } from '@/hooks/useCommunity';
+import { useToast } from '@/hooks/use-toast';
 
 const MarketplaceSection = () => {
-  const { marketplaceItems, profile, purchaseItem } = useCommunity();
+  const { marketplaceItems, profile, purchaseItem, loading } = useCommunity();
+  const { toast } = useToast();
   const [sortBy, setSortBy] = useState('featured');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [purchasing, setPurchasing] = useState<string | null>(null);
+
+  const handlePurchase = async (itemId: string, itemName: string, points: number) => {
+    if (!profile || profile.points < points) {
+      toast({
+        title: "Insufficient points",
+        description: `You need ${points} points to purchase this item.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setPurchasing(itemId);
+    try {
+      await purchaseItem(itemId, points);
+      toast({
+        title: "Purchase successful!",
+        description: `You've purchased "${itemName}" for ${points} points.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Purchase failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setPurchasing(null);
+    }
+  };
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -101,10 +132,17 @@ const MarketplaceSection = () => {
         
         <Button 
           className="w-full"
-          disabled={!profile || profile.points < item.price_points}
-          onClick={() => purchaseItem(item.id, item.price_points)}
+          disabled={
+            loading || 
+            purchasing === item.id || 
+            !profile || 
+            profile.points < item.price_points
+          }
+          onClick={() => handlePurchase(item.id, item.name, item.price_points)}
         >
-          {!profile || profile.points < item.price_points ? (
+          {purchasing === item.id ? (
+            'Purchasing...'
+          ) : !profile || profile.points < item.price_points ? (
             'Insufficient Points'
           ) : (
             <>

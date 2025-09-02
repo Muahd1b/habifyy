@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trophy, Calendar, Users, Clock, MapPin, Target, Crown, Medal } from 'lucide-react';
+import { Trophy, Calendar, Users, Clock, MapPin, Target, Crown, Medal, Star } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,9 +7,32 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useCommunity } from '@/hooks/useCommunity';
+import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
 
 const CompetitionsSection = () => {
-  const { competitions, joinCompetition } = useCommunity();
+  const { competitions, joinCompetition, loading } = useCommunity();
+  const { toast } = useToast();
+  const [joiningCompetition, setJoiningCompetition] = useState<string | null>(null);
+
+  const handleJoinCompetition = async (competitionId: string, title: string) => {
+    setJoiningCompetition(competitionId);
+    try {
+      await joinCompetition(competitionId);
+      toast({
+        title: "Joined competition!",
+        description: `You've successfully joined "${title}".`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to join competition. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setJoiningCompetition(null);
+    }
+  };
 
   const activeCompetitions = competitions.filter(c => c.status === 'active');
   const upcomingCompetitions = competitions.filter(c => c.status === 'upcoming');
@@ -85,15 +108,21 @@ const CompetitionsSection = () => {
         {showJoinButton && competition.status === 'active' && (
           <Button 
             className="w-full"
-            onClick={() => joinCompetition(competition.id)}
+            onClick={() => handleJoinCompetition(competition.id, competition.title)}
+            disabled={loading || joiningCompetition === competition.id}
           >
-            Join Competition
+            {joiningCompetition === competition.id ? 'Joining...' : 'Join Competition'}
           </Button>
         )}
 
-        {competition.status === 'upcoming' && (
-          <Button variant="outline" className="w-full" disabled>
-            Starts {new Date(competition.start_date).toLocaleDateString()}
+        {showJoinButton && competition.status === 'upcoming' && (
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => handleJoinCompetition(competition.id, competition.title)}
+            disabled={loading || joiningCompetition === competition.id}
+          >
+            {joiningCompetition === competition.id ? 'Joining...' : `Join Competition`}
           </Button>
         )}
       </CardContent>

@@ -1,15 +1,33 @@
 import React, { useState } from 'react';
-import { Users, Search, UserPlus, MessageCircle, Crown, Zap } from 'lucide-react';
+import { Users, Search, UserPlus, MessageCircle, Crown, Zap, Check, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useCommunity } from '@/hooks/useCommunity';
+import { useToast } from '@/hooks/use-toast';
 
 const FriendsSection = () => {
-  const { friends, profile, sendFriendRequest } = useCommunity();
+  const { friends, profile, sendFriendRequest, loading } = useCommunity();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSendFriendRequest = async (friendId: string, friendName: string) => {
+    try {
+      await sendFriendRequest(friendId);
+      toast({
+        title: "Friend request sent!",
+        description: `Your request to ${friendName} has been sent.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send friend request. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const filteredFriends = friends.filter(friend => 
     friend.profile?.display_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -194,7 +212,8 @@ const FriendsSection = () => {
                   <Button 
                     size="sm" 
                     className="w-full"
-                    onClick={() => sendFriendRequest(person.id)}
+                    onClick={() => handleSendFriendRequest(person.id, person.display_name)}
+                    disabled={loading}
                   >
                     <UserPlus className="h-3 w-3 mr-1" />
                     Add Friend

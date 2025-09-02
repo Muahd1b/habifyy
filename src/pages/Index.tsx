@@ -6,6 +6,8 @@ import { StatsOverview } from "@/components/StatsOverview";
 import Community from "@/components/Community";
 import { Analytics } from "@/components/Analytics";
 import { Settings } from "@/components/Settings";
+import MobileCommunity from "@/components/MobileCommunity";
+import MobileSettings from "@/components/MobileSettings";
 import { ProfileModal } from "@/components/ProfileModal";
 import { Auth } from "@/components/Auth";
 import { useAuth } from "@/hooks/useAuth";
@@ -88,11 +90,15 @@ const Index = () => {
           </div>
         );
       case "community":
-        return <Community open={true} onClose={() => setActiveView("home")} />;
+        return isMobile ? 
+          <MobileCommunity onClose={() => setActiveView("home")} /> :
+          <Community open={true} onClose={() => setActiveView("home")} />;
       case "analytics":
         return <Analytics open={true} onClose={() => setActiveView("home")} />;
       case "settings":
-        return <Settings onClose={() => setActiveView("home")} />;
+        return isMobile ?
+          <MobileSettings onClose={() => setActiveView("home")} /> :
+          <Settings onClose={() => setActiveView("home")} />;
       default:
         return (
           <main className="container mx-auto px-4 py-8 space-y-8">
