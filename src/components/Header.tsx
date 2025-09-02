@@ -105,12 +105,10 @@ export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onA
               )}
             </Button>
 
-            {/* Settings - Hidden on Mobile (available in bottom nav) */}
-            {!isMobile && (
-              <Button variant="ghost" size="sm" onClick={onSettingsClick}>
-                <Settings className="w-4 h-4" />
-              </Button>
-            )}
+            {/* Settings - Now available on both mobile and desktop */}
+            <Button variant="ghost" size="sm" onClick={onSettingsClick}>
+              <Settings className="w-4 h-4" />
+            </Button>
 
             {/* Profile */}
             <Button variant="outline" size="sm" className="gap-2" onClick={onProfileClick}>

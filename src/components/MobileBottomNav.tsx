@@ -44,10 +44,10 @@ const navItems = [
     view: 'analytics'
   },
   {
-    id: 'settings',
-    label: 'Settings',
-    icon: Settings,
-    view: 'settings'
+    id: 'premium',
+    label: 'Premium',
+    icon: Crown,
+    view: 'premium'
   }
 ];
 
