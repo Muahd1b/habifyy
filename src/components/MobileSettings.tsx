@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, User, Bell, Shield, Palette, Smartphone, Info } from 'lucide-react';
+import { ArrowLeft, User, Bell, Shield, Palette, Smartphone, Info, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -14,13 +14,14 @@ import { useProfile } from '@/hooks/useProfile';
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 interface MobileSettingsProps {
   onClose: () => void;
 }
 
 const MobileSettings = ({ onClose }: MobileSettingsProps) => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { profile, updateProfile, loading: profileLoading } = useProfile(user?.id);
   const { preferences, updatePreferences } = useNotificationPreferences();
   const { toast } = useToast();
@@ -32,6 +33,7 @@ const MobileSettings = ({ onClose }: MobileSettingsProps) => {
     location: '',
     website: ''
   });
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   // Privacy settings based on profile
   const [privacy, setPrivacy] = useState({
@@ -238,6 +240,18 @@ const MobileSettings = ({ onClose }: MobileSettingsProps) => {
                           />
                         </div>
                       </CardContent>
+                    </Card>
+
+                    {/* Logout Button */}
+                    <Card className="p-6">
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowLogoutDialog(true)}
+                        className="w-full text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+                      >
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Sign Out
+                      </Button>
                     </Card>
                   </div>
                 </ScrollArea>

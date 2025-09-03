@@ -1,27 +1,27 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Slider } from '@/components/ui/slider';
+import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
-import { Separator } from '@/components/ui/separator';
-import {
-  Target,
-  Calendar,
-  Plus,
-  Minus,
-  CheckCircle2,
-  Circle,
-  Edit3,
-  Save,
-  MessageCircle,
-  TrendingUp,
-  Flame
+import { 
+  CheckCircle2, 
+  Circle, 
+  Target, 
+  Plus, 
+  Minus, 
+  MessageSquare, 
+  Edit3, 
+  Trash2,
+  Flame,
+  Calendar
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { type HabitWithProgress } from '@/hooks/useHabits';
+import type { HabitWithProgress } from '@/hooks/useHabits';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { useToast } from '@/hooks/use-toast';
 
 interface EnhancedDayDetailsProps {
   date: Date;
@@ -36,6 +36,7 @@ interface EnhancedDayDetailsProps {
   onNotesUpdate: (habitId: string, notes: string) => void;
   onMarkAllComplete: () => void;
   onEditHabit: (habitId: string) => void;
+  onDeleteHabit: (habitId: string) => void;
   editMode: boolean;
 }
 
@@ -48,52 +49,86 @@ export const EnhancedDayDetails = ({
   onNotesUpdate,
   onMarkAllComplete,
   onEditHabit,
+  onDeleteHabit,
   editMode
 }: EnhancedDayDetailsProps) => {
   const [expandedNotes, setExpandedNotes] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deletingHabitId, setDeletingHabitId] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const getHabitProgress = (habitId: string) => {
-    return completedHabits.find(c => c.habitId === habitId)?.progress || 0;
+    const completion = completedHabits.find(c => c.habitId === habitId);
+    return completion?.progress || 0;
   };
 
   const getHabitNotes = (habitId: string) => {
-    return completedHabits.find(c => c.habitId === habitId)?.notes || '';
+    const completion = completedHabits.find(c => c.habitId === habitId);
+    return completion?.notes || '';
   };
 
-  const completedCount = completedHabits.length;
-  const totalCount = habits.length;
-  const completionRate = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+  const handleDeleteHabit = async () => {
+    if (!deletingHabitId) return;
+    
+    try {
+      await onDeleteHabit(deletingHabitId);
+      toast({
+        title: "Habit deleted",
+        description: "Your habit has been successfully removed.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error", 
+        description: "Failed to delete habit. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setShowDeleteDialog(false);
+      setDeletingHabitId(null);
+    }
+  };
+
+  const openDeleteDialog = (habitId: string) => {
+    setDeletingHabitId(habitId);
+    setShowDeleteDialog(true);
+  };
+
+  const completionRate = habits.length > 0 
+    ? Math.round((habits.filter(h => getHabitProgress(h.id) >= h.target).length / habits.length) * 100)
+    : 0;
 
   return (
-    <div className="space-y-4">
-      {/* Day Header */}
-      <Card className="p-4 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
+    <div className="space-y-6">
+      {/* Header */}
+      <Card className="p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-lg flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-primary" />
-            {format(date, 'EEEE, MMMM d')}
-          </h3>
-          {completionRate === 100 && completedCount > 0 && (
-            <Badge className="bg-gradient-success">
-              <Flame className="w-3 h-3 mr-1" />
+          <div>
+            <h3 className="text-xl font-semibold">{format(date, 'EEEE, MMMM d')}</h3>
+            <p className="text-sm text-muted-foreground">
+              {habits.length} habit{habits.length !== 1 ? 's' : ''} tracked
+            </p>
+          </div>
+          {completionRate === 100 && habits.length > 0 && (
+            <Badge className="bg-gradient-to-r from-success to-success-foreground text-success-foreground">
+              <Target className="w-3 h-3 mr-1" />
               Perfect Day!
             </Badge>
           )}
         </div>
-
-        <div className="flex items-center gap-3 mb-3">
-          <div className="flex items-center gap-2">
-            <Target className="w-4 h-4 text-primary" />
-            <span className="text-sm text-muted-foreground">Progress</span>
+        
+        {/* Progress Overview */}
+        <div className="space-y-3">
+          <div className="flex justify-between text-sm">
+            <span>Daily Progress</span>
+            <span className="font-medium">{completionRate}%</span>
           </div>
-          <Badge variant={completionRate === 100 ? "default" : "secondary"}>
-            {completedCount}/{totalCount} habits
-          </Badge>
+          <Progress value={completionRate} className="h-2" />
         </div>
 
-        <Progress value={completionRate} className="h-2 mb-3" />
-
-        <div className="flex gap-2">
+        <div className="flex justify-between items-center mt-4">
+          <div className="text-sm text-muted-foreground">
+            {habits.filter(h => getHabitProgress(h.id) >= h.target).length} of {habits.length} completed
+          </div>
           <Button
             size="sm"
             onClick={onMarkAllComplete}
@@ -131,13 +166,24 @@ export const EnhancedDayDetails = ({
                 </div>
                 <div className="flex items-center gap-2">
                   {editMode && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onEditHabit(habit.id)}
-                    >
-                      <Edit3 className="w-4 h-4" />
-                    </Button>
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onEditHabit(habit.id)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openDeleteDialog(habit.id)}
+                        className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </>
                   )}
                   <div className="flex items-center gap-2">
                     {isCompleted ? (
@@ -198,7 +244,7 @@ export const EnhancedDayDetails = ({
                     <Minus className="w-4 h-4" />
                   </Button>
                   
-                  <div className="text-center">
+                  <div className="text-center min-w-[60px]">
                     <div className="text-lg font-bold text-primary">
                       {Math.round(progressPercentage)}%
                     </div>
@@ -224,24 +270,18 @@ export const EnhancedDayDetails = ({
                   onClick={() => setExpandedNotes(expandedNotes === habit.id ? null : habit.id)}
                   className="w-full justify-start h-8 px-2"
                 >
-                  <MessageCircle className="w-4 h-4 mr-2" />
+                  <MessageSquare className="w-4 h-4 mr-2" />
                   {notes ? 'Edit notes' : 'Add notes'}
                 </Button>
 
                 {expandedNotes === habit.id && (
                   <div className="space-y-2">
                     <Textarea
-                      placeholder="Add notes about this habit..."
                       value={notes}
                       onChange={(e) => onNotesUpdate(habit.id, e.target.value)}
-                      className="min-h-[60px]"
+                      placeholder="Add notes about this habit..."
+                      className="min-h-[80px] resize-none"
                     />
-                  </div>
-                )}
-
-                {notes && expandedNotes !== habit.id && (
-                  <div className="p-2 bg-muted/50 rounded text-sm text-muted-foreground">
-                    {notes.length > 50 ? `${notes.substring(0, 50)}...` : notes}
                   </div>
                 )}
               </div>
@@ -261,6 +301,21 @@ export const EnhancedDayDetails = ({
           </p>
         </Card>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title="Delete Habit"
+        description={
+          deletingHabitId 
+            ? `Are you sure you want to delete "${habits.find(h => h.id === deletingHabitId)?.name}"? This action cannot be undone and all progress will be lost.`
+            : "Are you sure you want to delete this habit?"
+        }
+        actionLabel="Delete"
+        variant="destructive"
+        onConfirm={handleDeleteHabit}
+      />
     </div>
   );
 };

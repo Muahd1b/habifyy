@@ -286,6 +286,7 @@ export const HabitCalendar = ({
               completedHabits={completedHabits.filter(c => isSameDay(c.date, selectedDate))}
               onHabitToggle={handleHabitToggle}
               onProgressUpdate={onHabitProgress}
+              onDeleteHabit={onDeleteHabit}
               onNotesUpdate={handleNotesUpdate}
               onMarkAllComplete={() => handleMarkAllComplete(selectedDate)}
               onEditHabit={onEditHabit}

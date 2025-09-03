@@ -86,6 +86,7 @@ const Index = () => {
               onAddHabit={() => setShowAddForm(true)}
               onEditHabit={(habitId) => console.log('Edit habit:', habitId)}
               onHabitProgress={handleHabitProgress}
+              onDeleteHabit={deleteHabit}
             />
           </div>
         );
@@ -143,6 +144,7 @@ const Index = () => {
                     <HabitCard 
                       habit={habit} 
                       onProgressUpdate={handleHabitProgress}
+                      onDelete={deleteHabit}
                     />
                   </div>
                 ))}

@@ -43,12 +43,16 @@ interface ProfileModalProps {
 export const ProfileModal = ({ userId, open, onClose }: ProfileModalProps) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isEditing, setIsEditing] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [editForm, setEditForm] = useState({
     display_name: '',
     bio: '',
     location: '',
     website: '',
   });
+  
+  const { user, signOut } = useAuth();
+  const { toast } = useToast();
 
   // Get current user to determine if this is own profile
   const [currentUser, setCurrentUser] = useState<any>(null);

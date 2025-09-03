@@ -3,17 +3,22 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Flame, Target, Plus, Minus, CheckCircle2 } from 'lucide-react';
+import { Flame, Target, Plus, Minus, CheckCircle2, Trash2 } from 'lucide-react';
 import { type HabitWithProgress } from '@/hooks/useHabits';
 import { cn } from '@/lib/utils';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { useToast } from '@/hooks/use-toast';
 
 interface HabitCardProps {
   habit: HabitWithProgress;
   onProgressUpdate: (habitId: string, progress: number) => void;
+  onDelete: (habitId: string) => void;
 }
 
-export const HabitCard = ({ habit, onProgressUpdate }: HabitCardProps) => {
+export const HabitCard = ({ habit, onProgressUpdate, onDelete }: HabitCardProps) => {
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { toast } = useToast();
   
   const progressPercentage = (habit.completed / habit.target) * 100;
   const isCompleted = habit.completedToday;
@@ -38,6 +43,22 @@ export const HabitCard = ({ habit, onProgressUpdate }: HabitCardProps) => {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      await onDelete(habit.id);
+      toast({
+        title: "Habit deleted",
+        description: "Your habit has been successfully removed.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete habit. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Card className={cn(
       "habit-card p-6 space-y-4 relative overflow-hidden",
@@ -53,15 +74,25 @@ export const HabitCard = ({ habit, onProgressUpdate }: HabitCardProps) => {
       {/* Header */}
       <div className="relative space-y-2">
         <div className="flex items-start justify-between">
-          <div className="space-y-1">
+          <div className="space-y-1 flex-1">
             <h3 className="font-semibold text-lg">{habit.name}</h3>
             {habit.description && (
               <p className="text-sm text-muted-foreground">{habit.description}</p>
             )}
           </div>
-          {isCompleted && (
-            <CheckCircle2 className="w-6 h-6 text-success animate-bounce-soft" />
-          )}
+          <div className="flex items-center gap-2">
+            {isCompleted && (
+              <CheckCircle2 className="w-6 h-6 text-success animate-bounce-soft" />
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowDeleteDialog(true)}
+              className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
         
         {/* Streak Badge */}
@@ -139,6 +170,17 @@ export const HabitCard = ({ habit, onProgressUpdate }: HabitCardProps) => {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title="Delete Habit"
+        description={`Are you sure you want to delete "${habit.name}"? This action cannot be undone and all progress will be lost.`}
+        actionLabel="Delete"
+        variant="destructive"
+        onConfirm={handleDelete}
+      />
     </Card>
   );
 };
