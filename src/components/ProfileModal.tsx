@@ -10,7 +10,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useProfile } from '@/hooks/useProfile';
+import { useAuth } from '@/hooks/useAuth'; 
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { 
   User, 
   UserPlus, 
@@ -25,6 +28,8 @@ import {
   Star,
   Link as LinkIcon,
   Edit3,
+  Edit2,
+  LogOut,
   Twitter,
   Instagram,
   Linkedin,

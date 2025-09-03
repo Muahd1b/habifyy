@@ -439,4 +439,26 @@ const MobileSettings = ({ onClose }: MobileSettingsProps) => {
   );
 };
 
+                  </div>
+                </ScrollArea>
+              </TabsContent>
+            </div>
+          </Tabs>
+        </div>
+      </div>
+
+      {/* Logout Confirmation Dialog */}
+      <ConfirmationDialog
+        open={showLogoutDialog}
+        onOpenChange={setShowLogoutDialog}
+        title="Sign Out"
+        description="Are you sure you want to sign out of your account?"
+        actionLabel="Sign Out"
+        variant="destructive"
+        onConfirm={handleLogout}
+      />
+    </>
+  );
+};
+
 export default MobileSettings;

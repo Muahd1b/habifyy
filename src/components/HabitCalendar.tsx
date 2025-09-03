@@ -17,6 +17,7 @@ interface HabitCalendarProps {
   onAddHabit: () => void;
   onEditHabit: (habitId: string) => void;
   onHabitProgress: (habitId: string, progress: number) => void;
+  onDeleteHabit: (habitId: string) => void;
 }
 
 interface DayData {
