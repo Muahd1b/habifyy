@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, User, Bell, Shield, Palette, Smartphone, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -19,17 +20,40 @@ interface MobileSettingsProps {
 }
 
 const MobileSettings = ({ onClose }: MobileSettingsProps) => {
-  const { profile, updateProfile } = useProfile();
+  const { user } = useAuth();
+  const { profile, updateProfile, loading: profileLoading } = useProfile(user?.id);
   const { preferences, updatePreferences } = useNotificationPreferences();
   const { toast } = useToast();
   
   const [editMode, setEditMode] = useState(false);
   const [profileData, setProfileData] = useState({
-    display_name: profile?.display_name || '',
-    bio: profile?.bio || '',
-    location: profile?.location || '',
-    website: profile?.website || ''
+    display_name: '',
+    bio: '',
+    location: '',
+    website: ''
   });
+
+  // Privacy settings based on profile
+  const [privacy, setPrivacy] = useState({
+    profilePublic: true,
+    showLocation: true
+  });
+
+  // Update form when profile loads
+  useEffect(() => {
+    if (profile) {
+      setProfileData({
+        display_name: profile.display_name || '',
+        bio: profile.bio || '',
+        location: profile.location || '',
+        website: profile.website || '',
+      });
+      setPrivacy({
+        profilePublic: !profile.privacy_profile,
+        showLocation: !profile.privacy_location
+      });
+    }
+  }, [profile]);
 
   const handleSaveProfile = async () => {
     try {
@@ -43,6 +67,29 @@ const MobileSettings = ({ onClose }: MobileSettingsProps) => {
       toast({
         title: "Error",
         description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUpdatePrivacy = async (updates: Partial<typeof privacy>) => {
+    const newPrivacy = { ...privacy, ...updates };
+    setPrivacy(newPrivacy);
+    
+    try {
+      // Update profile with privacy settings
+      await updateProfile({
+        privacy_profile: !newPrivacy.profilePublic,
+        privacy_location: !newPrivacy.showLocation,
+      });
+      toast({
+        title: "Privacy updated",
+        description: "Your privacy settings have been saved successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update privacy settings. Please try again.",
         variant: "destructive",
       });
     }
@@ -277,27 +324,27 @@ const MobileSettings = ({ onClose }: MobileSettingsProps) => {
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label>Public Profile</Label>
-                            <p className="text-sm text-muted-foreground">Allow others to see your profile</p>
-                          </div>
-                          <Switch
-                            checked={!profile?.privacy_profile}
-                            onCheckedChange={(checked) => updateProfile({ privacy_profile: !checked })}
-                          />
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label>Share Location</Label>
-                            <p className="text-sm text-muted-foreground">Show your location to friends</p>
-                          </div>
-                          <Switch
-                            checked={!profile?.privacy_location}
-                            onCheckedChange={(checked) => updateProfile({ privacy_location: !checked })}
-                          />
-                        </div>
+                         <div className="flex items-center justify-between">
+                           <div>
+                             <Label>Public Profile</Label>
+                             <p className="text-sm text-muted-foreground">Allow others to see your profile</p>
+                           </div>
+                           <Switch
+                             checked={privacy.profilePublic}
+                             onCheckedChange={(checked) => handleUpdatePrivacy({ profilePublic: checked })}
+                           />
+                         </div>
+                         
+                         <div className="flex items-center justify-between">
+                           <div>
+                             <Label>Share Location</Label>
+                             <p className="text-sm text-muted-foreground">Show your location to friends</p>
+                           </div>
+                           <Switch
+                             checked={privacy.showLocation}
+                             onCheckedChange={(checked) => handleUpdatePrivacy({ showLocation: checked })}
+                           />
+                         </div>
                       </CardContent>
                     </Card>
                   </div>
