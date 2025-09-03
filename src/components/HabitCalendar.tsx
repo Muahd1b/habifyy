@@ -213,28 +213,28 @@ export const HabitCalendar = ({
                   empty: "opacity-50 relative",
                   today: "ring-2 ring-primary ring-offset-2"
                 }}
-                components={{
-                  Day: ({ date, ...props }) => {
-                    const dayData = calendarData.find(day => isSameDay(day.date, date));
-                    return (
-                      <div
-                        {...props}
-                        onContextMenu={(e) => handleDayRightClick(e, date)}
-                        className="relative cursor-pointer"
-                      >
-                        <div className="w-full h-full flex flex-col items-center justify-center">
-                          <span>{date.getDate()}</span>
-                          {dayData && (
-                            <HabitDayIndicators 
-                              habits={dayData.habits}
-                              className="absolute -bottom-1"
-                            />
-                          )}
-                        </div>
-                      </div>
-                    );
-                  }
-                }}
+                 components={{
+                   Day: ({ day, ...props }) => {
+                     const dayData = calendarData.find(d => isSameDay(d.date, day.date));
+                     return (
+                       <div
+                         {...props}
+                         onContextMenu={(e) => handleDayRightClick(e, day.date)}
+                         className="relative cursor-pointer"
+                       >
+                         <div className="w-full h-full flex flex-col items-center justify-center">
+                           <span>{day.date.getDate()}</span>
+                           {dayData && (
+                             <HabitDayIndicators 
+                               habits={dayData.habits}
+                               className="absolute -bottom-1"
+                             />
+                           )}
+                         </div>
+                       </div>
+                     );
+                   }
+                 }}
               />
               
               {/* Context Menu */}
