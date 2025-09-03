@@ -39,7 +39,8 @@ export const HabitCalendar = ({
   onClose, 
   onAddHabit, 
   onEditHabit, 
-  onHabitProgress 
+  onHabitProgress,
+  onDeleteHabit 
 }: HabitCalendarProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [viewDate, setViewDate] = useState<Date>(new Date());
