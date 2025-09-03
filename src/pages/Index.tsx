@@ -4,11 +4,12 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { HabitCalendar } from "@/components/HabitCalendar";
 import { StatsOverview } from "@/components/StatsOverview";
 import Community from "@/components/Community";
-import { Analytics } from "@/components/Analytics";
+import { ModernAnalytics } from "@/components/ModernAnalytics";
 import { Settings } from "@/components/Settings";
 import MobileCommunity from "@/components/MobileCommunity";
 import MobileSettings from "@/components/MobileSettings";
 import { ProfileModal } from "@/components/ProfileModal";
+import { PersonalizedQuotes } from "@/components/PersonalizedQuotes";
 import { Auth } from "@/components/Auth";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -78,24 +79,20 @@ const Index = () => {
   const renderActiveView = () => {
     switch (activeView) {
       case "calendar":
-        return (
-          <div className="container mx-auto px-4 py-8 space-y-8">
-            <HabitCalendar 
-              habits={habits} 
-              onClose={() => setActiveView("home")}
-              onAddHabit={() => setShowAddForm(true)}
-              onEditHabit={(habitId) => console.log('Edit habit:', habitId)}
-              onHabitProgress={handleHabitProgress}
-              onDeleteHabit={deleteHabit}
-            />
-          </div>
-        );
+        return <HabitCalendar 
+          habits={habits} 
+          onClose={() => setActiveView("home")}
+          onAddHabit={() => setShowAddForm(true)}
+          onEditHabit={(habitId) => console.log('Edit habit:', habitId)}
+          onHabitProgress={handleHabitProgress}
+          onDeleteHabit={deleteHabit}
+        />;
       case "community":
         return isMobile ? 
           <MobileCommunity onClose={() => setActiveView("home")} /> :
           <Community open={true} onClose={() => setActiveView("home")} />;
       case "analytics":
-        return <Analytics open={true} onClose={() => setActiveView("home")} />;
+        return <ModernAnalytics open={true} onClose={() => setActiveView("home")} />;
       case "settings":
         return isMobile ?
           <MobileSettings onClose={() => setActiveView("home")} /> :
@@ -103,13 +100,17 @@ const Index = () => {
       default:
         return (
           <main className="container mx-auto px-4 py-8 space-y-8">
-            {/* Welcome Section */}
-            <section className="text-center space-y-4 animate-fade-in-up">
-              <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary via-primary-light to-accent bg-clip-text text-transparent">
-                Habifyy
-              </h1>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Transform your life, one habit at a time. Track your progress, build streaks, and achieve your goals.
+            {/* Welcome Section with Enhanced Branding */}
+            <section className="text-center space-y-6 animate-fade-in-up">
+              <div className="relative">
+                <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary via-primary-light to-accent bg-clip-text text-transparent">
+                  Habifyy
+                </h1>
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary/20 rounded-full animate-pulse" />
+                <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-accent/30 rounded-full animate-pulse delay-300" />
+              </div>
+              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                Your personal growth companion. Build lasting habits, track meaningful progress, and celebrate every victory.
               </p>
             </section>
 
@@ -172,15 +173,8 @@ const Index = () => {
               </div>
             </section>
 
-            {/* Motivational Quote */}
-            {habits.length > 0 && (
-              <Card className="p-8 text-center bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20">
-                <blockquote className="text-lg italic text-foreground/90">
-                  "We are what we repeatedly do. Excellence, then, is not an act, but a habit."
-                </blockquote>
-                <cite className="text-sm text-muted-foreground mt-2 block">— Aristotle</cite>
-              </Card>
-            )}
+            {/* Personalized Quotes Section */}
+            {habits.length > 0 && <PersonalizedQuotes />}
           </main>
         );
     }
