@@ -15,7 +15,8 @@ import {
   Award,
   Filter,
   RotateCcw,
-  Zap
+  Zap,
+  Trophy
 } from 'lucide-react';
 import { format, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, subDays } from 'date-fns';
 import type { HabitWithProgress } from '@/hooks/useHabits';
@@ -368,7 +369,7 @@ export const EnhancedCalendar = ({
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <div className="w-4 h-4 bg-yellow-400 rounded-full shadow-sm"></div>
-                  <span>Partial (>0%)</span>
+                  <span>Partial (&gt;0%)</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <div className="w-4 h-4 bg-muted rounded-full opacity-40"></div>
