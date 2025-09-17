@@ -4,7 +4,6 @@ import {
   Trophy, 
   ShoppingBag, 
   Award,
-  MapPin,
   User,
   MessageSquare,
   Calendar,
@@ -23,7 +22,7 @@ import FriendsSection from './community/FriendsSection';
 import CompetitionsSection from './community/CompetitionsSection';
 import MarketplaceSection from './community/MarketplaceSection';
 import AchievementsSection from './community/AchievementsSection';
-import MapSection from './community/MapSection';
+
 
 interface CommunityProps {
   onClose: () => void;
@@ -211,17 +210,6 @@ const Community = ({ onClose, open }: CommunityProps) => {
               <ChevronRight className="h-4 w-4" />
             </Button>
             
-            <Button 
-              variant="outline" 
-              className="w-full justify-between"
-              onClick={() => setActiveTab('map')}
-            >
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                Explore Map
-              </div>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
           </CardContent>
         </Card>
       </div>
@@ -272,10 +260,6 @@ const Community = ({ onClose, open }: CommunityProps) => {
                 <Award className="h-4 w-4" />
                 Achievements
               </TabsTrigger>
-              <TabsTrigger value="map" className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                Map
-              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">
@@ -298,9 +282,6 @@ const Community = ({ onClose, open }: CommunityProps) => {
               <AchievementsSection />
             </TabsContent>
 
-            <TabsContent value="map">
-              <MapSection />
-            </TabsContent>
           </Tabs>
         </div>
       </DialogContent>

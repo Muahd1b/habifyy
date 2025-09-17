@@ -108,19 +108,6 @@ const Index = () => {
       default:
         return (
           <main className="container mx-auto px-4 py-8 space-y-8">
-            {/* Welcome Section with Enhanced Branding */}
-            <section className="text-center space-y-6 animate-fade-in-up">
-              <div className="relative">
-                <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary via-primary-light to-accent bg-clip-text text-transparent">
-                  Habifyy
-                </h1>
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary/20 rounded-full animate-pulse" />
-                <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-accent/30 rounded-full animate-pulse delay-300" />
-              </div>
-              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                Your personal growth companion. Build lasting habits, track meaningful progress, and celebrate every victory.
-              </p>
-            </section>
 
             {/* Personalized Quotes Section - Moved to top */}
             <PersonalizedQuotes />

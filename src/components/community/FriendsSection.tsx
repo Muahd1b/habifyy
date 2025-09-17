@@ -34,39 +34,7 @@ const FriendsSection = () => {
     friend.profile?.username?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Mock suggested friends data - in a real app, this would come from an API
-  const suggestedFriends = [
-    {
-      id: '1',
-      display_name: 'Sarah Chen',
-      username: 'sarah_fitness',
-      avatar_url: null,
-      points: 1250,
-      level: 8,
-      mutual_friends: 3,
-      similar_habits: ['Exercise', 'Reading']
-    },
-    {
-      id: '2', 
-      display_name: 'Mike Johnson',
-      username: 'mike_coding',
-      avatar_url: null,
-      points: 980,
-      level: 6,
-      mutual_friends: 2,
-      similar_habits: ['Coding', 'Learning']
-    },
-    {
-      id: '3',
-      display_name: 'Emma Wilson',
-      username: 'emma_wellness',
-      avatar_url: null,
-      points: 1500,
-      level: 10,
-      mutual_friends: 1,
-      similar_habits: ['Meditation', 'Exercise']
-    }
-  ];
+  const suggestedFriends: any[] = [];
 
   return (
     <div className="space-y-6">
@@ -169,57 +137,12 @@ const FriendsSection = () => {
               </CardTitle>
               <CardDescription>People you might know</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {suggestedFriends.map((person) => (
-                <div key={person.id} className="p-4 rounded-lg border bg-card">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={person.avatar_url} />
-                      <AvatarFallback>
-                        {person.display_name[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-sm text-foreground">{person.display_name}</h4>
-                      <p className="text-xs text-muted-foreground">@{person.username}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2 mb-3">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">Level {person.level}</span>
-                      <span className="flex items-center gap-1 text-muted-foreground">
-                        <Zap className="h-3 w-3" />
-                        {person.points}
-                      </span>
-                    </div>
-                    
-                    {person.mutual_friends > 0 && (
-                      <p className="text-xs text-muted-foreground">
-                        {person.mutual_friends} mutual friend{person.mutual_friends > 1 ? 's' : ''}
-                      </p>
-                    )}
-                    
-                    <div className="flex flex-wrap gap-1">
-                      {person.similar_habits.slice(0, 2).map((habit) => (
-                        <Badge key={habit} variant="secondary" className="text-xs">
-                          {habit}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    size="sm" 
-                    className="w-full"
-                    onClick={() => handleSendFriendRequest(person.id, person.display_name)}
-                    disabled={loading}
-                  >
-                    <UserPlus className="h-3 w-3 mr-1" />
-                    Add Friend
-                  </Button>
-                </div>
-              ))}
+            <CardContent>
+              <div className="text-center py-8 text-muted-foreground">
+                <UserPlus className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p>No suggested friends available</p>
+                <p className="text-sm">Connect with friends to get suggestions</p>
+              </div>
             </CardContent>
           </Card>
 

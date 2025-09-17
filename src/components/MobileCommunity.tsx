@@ -22,7 +22,7 @@ import FriendsSection from './community/FriendsSection';
 import CompetitionsSection from './community/CompetitionsSection';
 import MarketplaceSection from './community/MarketplaceSection';
 import AchievementsSection from './community/AchievementsSection';
-import MapSection from './community/MapSection';
+
 
 interface MobileCommunityProps {
   onClose: () => void;
@@ -275,12 +275,6 @@ const MobileCommunity = ({ onClose }: MobileCommunityProps) => {
                   >
                     Rewards
                   </TabsTrigger>
-                  <TabsTrigger 
-                    value="map" 
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-3"
-                  >
-                    Map
-                  </TabsTrigger>
                 </TabsList>
               </ScrollArea>
             </div>
@@ -327,13 +321,6 @@ const MobileCommunity = ({ onClose }: MobileCommunityProps) => {
                 </ScrollArea>
               </TabsContent>
 
-              <TabsContent value="map" className="h-full m-0">
-                <ScrollArea className="h-full">
-                  <div className="p-4">
-                    <MapSection />
-                  </div>
-                </ScrollArea>
-              </TabsContent>
             </div>
           </Tabs>
         </div>

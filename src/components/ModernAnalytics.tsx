@@ -143,7 +143,7 @@ export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
             <div className="p-2 bg-primary/10 rounded-full">
               <BarChart3 className="h-6 w-6 text-primary" />
             </div>
-            Customer Analytics Dashboard
+            Analytics Dashboard
           </DialogTitle>
         </DialogHeader>
 

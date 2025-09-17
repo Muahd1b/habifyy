@@ -398,7 +398,7 @@ export const Settings = ({ onClose }: SettingsProps) => {
             </div>
             <Check size={24} />
           </div>
-          <p className="opacity-90">Thank you for supporting Habifyy!</p>
+          <p className="opacity-90">Thank you for your support!</p>
         </div>
       )}
 
