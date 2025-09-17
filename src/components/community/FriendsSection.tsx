@@ -7,11 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useCommunity } from '@/hooks/useCommunity';
 import { useToast } from '@/hooks/use-toast';
+import { FindFriendsModal } from './FindFriendsModal';
 
 const FriendsSection = () => {
   const { friends, profile, sendFriendRequest, loading } = useCommunity();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
+  const [showFindFriendsModal, setShowFindFriendsModal] = useState(false);
 
   const handleSendFriendRequest = async (friendId: string, friendName: string) => {
     try {
@@ -119,7 +121,12 @@ const FriendsSection = () => {
                     }
                   </p>
                   {!searchQuery && (
-                    <Button variant="outline">Find Friends</Button>
+                    <Button 
+                      variant="outline"
+                      onClick={() => setShowFindFriendsModal(true)}
+                    >
+                      Find Friends
+                    </Button>
                   )}
                 </div>
               )}
@@ -192,6 +199,13 @@ const FriendsSection = () => {
           </Card>
         </div>
       </div>
+
+      {/* Find Friends Modal */}
+      <FindFriendsModal 
+        open={showFindFriendsModal}
+        onClose={() => setShowFindFriendsModal(false)}
+        onFriendRequest={handleSendFriendRequest}
+      />
     </div>
   );
 };
