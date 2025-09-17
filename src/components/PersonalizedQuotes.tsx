@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Quote } from 'lucide-react';
+import { RefreshCw, Quote, Plus } from 'lucide-react';
 import { useHabits } from '@/hooks/useHabits';
+import { useCustomQuotes } from '@/hooks/useCustomQuotes';
+import { CreateQuoteModal } from '@/components/CreateQuoteModal';
 
 interface QuoteData {
   text: string;
@@ -46,8 +48,10 @@ const motivationalQuotes: QuoteData[] = [
 
 export const PersonalizedQuotes = () => {
   const { habits } = useHabits();
+  const { customQuotes, createCustomQuote } = useCustomQuotes();
   const [currentQuote, setCurrentQuote] = useState<QuoteData | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const generatePersonalizedQuote = (): QuoteData => {
     const totalHabits = habits.length;
@@ -83,8 +87,16 @@ export const PersonalizedQuotes = () => {
       }
     ];
 
-    // Mix personalized and motivational quotes
-    const allQuotes = [...personalizedQuotes, ...motivationalQuotes];
+    // Convert custom quotes to QuoteData format
+    const customQuoteData: QuoteData[] = customQuotes.map(quote => ({
+      text: quote.text,
+      author: quote.author || 'You',
+      category: quote.category,
+      isPersonalized: true
+    }));
+
+    // Mix personalized, custom, and motivational quotes
+    const allQuotes = [...personalizedQuotes, ...customQuoteData, ...motivationalQuotes];
     return allQuotes[Math.floor(Math.random() * allQuotes.length)];
   };
 
@@ -98,7 +110,7 @@ export const PersonalizedQuotes = () => {
 
   useEffect(() => {
     setCurrentQuote(generatePersonalizedQuote());
-  }, [habits]);
+  }, [habits, customQuotes]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -106,7 +118,7 @@ export const PersonalizedQuotes = () => {
     }, 30000); // Auto-refresh every 30 seconds
 
     return () => clearInterval(interval);
-  }, [habits]);
+  }, [habits, customQuotes]);
 
   if (!currentQuote) return null;
 
@@ -141,7 +153,22 @@ export const PersonalizedQuotes = () => {
         >
           <RefreshCw className={`w-4 h-4 ${isAnimating ? 'animate-spin' : ''}`} />
         </Button>
+        
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowCreateModal(true)}
+          className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary"
+        >
+          <Plus className="w-4 h-4" />
+        </Button>
       </div>
+
+      <CreateQuoteModal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSubmit={createCustomQuote}
+      />
     </Card>
   );
 };

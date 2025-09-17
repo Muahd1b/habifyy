@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
-import { HabitCalendar } from "@/components/HabitCalendar";
+import { AppleCalendar } from "@/components/AppleCalendar";
 import { StatsOverview } from "@/components/StatsOverview";
 import Community from "@/components/Community";
 import { ModernAnalytics } from "@/components/ModernAnalytics";
@@ -89,13 +89,11 @@ const Index = () => {
   const renderActiveView = () => {
     switch (activeView) {
       case "calendar":
-        return <HabitCalendar 
+        return <AppleCalendar 
           habits={habits} 
           onClose={() => setActiveView("home")}
           onAddHabit={() => setShowAddForm(true)}
-          onEditHabit={(habitId) => console.log('Edit habit:', habitId)}
-          onHabitProgress={handleHabitProgress}
-          onDeleteHabit={deleteHabit}
+          onDateSelect={(date) => console.log('Selected date:', date)}
         />;
       case "community":
         return isMobile ? 
@@ -123,6 +121,9 @@ const Index = () => {
                 Your personal growth companion. Build lasting habits, track meaningful progress, and celebrate every victory.
               </p>
             </section>
+
+            {/* Personalized Quotes Section - Moved to top */}
+            <PersonalizedQuotes />
 
             {/* Stats Overview */}
             <StatsOverview 
@@ -183,8 +184,6 @@ const Index = () => {
               </div>
             </section>
 
-            {/* Personalized Quotes Section */}
-            {habits.length > 0 && <PersonalizedQuotes />}
           </main>
         );
     }
