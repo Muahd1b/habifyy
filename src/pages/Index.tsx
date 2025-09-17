@@ -64,9 +64,8 @@ const Index = () => {
     await updateHabitProgress(habitId, progress);
   };
 
-  const isInitialLoading = (loading || habitsLoading) && habits.length === 0;
-
-  if (isInitialLoading) {
+  // Prioritize auth state to avoid spinner when logged out
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -76,6 +75,15 @@ const Index = () => {
 
   if (!isAuthenticated) {
     return <Auth />;
+  }
+
+  const isInitialLoading = habitsLoading && habits.length === 0;
+  if (isInitialLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   const renderActiveView = () => {

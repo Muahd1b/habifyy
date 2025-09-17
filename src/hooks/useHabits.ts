@@ -268,7 +268,12 @@ export const useHabits = () => {
 
   // Set up real-time subscription
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      // If there's no user, ensure we are not stuck in loading state
+      setHabits([]);
+      setLoading(false);
+      return;
+    }
 
     fetchHabits();
 
