@@ -23,7 +23,10 @@ import {
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, Cell, PieChart, Pie } from "recharts";
 import { useHabits } from '@/hooks/useHabits';
+import { useHabitCompletions } from '@/hooks/useHabitCompletions';
+import { useProfile } from '@/hooks/useProfile';
 import { useMemo } from 'react';
+import { format, startOfDay, subDays, isAfter, isBefore, parseISO } from 'date-fns';
 
 interface ModernAnalyticsProps {
   open: boolean;
@@ -32,67 +35,109 @@ interface ModernAnalyticsProps {
 
 export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
   const { habits } = useHabits();
+  const { completions, getCompletionsForDate, getCompletionStats } = useHabitCompletions();
+  const { profile } = useProfile();
 
-  // Generate realistic analytics data based on actual habits
+  // Calculate real analytics data based on actual habit completions
   const analyticsData = useMemo(() => {
-    const completedToday = habits.filter(h => h.completedToday).length;
-    const totalStreak = habits.reduce((sum, h) => sum + h.currentStreak, 0);
-    const longestStreak = Math.max(...habits.map(h => h.longestStreak), 0);
-    const averageCompletion = habits.length > 0 ? (completedToday / habits.length) * 100 : 0;
-
-    // Generate 30-day trend data
-    const trendData = Array.from({ length: 30 }, (_, i) => {
-      const date = new Date();
-      date.setDate(date.getDate() - (29 - i));
-      const completion = Math.max(40, Math.min(100, averageCompletion + (Math.random() - 0.5) * 30));
+    if (!completions.length || !habits.length) {
       return {
-        date: date.toISOString().split('T')[0],
-        completion: Math.round(completion),
-        habits: Math.round((completion / 100) * habits.length),
-        streak: Math.max(0, i - Math.floor(Math.random() * 5))
+        overview: { winRate: 0, currentStreak: 0, totalPoints: profile?.points || 0, activeHabits: habits.length, perfectDays: 0 },
+        trends: [],
+        habits: [],
+        weekly: []
+      };
+    }
+
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const todaysCompletions = getCompletionsForDate(today);
+    const completedToday = todaysCompletions.filter(c => c.progress >= 100).length;
+    
+    // Calculate 30-day trend data from real completions
+    const trendData = Array.from({ length: 30 }, (_, i) => {
+      const date = startOfDay(subDays(new Date(), 29 - i));
+      const dateStr = format(date, 'yyyy-MM-dd');
+      const dayCompletions = getCompletionsForDate(dateStr);
+      const completed = dayCompletions.filter(c => c.progress >= 100).length;
+      const totalHabits = habits.length;
+      const completionRate = totalHabits > 0 ? (completed / totalHabits) * 100 : 0;
+      
+      return {
+        date: dateStr,
+        completion: Math.round(completionRate),
+        habits: completed,
+        streak: completed === totalHabits ? 1 : 0
       };
     });
 
-    // Habit performance data
-    const habitPerformance = habits.map((habit, index) => ({
-      name: habit.name,
-      completion: habit.completedToday ? 100 : Math.max(20, 80 - (index * 15)),
-      streak: habit.currentStreak,
-      target: habit.target,
-      color: habit.color,
-      progress: habit.completed || 0
-    }));
+    // Calculate streaks for each habit
+    const habitStats = habits.map(habit => {
+      const stats = getCompletionStats(habit.id, 30);
+      const recentCompletions = completions
+        .filter(c => c.habit_id === habit.id)
+        .sort((a, b) => new Date(b.completion_date).getTime() - new Date(a.completion_date).getTime());
+      
+      // Calculate current streak
+      let currentStreak = 0;
+      const today = new Date();
+      for (let i = 0; i < 365; i++) {
+        const checkDate = format(subDays(today, i), 'yyyy-MM-dd');
+        const completion = recentCompletions.find(c => c.completion_date === checkDate);
+        if (completion && completion.progress >= 100) {
+          currentStreak++;
+        } else if (i > 0) { // Allow missing today
+          break;
+        }
+      }
 
-    // Weekly comparison
-    const weeklyData = Array.from({ length: 7 }, (_, i) => {
-      const date = new Date();
-      date.setDate(date.getDate() - (6 - i));
       return {
-        day: date.toLocaleDateString('en', { weekday: 'short' }),
-        completed: Math.round(Math.random() * habits.length),
-        total: habits.length,
-        percentage: Math.round((Math.random() * 50) + 50)
+        name: habit.name,
+        completion: Math.round(stats.completionRate),
+        streak: currentStreak,
+        target: habit.target,
+        color: habit.color,
+        progress: stats.averageProgress,
+        totalDays: stats.totalDays,
+        completedDays: stats.completedDays
+      };
+    });
+
+    // Calculate overall stats
+    const totalCompletionRate = habitStats.length > 0 ? 
+      habitStats.reduce((sum, h) => sum + h.completion, 0) / habitStats.length : 0;
+    const maxStreak = Math.max(...habitStats.map(h => h.streak), 0);
+    const perfectDays = trendData.filter(d => d.completion === 100).length;
+
+    // Weekly data from real completions
+    const weeklyData = Array.from({ length: 7 }, (_, i) => {
+      const date = subDays(new Date(), 6 - i);
+      const dateStr = format(date, 'yyyy-MM-dd');
+      const dayCompletions = getCompletionsForDate(dateStr);
+      const completed = dayCompletions.filter(c => c.progress >= 100).length;
+      const total = habits.length;
+      const percentage = total > 0 ? (completed / total) * 100 : 0;
+
+      return {
+        day: format(date, 'EEE'),
+        completed,
+        total,
+        percentage: Math.round(percentage)
       };
     });
 
     return {
       overview: {
-        winRate: Math.round(averageCompletion),
-        currentStreak: Math.max(...habits.map(h => h.currentStreak), 0),
-        totalPoints: totalStreak * 10 + completedToday * 25,
+        winRate: Math.round(totalCompletionRate),
+        currentStreak: maxStreak,
+        totalPoints: profile?.points || 0,
         activeHabits: habits.length,
-        perfectDays: Math.floor(longestStreak * 0.7),
-        improvements: {
-          winRate: Math.random() > 0.5 ? 'up' : 'down',
-          streak: Math.random() > 0.3 ? 'up' : 'down',
-          points: 'up'
-        }
+        perfectDays
       },
       trends: trendData,
-      habits: habitPerformance,
+      habits: habitStats,
       weekly: weeklyData
     };
-  }, [habits]);
+  }, [habits, completions, profile, getCompletionsForDate, getCompletionStats]);
 
   const MetricCard = ({ title, value, subtitle, icon: Icon, trend }: any) => (
     <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300">
@@ -178,28 +223,28 @@ export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
                 <MetricCard
                   title="Success Rate"
                   value={`${analyticsData.overview.winRate}%`}
-                  subtitle={`+${Math.floor(Math.random() * 5) + 1}% this week`}
+                  subtitle={`Based on ${analyticsData.habits.length} habits`}
                   icon={Target}
-                  trend={analyticsData.overview.improvements.winRate}
+                  trend={analyticsData.overview.winRate >= 70 ? 'up' : analyticsData.overview.winRate >= 50 ? 'stable' : 'down'}
                 />
                 <MetricCard
                   title="Current Streak"
                   value={`${analyticsData.overview.currentStreak} days`}
-                  subtitle={`Best: ${Math.max(...habits.map(h => h.longestStreak), 0)} days`}
+                  subtitle={`Perfect days: ${analyticsData.overview.perfectDays}`}
                   icon={Flame}
-                  trend={analyticsData.overview.improvements.streak}
+                  trend={analyticsData.overview.currentStreak > 0 ? 'up' : 'down'}
                 />
                 <MetricCard
                   title="Total Points"
                   value={analyticsData.overview.totalPoints.toLocaleString()}
-                  subtitle={"+256 this week"}
+                  subtitle={`Level ${profile?.level || 1} member`}
                   icon={Award}
-                  trend="up"
+                  trend="stable"
                 />
                 <MetricCard
                   title="Active Habits"
                   value={analyticsData.overview.activeHabits}
-                  subtitle="All habits tracking"
+                  subtitle={analyticsData.overview.activeHabits > 0 ? "Keep it up!" : "Add your first habit"}
                   icon={Calendar}
                   trend="stable"
                 />
@@ -318,7 +363,7 @@ export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
                         <AnimatedProgress value={habit.completion} />
                         <div className="flex justify-between text-xs text-muted-foreground">
                           <span>{habit.streak} day streak</span>
-                          <span>Target: {habit.target}</span>
+                          <span>{habit.completedDays}/{habit.totalDays} days</span>
                         </div>
                       </div>
                     ))}
@@ -335,35 +380,61 @@ export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
                     <CardDescription>AI-powered recommendations</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Trophy className="w-4 h-4 text-green-600" />
-                        <h4 className="font-semibold text-green-800 dark:text-green-400">Excellent Progress!</h4>
+                    {analyticsData.overview.winRate >= 70 ? (
+                      <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Trophy className="w-4 h-4 text-green-600" />
+                          <h4 className="font-semibold text-green-800 dark:text-green-400">Excellent Progress!</h4>
+                        </div>
+                        <p className="text-sm text-green-700 dark:text-green-300">
+                          You're maintaining a {analyticsData.overview.winRate}% success rate. Keep up the momentum!
+                        </p>
                       </div>
-                      <p className="text-sm text-green-700 dark:text-green-300">
-                        You're maintaining a {analyticsData.overview.winRate}% success rate. Keep up the momentum!
-                      </p>
-                    </div>
+                    ) : analyticsData.overview.winRate >= 50 ? (
+                      <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Clock className="w-4 h-4 text-blue-600" />
+                          <h4 className="font-semibold text-blue-800 dark:text-blue-400">Room for Growth</h4>
+                        </div>
+                        <p className="text-sm text-blue-700 dark:text-blue-300">
+                          You're at {analyticsData.overview.winRate}% success rate. Try focusing on your most important habit first.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Star className="w-4 h-4 text-amber-600" />
+                          <h4 className="font-semibold text-amber-800 dark:text-amber-400">Getting Started</h4>
+                        </div>
+                        <p className="text-sm text-amber-700 dark:text-amber-300">
+                          Start small and be consistent. Even completing one habit daily makes a big difference!
+                        </p>
+                      </div>
+                    )}
 
-                    <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Clock className="w-4 h-4 text-blue-600" />
-                        <h4 className="font-semibold text-blue-800 dark:text-blue-400">Optimization Tip</h4>
+                    {analyticsData.overview.currentStreak > 0 && (
+                      <div className="p-4 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Flame className="w-4 h-4 text-purple-600" />
+                          <h4 className="font-semibold text-purple-800 dark:text-purple-400">Streak Power</h4>
+                        </div>
+                        <p className="text-sm text-purple-700 dark:text-purple-300">
+                          You're on a {analyticsData.overview.currentStreak}-day streak! Don't break the chain today.
+                        </p>
                       </div>
-                      <p className="text-sm text-blue-700 dark:text-blue-300">
-                        Your best performance days are weekdays. Consider setting reminders for weekends.
-                      </p>
-                    </div>
+                    )}
 
-                    <div className="p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Star className="w-4 h-4 text-amber-600" />
-                        <h4 className="font-semibold text-amber-800 dark:text-amber-400">Next Milestone</h4>
+                    {analyticsData.weekly.some(d => d.percentage === 100) && (
+                      <div className="p-4 bg-cyan-50 dark:bg-cyan-950/20 rounded-lg border border-cyan-200 dark:border-cyan-800">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Award className="w-4 h-4 text-cyan-600" />
+                          <h4 className="font-semibold text-cyan-800 dark:text-cyan-400">Perfect Days!</h4>
+                        </div>
+                        <p className="text-sm text-cyan-700 dark:text-cyan-300">
+                          You've had {analyticsData.weekly.filter(d => d.percentage === 100).length} perfect completion days this week!
+                        </p>
                       </div>
-                      <p className="text-sm text-amber-700 dark:text-amber-300">
-                        You're {30 - analyticsData.overview.currentStreak} days away from a 30-day streak!
-                      </p>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
               </div>
