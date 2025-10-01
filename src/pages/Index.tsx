@@ -107,13 +107,13 @@ const Index = () => {
           <Settings onClose={() => setActiveView("home")} />;
       default:
         return (
-          <main className="container mx-auto px-4 py-8 space-y-8">
+          <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 space-y-4 sm:space-y-8 max-w-7xl">
 
             {/* Personalized Quotes Section - Moved to top */}
             <PersonalizedQuotes />
 
             {/* Stats Overview */}
-            <StatsOverview 
+            <StatsOverview
               completedToday={habits.filter(h => h.completedToday).length}
               totalHabits={habits.length}
               totalStreak={habits.reduce((sum, h) => sum + h.currentStreak, 0)}
@@ -121,23 +121,23 @@ const Index = () => {
             />
 
             {/* Today's Focus */}
-            <section className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-semibold flex items-center gap-2">
-                  <Target className="w-6 h-6 text-primary" />
+            <section className="space-y-4 sm:space-y-6">
+              <div className="flex items-center justify-between gap-2">
+                <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
+                  <Target className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                   Today's Focus
                 </h2>
                 <Button 
                   onClick={() => setShowAddForm(true)}
-                  className="bg-gradient-primary text-primary-foreground hover:scale-105 transition-transform"
+                  className="bg-gradient-primary text-primary-foreground hover:scale-105 transition-transform h-9 sm:h-10 px-3 sm:px-4"
                 >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Habit
+                  <Plus className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Add Habit</span>
                 </Button>
               </div>
 
               {/* Habit Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {habits.map((habit, index) => (
                   <div key={habit.id} className="animate-slide-up" style={{ animationDelay: `${index * 100}ms` }}>
                     <HabitCard 
@@ -177,8 +177,8 @@ const Index = () => {
   };
 
   return (
-    <div className={`min-h-screen bg-background ${isMobile ? 'pb-16' : ''}`}>
-      <Header 
+    <div className={`min-h-screen bg-background ${isMobile ? 'pb-20' : ''}`}>
+      <Header
         onCalendarClick={() => setActiveView("calendar")} 
         onSettingsClick={() => setActiveView("settings")}
         onCommunityClick={() => setActiveView("community")}

@@ -137,24 +137,24 @@ export const PersonalizedQuotes = () => {
   if (!currentQuote) return null;
 
   return (
-    <Card className={`p-8 text-center bg-gradient-to-br from-primary/5 via-background to-accent/5 border-primary/20 shadow-elegant transition-all duration-300 ${isAnimating ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}`}>
-      <div className="flex items-center justify-center mb-4">
-        <Quote className="w-8 h-8 text-primary/60" />
+    <Card className={`p-4 sm:p-8 text-center bg-gradient-to-br from-primary/5 via-background to-accent/5 border-primary/20 shadow-elegant transition-all duration-300 ${isAnimating ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}`}>
+      <div className="flex items-center justify-center mb-3 sm:mb-4">
+        <Quote className="w-6 h-6 sm:w-8 sm:h-8 text-primary/60" />
       </div>
       
-      <blockquote className={`text-lg md:text-xl font-medium text-foreground/90 mb-4 transition-all duration-500 ${isAnimating ? 'blur-sm' : 'blur-0'}`}>
+      <blockquote className={`text-base sm:text-lg md:text-xl font-medium text-foreground/90 mb-3 sm:mb-4 leading-relaxed transition-all duration-500 ${isAnimating ? 'blur-sm' : 'blur-0'}`}>
         "{currentQuote.text}"
       </blockquote>
       
-      <div className="flex items-center justify-center gap-4">
-        <cite className="text-sm text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
+        <cite className="text-xs sm:text-sm text-muted-foreground">
           — {currentQuote.author}
         </cite>
         
         {currentQuote.isPersonalized && (
-          <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 rounded-full">
-            <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-            <span className="text-xs text-primary font-medium">Personal</span>
+          <div className="flex items-center gap-1 px-2 py-0.5 sm:py-1 bg-primary/10 rounded-full">
+            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full animate-pulse"></div>
+            <span className="text-[10px] sm:text-xs text-primary font-medium">Personal</span>
           </div>
         )}
         
@@ -162,7 +162,7 @@ export const PersonalizedQuotes = () => {
           variant="ghost"
           size="sm"
           onClick={refreshQuote}
-          className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary"
+          className="h-9 w-9 sm:h-8 sm:w-8 p-0 hover:bg-primary/10 hover:text-primary active:scale-90 transition-transform"
           disabled={isAnimating}
         >
           <RefreshCw className={`w-4 h-4 ${isAnimating ? 'animate-spin' : ''}`} />
@@ -172,7 +172,7 @@ export const PersonalizedQuotes = () => {
           variant="ghost"
           size="sm"
           onClick={() => setShowCreateModal(true)}
-          className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary"
+          className="h-9 w-9 sm:h-8 sm:w-8 p-0 hover:bg-primary/10 hover:text-primary active:scale-90 transition-transform"
         >
           <Plus className="w-4 h-4" />
         </Button>

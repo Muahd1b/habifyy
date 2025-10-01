@@ -53,31 +53,31 @@ export const StatsOverview = ({
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       {stats.map((stat, index) => (
         <Card 
           key={stat.label} 
-          className="p-6 habit-card space-y-4 animate-slide-up"
-          style={{ animationDelay: `${index * 100}ms` }}
+          className="p-4 sm:p-6 habit-card space-y-3 sm:space-y-4 animate-slide-up active:scale-[0.98] transition-transform"
+          style={{ animationDelay: `${index * 50}ms` }}
         >
           <div className="flex items-center justify-between">
-            <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-              <stat.icon className={`w-5 h-5 ${stat.color}`} />
+            <div className={`p-1.5 sm:p-2 rounded-lg ${stat.bgColor}`}>
+              <stat.icon className={`w-4 h-4 sm:w-5 sm:h-5 ${stat.color}`} />
             </div>
             
             {stat.label === "Completed Today" && completionRate === 100 && totalHabits > 0 && (
-              <Badge className="streak-badge text-xs">
-                Perfect Day!
+              <Badge className="streak-badge text-[10px] sm:text-xs px-1.5 sm:px-2">
+                Perfect!
               </Badge>
             )}
           </div>
           
-          <div className="space-y-1">
-            <div className="text-2xl font-bold">{stat.value}</div>
-            <div className="text-sm font-medium text-foreground">
+          <div className="space-y-0.5 sm:space-y-1">
+            <div className="text-xl sm:text-2xl font-bold">{stat.value}</div>
+            <div className="text-xs sm:text-sm font-medium text-foreground leading-tight">
               {stat.label}
             </div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-[10px] sm:text-xs text-muted-foreground line-clamp-1">
               {stat.description}
             </div>
           </div>

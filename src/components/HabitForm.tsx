@@ -65,23 +65,23 @@ export const HabitForm = ({ onSubmit, onCancel }: HabitFormProps) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in">
-      <Card className="w-full max-w-md p-6 space-y-6 animate-scale-in">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-3 sm:p-4 z-50 animate-fade-in">
+      <Card className="w-full max-w-md p-4 sm:p-6 space-y-4 sm:space-y-6 animate-scale-in max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Create New Habit</h2>
+        <div className="flex items-center justify-between sticky top-0 bg-card z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 sm:py-0 border-b sm:border-0 mb-2 sm:mb-0">
+          <h2 className="text-lg sm:text-xl font-semibold">Create New Habit</h2>
           <Button
             variant="ghost"
             size="sm"
             onClick={onCancel}
-            className="h-8 w-8 p-0 rounded-full"
+            className="h-9 w-9 sm:h-8 sm:w-8 p-0 rounded-full active:scale-90 transition-transform"
           >
             <X className="w-4 h-4" />
           </Button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           {/* Habit Name */}
           <div className="space-y-2">
             <label htmlFor="name" className="text-sm font-medium">
@@ -136,15 +136,15 @@ export const HabitForm = ({ onSubmit, onCancel }: HabitFormProps) => {
           </div>
 
           {/* Color Selection */}
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             <label className="text-sm font-medium">Choose Color Theme</label>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-4 gap-2 sm:gap-2">
               {colorOptions.map((option) => (
                 <button
                   key={option.value}
                   type="button"
                   className={`
-                    h-10 rounded-lg border-2 transition-all
+                    h-12 sm:h-10 rounded-lg border-2 transition-all active:scale-95
                     bg-gradient-to-br ${option.value}
                     ${formData.color === option.value 
                       ? 'border-primary shadow-medium scale-110' 
@@ -159,18 +159,18 @@ export const HabitForm = ({ onSubmit, onCancel }: HabitFormProps) => {
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-2 sm:gap-3 pt-2 sm:pt-4 sticky bottom-0 bg-card -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 sm:py-0 border-t sm:border-0">
             <Button
               type="button"
               variant="outline"
               onClick={onCancel}
-              className="flex-1"
+              className="flex-1 h-11 sm:h-10 active:scale-95 transition-transform"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="flex-1 bg-gradient-primary text-primary-foreground"
+              className="flex-1 h-11 sm:h-10 bg-gradient-primary text-primary-foreground active:scale-95 transition-transform"
             >
               <Plus className="w-4 h-4 mr-2" />
               Create Habit

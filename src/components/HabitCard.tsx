@@ -61,7 +61,7 @@ export const HabitCard = ({ habit, onProgressUpdate, onDelete }: HabitCardProps)
 
   return (
     <Card className={cn(
-      "habit-card p-6 space-y-4 relative overflow-hidden",
+      "habit-card p-4 sm:p-6 space-y-3 sm:space-y-4 relative overflow-hidden active:scale-[0.98] transition-transform",
       isCompleted && "habit-card-completed",
       isUpdating && "animate-bounce-soft"
     )}>
@@ -73,22 +73,22 @@ export const HabitCard = ({ habit, onProgressUpdate, onDelete }: HabitCardProps)
       
       {/* Header */}
       <div className="relative space-y-2">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1 flex-1">
-            <h3 className="font-semibold text-lg">{habit.name}</h3>
+        <div className="flex items-start justify-between gap-2">
+          <div className="space-y-1 flex-1 min-w-0">
+            <h3 className="font-semibold text-base sm:text-lg truncate">{habit.name}</h3>
             {habit.description && (
-              <p className="text-sm text-muted-foreground">{habit.description}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{habit.description}</p>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             {isCompleted && (
-              <CheckCircle2 className="w-6 h-6 text-success animate-bounce-soft" />
+              <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-success animate-bounce-soft" />
             )}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowDeleteDialog(true)}
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              className="h-9 w-9 sm:h-8 sm:w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 active:scale-90 transition-transform"
             >
               <Trash2 className="w-4 h-4" />
             </Button>
@@ -127,16 +127,16 @@ export const HabitCard = ({ habit, onProgressUpdate, onDelete }: HabitCardProps)
             size="sm"
             onClick={handleDecrement}
             disabled={habit.completed === 0 || isUpdating}
-            className="h-8 w-8 p-0 rounded-full border-2"
+            className="h-10 w-10 sm:h-8 sm:w-8 p-0 rounded-full border-2 active:scale-90 transition-transform"
           >
             <Minus className="w-4 h-4" />
           </Button>
           
           <div className="text-center">
-            <div className="text-2xl font-bold text-primary">
+            <div className="text-xl sm:text-2xl font-bold text-primary">
               {Math.round(progressPercentage)}%
             </div>
-            <div className="text-xs text-muted-foreground">Complete</div>
+            <div className="text-[10px] sm:text-xs text-muted-foreground">Complete</div>
           </div>
           
           <Button
@@ -144,7 +144,7 @@ export const HabitCard = ({ habit, onProgressUpdate, onDelete }: HabitCardProps)
             size="sm"
             onClick={handleIncrement}
             disabled={habit.completed >= habit.target || isUpdating}
-            className="h-8 w-8 p-0 rounded-full border-2 hover:bg-success/10 hover:border-success"
+            className="h-10 w-10 sm:h-8 sm:w-8 p-0 rounded-full border-2 hover:bg-success/10 hover:border-success active:scale-90 transition-transform"
           >
             <Plus className="w-4 h-4" />
           </Button>
