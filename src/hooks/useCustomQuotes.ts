@@ -21,8 +21,13 @@ export const useCustomQuotes = () => {
   const fetchCustomQuotes = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        console.log('No user logged in for custom quotes');
+        setLoading(false);
+        return;
+      }
 
+      console.log('Fetching custom quotes for user:', user.id);
       const { data, error } = await supabase
         .from('custom_quotes')
         .select('*')
@@ -30,10 +35,20 @@ export const useCustomQuotes = () => {
         .eq('is_active', true)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error fetching custom quotes:', error);
+        throw error;
+      }
+      
+      console.log('Custom quotes fetched:', data?.length || 0, 'quotes');
       setCustomQuotes(data || []);
     } catch (error: any) {
       console.error('Error fetching custom quotes:', error);
+      toast({
+        title: "Error loading quotes",
+        description: "Could not load your custom quotes. Please try refreshing.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -42,8 +57,12 @@ export const useCustomQuotes = () => {
   const createCustomQuote = async (quoteData: { text: string; author?: string; category?: string }) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        console.error('No user logged in when creating quote');
+        return;
+      }
 
+      console.log('Creating custom quote:', quoteData);
       const { data, error } = await supabase
         .from('custom_quotes')
         .insert([{
@@ -55,8 +74,12 @@ export const useCustomQuotes = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating quote in Supabase:', error);
+        throw error;
+      }
 
+      console.log('Quote created successfully:', data);
       setCustomQuotes(prev => [data, ...prev]);
       toast({
         title: "Quote created!",
@@ -65,6 +88,7 @@ export const useCustomQuotes = () => {
 
       return data;
     } catch (error: any) {
+      console.error('Error in createCustomQuote:', error);
       toast({
         title: "Error creating quote",
         description: error.message,

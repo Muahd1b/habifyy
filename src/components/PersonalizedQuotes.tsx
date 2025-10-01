@@ -59,6 +59,23 @@ export const PersonalizedQuotes = () => {
     const totalStreak = habits.reduce((sum, h) => sum + h.currentStreak, 0);
     const longestStreak = Math.max(...habits.map(h => h.longestStreak), 0);
 
+    // Convert custom quotes to QuoteData format
+    const customQuoteData: QuoteData[] = customQuotes.map(quote => ({
+      text: quote.text,
+      author: quote.author || 'You',
+      category: quote.category,
+      isPersonalized: true
+    }));
+
+    console.log('Custom quotes available:', customQuoteData.length);
+
+    // Prioritize custom quotes - 60% chance if they exist
+    if (customQuoteData.length > 0 && Math.random() < 0.6) {
+      const selectedQuote = customQuoteData[Math.floor(Math.random() * customQuoteData.length)];
+      console.log('Selected custom quote:', selectedQuote.text.substring(0, 30) + '...');
+      return selectedQuote;
+    }
+
     // Personalized quotes based on user's data
     const personalizedQuotes: QuoteData[] = [
       {
@@ -87,17 +104,11 @@ export const PersonalizedQuotes = () => {
       }
     ];
 
-    // Convert custom quotes to QuoteData format
-    const customQuoteData: QuoteData[] = customQuotes.map(quote => ({
-      text: quote.text,
-      author: quote.author || 'You',
-      category: quote.category,
-      isPersonalized: true
-    }));
-
-    // Mix personalized, custom, and motivational quotes
-    const allQuotes = [...personalizedQuotes, ...customQuoteData, ...motivationalQuotes];
-    return allQuotes[Math.floor(Math.random() * allQuotes.length)];
+    // Mix personalized and motivational quotes for remaining 40%
+    const allQuotes = [...personalizedQuotes, ...motivationalQuotes];
+    const selectedQuote = allQuotes[Math.floor(Math.random() * allQuotes.length)];
+    console.log('Selected quote type:', selectedQuote.isPersonalized ? 'personalized' : 'motivational');
+    return selectedQuote;
   };
 
   const refreshQuote = () => {
@@ -109,8 +120,11 @@ export const PersonalizedQuotes = () => {
   };
 
   useEffect(() => {
-    setCurrentQuote(generatePersonalizedQuote());
-  }, [habits, customQuotes]);
+    if (habits.length > 0) {
+      console.log('Generating initial quote with', customQuotes.length, 'custom quotes available');
+      setCurrentQuote(generatePersonalizedQuote());
+    }
+  }, [habits.length, customQuotes.length]);
 
   useEffect(() => {
     const interval = setInterval(() => {
