@@ -240,6 +240,113 @@
   }
 }
 
+/* Liquid Chart Animations */
+@keyframes liquidRise {
+  from {
+    height: 0%;
+    opacity: 0.5;
+  }
+  to {
+    height: var(--final-height);
+    opacity: 1;
+  }
+}
+
+@keyframes wave {
+  0%, 100% {
+    transform: translateY(0) scaleX(1);
+  }
+  50% {
+    transform: translateY(-3px) scaleX(1.05);
+  }
+}
+
+@keyframes progressDraw {
+  from {
+    stroke-dashoffset: calc(2 * 3.14159 * var(--radius, 50));
+  }
+  to {
+    stroke-dashoffset: var(--final-offset);
+  }
+}
+
+/* Interactive Effects */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Glassmorphism utilities */
+.glass-card {
+  @apply backdrop-blur-xl bg-card/80 border border-border/50 shadow-soft;
+}
+
+.glass-panel {
+  @apply backdrop-blur-lg bg-background/60 border border-border/30;
+}
+
+/* Interactive button effects - Applied globally */
+.interactive-press {
+  @apply active:scale-95 active:brightness-95 transition-all duration-150;
+}
+
+.interactive-hover {
+  @apply hover:scale-105 hover:shadow-medium transition-transform duration-200;
+}
+
+.interactive-lift {
+  @apply hover:-translate-y-1 hover:shadow-strong transition-all duration-300;
+}
+
+/* Tab underline animation */
+.tab-underline {
+  @apply relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary after:transform after:scale-x-0 after:transition-transform after:duration-300 data-[state=active]:after:scale-x-100;
+}
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 6px;

@@ -21,12 +21,13 @@ import {
   ArrowDown,
   Minus
 } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, Cell, PieChart, Pie } from "recharts";
+import { LiquidTubeComparison } from '@/components/charts/LiquidTubeChart';
+import { RadialProgressChart } from '@/components/charts/RadialProgressChart';
 import { useHabits } from '@/hooks/useHabits';
 import { useHabitCompletions } from '@/hooks/useHabitCompletions';
 import { useProfile } from '@/hooks/useProfile';
 import { useMemo } from 'react';
-import { format, startOfDay, subDays, isAfter, isBefore, parseISO } from 'date-fns';
+import { format, startOfDay, subDays } from 'date-fns';
 
 interface ModernAnalyticsProps {
   open: boolean;
@@ -140,20 +141,21 @@ export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
   }, [habits, completions, profile, getCompletionsForDate, getCompletionStats]);
 
   const MetricCard = ({ title, value, subtitle, icon: Icon, trend }: any) => (
-    <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+    <Card className="relative overflow-hidden group hover:shadow-strong transition-all duration-300 glass-card active:scale-95 cursor-pointer">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
         <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-        <div className="p-2 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors">
+        <div className="p-2 bg-primary/10 rounded-full group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
           <Icon className="h-4 w-4 text-primary" />
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold text-foreground">{value}</div>
+      <CardContent className="relative z-10">
+        <div className="text-2xl font-bold text-foreground animate-[fadeInUp_0.5s_ease-out]">{value}</div>
         <div className="flex items-center gap-2 mt-1">
           <p className="text-xs text-muted-foreground">{subtitle}</p>
           {trend && (
-            <div className={`flex items-center gap-1 ${
-              trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-muted-foreground'
+            <div className={`flex items-center gap-1 animate-[bounceSoft_1s_ease-out] ${
+              trend === 'up' ? 'text-success' : trend === 'down' ? 'text-destructive' : 'text-muted-foreground'
             }`}>
               {trend === 'up' && <ArrowUp className="w-3 h-3" />}
               {trend === 'down' && <ArrowDown className="w-3 h-3" />}
@@ -162,7 +164,7 @@ export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
           )}
         </div>
       </CardContent>
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-success opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
     </Card>
   );
 
@@ -181,35 +183,37 @@ export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl max-h-[95vh] overflow-hidden p-0">
-        {/* Enhanced Header */}
-        <DialogHeader className="px-8 py-6 border-b bg-gradient-to-r from-background to-accent/5">
+      <DialogContent className="max-w-7xl max-h-[95vh] overflow-hidden p-0 glass-card">
+        {/* Enhanced Header with Glassmorphism */}
+        <DialogHeader className="px-8 py-6 border-b border-border/50 backdrop-blur-xl bg-gradient-to-r from-primary/5 via-background to-accent/5">
           <DialogTitle className="flex items-center gap-3 text-xl">
-            <div className="p-2 bg-primary/10 rounded-full">
+            <div className="p-2 bg-primary/10 rounded-full animate-[float_3s_ease-in-out_infinite]">
               <BarChart3 className="h-6 w-6 text-primary" />
             </div>
-            Analytics Dashboard
+            <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              Analytics Dashboard
+            </span>
           </DialogTitle>
         </DialogHeader>
 
         <div className="overflow-y-auto max-h-[calc(95vh-80px)]">
           <Tabs defaultValue="overview" className="w-full">
-            {/* Enhanced Tab Navigation */}
-            <div className="px-8 py-4 border-b bg-muted/20">
-              <TabsList className="grid w-full max-w-2xl grid-cols-4 h-14 bg-background shadow-sm">
-                <TabsTrigger value="overview" className="flex items-center gap-2 px-4 py-3 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            {/* Enhanced Tab Navigation with Glass Effect */}
+            <div className="px-8 py-4 border-b border-border/30 backdrop-blur-sm bg-gradient-to-r from-muted/10 to-muted/5">
+              <TabsList className="grid w-full max-w-2xl grid-cols-4 h-14 glass-card">
+                <TabsTrigger value="overview" className="flex items-center gap-2 px-4 py-3 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
                   <Activity className="w-4 h-4" />
                   <span>Overview</span>
                 </TabsTrigger>
-                <TabsTrigger value="performance" className="flex items-center gap-2 px-4 py-3 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="performance" className="flex items-center gap-2 px-4 py-3 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
                   <TrendingUp className="w-4 h-4" />
                   <span>Performance</span>
                 </TabsTrigger>
-                <TabsTrigger value="habits" className="flex items-center gap-2 px-4 py-3 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="habits" className="flex items-center gap-2 px-4 py-3 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
                   <Target className="w-4 h-4" />
                   <span>Habits</span>
                 </TabsTrigger>
-                <TabsTrigger value="insights" className="flex items-center gap-2 px-4 py-3 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="insights" className="flex items-center gap-2 px-4 py-3 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
                   <Zap className="w-4 h-4" />
                   <span>Insights</span>
                 </TabsTrigger>
@@ -250,82 +254,66 @@ export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
                 />
               </div>
 
-              {/* Enhanced Performance Chart */}
+              {/* Liquid Tube Charts - Modern Visualization */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card className="lg:col-span-2">
-                  <CardHeader>
+                <Card className="lg:col-span-2 glass-card overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <CardHeader className="relative z-10">
                     <div className="flex items-center justify-between">
                       <div>
                         <CardTitle className="flex items-center gap-2">
                           <TrendingUp className="w-5 h-5 text-primary" />
-                          30-Day Performance Trend
+                          Weekly Performance Overview
                         </CardTitle>
-                        <CardDescription>Your completion rate and habit consistency over time</CardDescription>
+                        <CardDescription>Liquid tube visualization of your habit consistency</CardDescription>
                       </div>
-                      <Badge variant="outline" className="bg-primary/5">
-                        Trending Up
+                      <Badge variant="outline" className="bg-primary/5 animate-pulse">
+                        Live Data
                       </Badge>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <AreaChart data={analyticsData.trends}>
-                        <defs>
-                          <linearGradient id="colorCompletion" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                        <XAxis 
-                          dataKey="date" 
-                          stroke="hsl(var(--muted-foreground))"
-                          fontSize={12}
-                          tickFormatter={(value) => new Date(value).toLocaleDateString('en', { month: 'short', day: 'numeric' })}
-                        />
-                        <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: 'hsl(var(--background))', 
-                            border: '1px solid hsl(var(--border))',
-                            borderRadius: '8px',
-                            boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
-                          }}
-                        />
-                        <Area 
-                          type="monotone" 
-                          dataKey="completion" 
-                          stroke="hsl(var(--primary))" 
-                          strokeWidth={3}
-                          fillOpacity={1}
-                          fill="url(#colorCompletion)"
-                        />
-                      </AreaChart>
-                    </ResponsiveContainer>
+                  <CardContent className="relative z-10">
+                    <LiquidTubeComparison
+                      data={analyticsData.weekly.map((day, idx) => ({
+                        label: day.day,
+                        percentage: day.percentage,
+                        color: idx === 6 ? 'primary' : day.percentage >= 80 ? 'success' : day.percentage >= 50 ? 'warning' : 'accent'
+                      }))}
+                      height={200}
+                    />
                   </CardContent>
                 </Card>
 
-                {/* Weekly Summary */}
-                <Card>
+                {/* Radial Progress Summary */}
+                <Card className="glass-card">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Calendar className="w-5 h-5 text-primary" />
-                      This Week
+                      Success Rate
                     </CardTitle>
-                    <CardDescription>Daily completion overview</CardDescription>
+                    <CardDescription>Overall completion this week</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    {analyticsData.weekly.map((day, index) => (
-                      <div key={day.day} className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium">{day.day}</span>
-                          <span className="text-sm text-muted-foreground">
-                            {day.completed}/{day.total}
-                          </span>
-                        </div>
-                        <AnimatedProgress value={day.percentage} />
+                  <CardContent className="flex flex-col items-center justify-center py-6 space-y-6">
+                    <RadialProgressChart
+                      percentage={analyticsData.overview.winRate}
+                      size={140}
+                      strokeWidth={12}
+                      color={analyticsData.overview.winRate >= 80 ? 'success' : analyticsData.overview.winRate >= 50 ? 'primary' : 'warning'}
+                      showValue={true}
+                    />
+                    <div className="text-center space-y-2">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        {analyticsData.overview.winRate >= 80 ? 'Excellent Performance!' : 
+                         analyticsData.overview.winRate >= 50 ? 'Good Progress!' : 
+                         'Keep Going!'}
+                      </p>
+                      <div className="flex items-center justify-center gap-2">
+                        <Badge variant="secondary" className="text-xs">
+                          <Flame className="w-3 h-3 mr-1" />
+                          {analyticsData.overview.currentStreak} day streak
+                        </Badge>
                       </div>
-                    ))}
+                    </div>
                   </CardContent>
                 </Card>
               </div>

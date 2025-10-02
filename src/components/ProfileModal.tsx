@@ -227,42 +227,54 @@ export const ProfileModal = ({ userId, open, onClose }: ProfileModalProps) => {
         </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Grid with Glass Effect */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="flex items-center justify-center mb-2">
-              <Target className="h-5 w-5 text-primary" />
+        <Card className="glass-card group hover:shadow-strong transition-all duration-300 active:scale-95 cursor-pointer">
+          <CardContent className="p-4 text-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="flex items-center justify-center mb-2 relative z-10">
+              <div className="p-2 bg-primary/10 rounded-full group-hover:scale-110 transition-transform duration-300">
+                <Target className="h-5 w-5 text-primary" />
+              </div>
             </div>
-            <div className="text-2xl font-bold">{stats?.totalHabits || 0}</div>
-            <div className="text-xs text-muted-foreground">Active Habits</div>
+            <div className="text-2xl font-bold relative z-10 animate-[fadeInUp_0.5s_ease-out]">{stats?.totalHabits || 0}</div>
+            <div className="text-xs text-muted-foreground relative z-10">Active Habits</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="flex items-center justify-center mb-2">
-              <TrendingUp className="h-5 w-5 text-success" />
+        <Card className="glass-card group hover:shadow-strong transition-all duration-300 active:scale-95 cursor-pointer">
+          <CardContent className="p-4 text-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-success/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="flex items-center justify-center mb-2 relative z-10">
+              <div className="p-2 bg-success/10 rounded-full group-hover:scale-110 transition-transform duration-300">
+                <TrendingUp className="h-5 w-5 text-success" />
+              </div>
             </div>
-            <div className="text-2xl font-bold">{stats?.currentStreak || 0}</div>
-            <div className="text-xs text-muted-foreground">Current Streak</div>
+            <div className="text-2xl font-bold relative z-10 animate-[fadeInUp_0.5s_ease-out]">{stats?.currentStreak || 0}</div>
+            <div className="text-xs text-muted-foreground relative z-10">Current Streak</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="flex items-center justify-center mb-2">
-              <Users className="h-5 w-5 text-accent" />
+        <Card className="glass-card group hover:shadow-strong transition-all duration-300 active:scale-95 cursor-pointer">
+          <CardContent className="p-4 text-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="flex items-center justify-center mb-2 relative z-10">
+              <div className="p-2 bg-accent/10 rounded-full group-hover:scale-110 transition-transform duration-300">
+                <Users className="h-5 w-5 text-accent" />
+              </div>
             </div>
-            <div className="text-2xl font-bold">{stats?.followersCount || 0}</div>
-            <div className="text-xs text-muted-foreground">Followers</div>
+            <div className="text-2xl font-bold relative z-10 animate-[fadeInUp_0.5s_ease-out]">{stats?.followersCount || 0}</div>
+            <div className="text-xs text-muted-foreground relative z-10">Followers</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="flex items-center justify-center mb-2">
-              <Trophy className="h-5 w-5 text-warning" />
+        <Card className="glass-card group hover:shadow-strong transition-all duration-300 active:scale-95 cursor-pointer">
+          <CardContent className="p-4 text-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-warning/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="flex items-center justify-center mb-2 relative z-10">
+              <div className="p-2 bg-warning/10 rounded-full group-hover:scale-110 transition-transform duration-300">
+                <Trophy className="h-5 w-5 text-warning" />
+              </div>
             </div>
-            <div className="text-2xl font-bold">{stats?.achievementsCount || 0}</div>
-            <div className="text-xs text-muted-foreground">Achievements</div>
+            <div className="text-2xl font-bold relative z-10 animate-[fadeInUp_0.5s_ease-out]">{stats?.achievementsCount || 0}</div>
+            <div className="text-xs text-muted-foreground relative z-10">Achievements</div>
           </CardContent>
         </Card>
       </div>
@@ -444,11 +456,15 @@ export const ProfileModal = ({ userId, open, onClose }: ProfileModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            {isOwnProfile ? 'Your Profile' : `${profile.display_name || 'User'}'s Profile`}
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto glass-card">
+        <DialogHeader className="backdrop-blur-sm bg-gradient-to-r from-primary/5 via-background/50 to-accent/5 -mx-6 -mt-6 px-6 pt-6 pb-4 mb-4 border-b border-border/30">
+          <DialogTitle className="flex items-center gap-3 text-xl">
+            <div className="p-2 bg-primary/10 rounded-full animate-[float_3s_ease-in-out_infinite]">
+              <User className="h-5 w-5 text-primary" />
+            </div>
+            <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              {isOwnProfile ? 'Your Profile' : `${profile.display_name || 'User'}'s Profile`}
+            </span>
           </DialogTitle>
         </DialogHeader>
 

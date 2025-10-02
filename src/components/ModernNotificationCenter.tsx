@@ -95,20 +95,22 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-md">
-      <div className="fixed right-0 top-0 h-full w-full max-w-md border-l bg-background/95 shadow-strong animate-slide-in-right">
+    <div className="fixed inset-0 z-50 bg-background/60 backdrop-blur-lg animate-[fadeIn_0.3s_ease-out]">
+      <div className="fixed right-0 top-0 h-full w-full max-w-md border-l border-border/30 glass-panel shadow-[0_0_40px_rgba(0,0,0,0.2)] animate-[slideInRight_0.4s_ease-out]">
         <Card className="h-full rounded-none border-0 bg-transparent">
-          {/* Enhanced Header */}
-          <CardHeader className="pb-4 border-b border-border/50">
+          {/* Enhanced Header with Glassmorphism */}
+          <CardHeader className="pb-4 border-b border-border/30 backdrop-blur-xl bg-gradient-to-r from-primary/5 via-background/50 to-accent/5">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-3">
-                <div className="p-2 bg-primary/10 rounded-full">
+                <div className="p-2 bg-primary/10 rounded-full animate-[float_3s_ease-in-out_infinite]">
                   <Bell className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold">Notifications</h2>
+                  <h2 className="text-lg font-semibold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                    Notifications
+                  </h2>
                   {stats.unread > 0 && (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground animate-pulse">
                       {stats.unread} unread updates
                     </p>
                   )}
@@ -118,34 +120,34 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
                 variant="ghost"
                 size="sm"
                 onClick={onClose}
-                className="h-9 w-9 p-0 hover:bg-destructive/10 hover:text-destructive"
+                className="h-9 w-9 p-0 hover:bg-destructive/10 hover:text-destructive active:scale-90 transition-all duration-200"
               >
                 <X className="w-5 h-5" />
               </Button>
             </div>
 
-            {/* Enhanced Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            {/* Enhanced Search with Glass Effect */}
+            <div className="relative group">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <Input
                 type="text"
                 placeholder="Search notifications..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-muted/50 border-0 focus:bg-background focus:ring-2 focus:ring-primary/20"
+                className="pl-10 glass-card border-0 focus:ring-2 focus:ring-primary/30 focus:shadow-glow transition-all duration-300"
               />
             </div>
 
-            {/* Quick Actions */}
+            {/* Quick Actions with Interactive Effects */}
             <div className="flex items-center gap-2">
               {quickActions.map((action) => (
                 <Button
                   key={action.label}
-                  variant="outline"
+                  variant="glass"
                   size="sm"
                   onClick={action.action}
                   disabled={action.disabled}
-                  className="h-8 px-3 text-xs"
+                  className="h-8 px-3 text-xs active:scale-95 hover:shadow-medium transition-all duration-200"
                 >
                   <action.icon className="w-3 h-3 mr-1" />
                   {action.label}
@@ -156,36 +158,36 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
 
           <CardContent className="px-0 py-0 flex-1 overflow-hidden">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-              {/* Enhanced Tab Navigation */}
-              <div className="px-6 py-4 border-b border-border/50">
-                <TabsList className="w-full grid grid-cols-4 h-10 bg-muted/50">
-                  <TabsTrigger value="all" className="text-xs font-medium data-[state=active]:bg-background">
+              {/* Enhanced Tab Navigation with Glass Effect */}
+              <div className="px-6 py-4 border-b border-border/30 backdrop-blur-sm">
+                <TabsList className="w-full grid grid-cols-4 h-10 glass-card">
+                  <TabsTrigger value="all" className="text-xs font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
                     <div className="flex items-center gap-1">
                       All
                       {getTabCount('all') > 0 && (
-                        <Badge variant="secondary" className="h-4 text-xs px-1">
+                        <Badge variant="secondary" className="h-4 text-xs px-1 animate-pulse">
                           {getTabCount('all')}
                         </Badge>
                       )}
                     </div>
                   </TabsTrigger>
-                  <TabsTrigger value="unread" className="text-xs font-medium data-[state=active]:bg-background">
+                  <TabsTrigger value="unread" className="text-xs font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
                     <div className="flex items-center gap-1">
                       New
                       {stats.unread > 0 && (
-                        <Badge variant="destructive" className="h-4 text-xs px-1">
+                        <Badge variant="destructive" className="h-4 text-xs px-1 animate-[bounceSoft_1s_ease-out_infinite]">
                           {stats.unread}
                         </Badge>
                       )}
                     </div>
                   </TabsTrigger>
-                  <TabsTrigger value="important" className="text-xs font-medium data-[state=active]:bg-background">
+                  <TabsTrigger value="important" className="text-xs font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
                     <div className="flex items-center gap-1">
                       <Star className="w-3 h-3" />
                       High
                     </div>
                   </TabsTrigger>
-                  <TabsTrigger value="habits" className="text-xs font-medium data-[state=active]:bg-background">
+                  <TabsTrigger value="habits" className="text-xs font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
                     <div className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       Habits
@@ -217,12 +219,17 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
                           </p>
                         </div>
                       ) : (
-                        <div className="space-y-3">
-                          {filteredNotifications.map((notification) => (
-                            <ModernNotificationItem 
-                              key={notification.id} 
-                              notification={notification} 
-                            />
+                        <div className="space-y-3 animate-[fadeInUp_0.5s_ease-out]">
+                          {filteredNotifications.map((notification, index) => (
+                            <div 
+                              key={notification.id}
+                              style={{ animationDelay: `${index * 0.05}s` }}
+                              className="animate-[fadeInUp_0.5s_ease-out]"
+                            >
+                              <ModernNotificationItem 
+                                notification={notification} 
+                              />
+                            </div>
                           ))}
                         </div>
                       )}
