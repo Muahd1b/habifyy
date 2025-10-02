@@ -18,6 +18,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useIsMobile } from '@/hooks/use-mobile';
+import logo from '@/assets/habifyy-logo.png';
 
 interface ModernHeaderProps {
   onCalendarClick: () => void;
@@ -137,9 +138,7 @@ export const ModernHeader = ({
             {/* Logo Section - Enhanced */}
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="w-8 h-8 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center shadow-sm">
-                  <span className="text-white font-bold text-sm">H</span>
-                </div>
+                <img src={logo} alt="Habifyy Logo" className="w-10 h-10 rounded-xl shadow-sm" />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background animate-pulse" />
               </div>
               <div>

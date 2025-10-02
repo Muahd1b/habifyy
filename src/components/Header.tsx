@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Sparkles, 
   Bell, 
   Settings, 
   User, 
@@ -14,6 +13,7 @@ import {
 import { useNotifications } from '@/hooks/useNotifications';
 import { NotificationCenter } from './NotificationCenter';
 import { useIsMobile } from '@/hooks/use-mobile';
+import logo from '@/assets/habifyy-logo.png';
 
 interface HeaderProps {
   onCalendarClick?: () => void;
@@ -35,9 +35,7 @@ export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onA
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-primary">
-              <Sparkles className="w-5 h-5 text-primary-foreground" />
-            </div>
+            <img src={logo} alt="Habifyy Logo" className="w-10 h-10 rounded-xl" />
             <div>
               <h1 className="font-bold text-lg">Habifyy</h1>
               <p className="text-xs text-muted-foreground hidden sm:block">
