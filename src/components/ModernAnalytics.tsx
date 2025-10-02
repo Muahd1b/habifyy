@@ -196,22 +196,22 @@ export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
           <Tabs defaultValue="overview" className="w-full">
             {/* Enhanced Tab Navigation */}
             <div className="px-8 py-4 border-b bg-muted/20">
-              <TabsList className="grid w-full max-w-2xl grid-cols-4 h-12 bg-background shadow-sm">
-                <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsList className="grid w-full max-w-2xl grid-cols-4 h-14 bg-background shadow-sm">
+                <TabsTrigger value="overview" className="flex items-center gap-2 px-4 py-3 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <Activity className="w-4 h-4" />
-                  Overview
+                  <span>Overview</span>
                 </TabsTrigger>
-                <TabsTrigger value="performance" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="performance" className="flex items-center gap-2 px-4 py-3 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <TrendingUp className="w-4 h-4" />
-                  Performance
+                  <span>Performance</span>
                 </TabsTrigger>
-                <TabsTrigger value="habits" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="habits" className="flex items-center gap-2 px-4 py-3 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <Target className="w-4 h-4" />
-                  Habits
+                  <span>Habits</span>
                 </TabsTrigger>
-                <TabsTrigger value="insights" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="insights" className="flex items-center gap-2 px-4 py-3 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <Zap className="w-4 h-4" />
-                  Insights
+                  <span>Insights</span>
                 </TabsTrigger>
               </TabsList>
             </div>
