@@ -1,9 +1,9 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   Trophy, 
   Target, 
@@ -19,7 +19,8 @@ import {
   Clock,
   ArrowUp,
   ArrowDown,
-  Minus
+  Minus,
+  ArrowLeft
 } from "lucide-react";
 import { LiquidTubeComparison } from '@/components/charts/LiquidTubeChart';
 import { RadialProgressChart } from '@/components/charts/RadialProgressChart';
@@ -30,11 +31,10 @@ import { useMemo } from 'react';
 import { format, startOfDay, subDays } from 'date-fns';
 
 interface ModernAnalyticsProps {
-  open: boolean;
   onClose: () => void;
 }
 
-export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
+export const ModernAnalytics = ({ onClose }: ModernAnalyticsProps) => {
   const { habits } = useHabits();
   const { completions, getCompletionsForDate, getCompletionStats } = useHabitCompletions();
   const { profile } = useProfile();
@@ -182,46 +182,48 @@ export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
   );
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl max-h-[95vh] overflow-hidden p-0 glass-card">
-        {/* Enhanced Header with Glassmorphism */}
-        <DialogHeader className="px-8 py-6 border-b border-border/50 backdrop-blur-xl bg-gradient-to-r from-primary/5 via-background to-accent/5">
-          <DialogTitle className="flex items-center gap-3 text-xl">
-            <div className="p-2 bg-primary/10 rounded-full animate-[float_3s_ease-in-out_infinite]">
-              <BarChart3 className="h-6 w-6 text-primary" />
-            </div>
-            <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-              Analytics Dashboard
-            </span>
-          </DialogTitle>
-        </DialogHeader>
+    <div className="fixed inset-0 z-50 bg-background flex flex-col">
+      {/* Header */}
+      <div className="flex items-center gap-4 p-4 border-b bg-background/95 backdrop-blur-sm sticky top-0 z-10">
+        <Button variant="ghost" size="icon" onClick={onClose} className="interactive-press">
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-full">
+            <BarChart3 className="h-5 w-5 text-primary" />
+          </div>
+          <h1 className="text-xl font-semibold">Analytics</h1>
+        </div>
+      </div>
 
-        <div className="overflow-y-auto max-h-[calc(95vh-80px)]">
+      {/* Content */}
+      <ScrollArea className="flex-1">
+        <div className="container mx-auto px-4 py-6 max-w-7xl">
           <Tabs defaultValue="overview" className="w-full">
-            {/* Enhanced Tab Navigation with Glass Effect */}
-            <div className="px-8 py-4 border-b border-border/30 backdrop-blur-sm bg-gradient-to-r from-muted/10 to-muted/5">
-              <TabsList className="grid w-full max-w-2xl grid-cols-4 h-14 glass-card">
-                <TabsTrigger value="overview" className="flex items-center gap-2 px-4 py-3 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
+            {/* Tab Navigation */}
+            <div className="mb-6">
+              <TabsList className="grid w-full grid-cols-4 h-12 bg-muted/30">
+                <TabsTrigger value="overview" className="flex items-center gap-2 interactive-press">
                   <Activity className="w-4 h-4" />
-                  <span>Overview</span>
+                  <span className="hidden sm:inline">Overview</span>
                 </TabsTrigger>
-                <TabsTrigger value="performance" className="flex items-center gap-2 px-4 py-3 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
+                <TabsTrigger value="performance" className="flex items-center gap-2 interactive-press">
                   <TrendingUp className="w-4 h-4" />
-                  <span>Performance</span>
+                  <span className="hidden sm:inline">Performance</span>
                 </TabsTrigger>
-                <TabsTrigger value="habits" className="flex items-center gap-2 px-4 py-3 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
+                <TabsTrigger value="habits" className="flex items-center gap-2 interactive-press">
                   <Target className="w-4 h-4" />
-                  <span>Habits</span>
+                  <span className="hidden sm:inline">Habits</span>
                 </TabsTrigger>
-                <TabsTrigger value="insights" className="flex items-center gap-2 px-4 py-3 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
+                <TabsTrigger value="insights" className="flex items-center gap-2 interactive-press">
                   <Zap className="w-4 h-4" />
-                  <span>Insights</span>
+                  <span className="hidden sm:inline">Insights</span>
                 </TabsTrigger>
               </TabsList>
             </div>
 
-            {/* Overview Tab - Enhanced */}
-            <TabsContent value="overview" className="space-y-8 px-8 py-6">
+            {/* Overview Tab */}
+            <TabsContent value="overview" className="space-y-6">
               {/* Key Metrics Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <MetricCard
@@ -319,8 +321,8 @@ export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
               </div>
             </TabsContent>
 
-            {/* Performance Tab - Enhanced */}
-            <TabsContent value="performance" className="space-y-6 px-8 py-6">
+            {/* Performance Tab */}
+            <TabsContent value="performance" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Habit Performance Comparison */}
                 <Card className="overflow-hidden">
@@ -428,8 +430,8 @@ export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
               </div>
             </TabsContent>
 
-            {/* Habits Tab - Enhanced */}
-            <TabsContent value="habits" className="space-y-6 px-8 py-6">
+            {/* Habits Tab */}
+            <TabsContent value="habits" className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {analyticsData.habits.map((habit, index) => (
                   <Card key={habit.name} className="group hover:shadow-lg transition-all duration-300">
@@ -480,8 +482,8 @@ export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
               </div>
             </TabsContent>
 
-            {/* Insights Tab - Enhanced */}
-            <TabsContent value="insights" className="space-y-6 px-8 py-6">
+            {/* Insights Tab */}
+            <TabsContent value="insights" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Achievement Overview */}
                 <Card>
@@ -551,7 +553,7 @@ export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
             </TabsContent>
           </Tabs>
         </div>
-      </DialogContent>
-    </Dialog>
+      </ScrollArea>
+    </div>
   );
 };

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,17 +35,17 @@ import {
   Linkedin,
   Github,
   Youtube,
-  Facebook
+  Facebook,
+  ArrowLeft
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ProfileModalProps {
   userId?: string;
-  open: boolean;
   onClose: () => void;
 }
 
-export const ProfileModal = ({ userId, open, onClose }: ProfileModalProps) => {
+export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isEditing, setIsEditing] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
@@ -92,33 +92,29 @@ export const ProfileModal = ({ userId, open, onClose }: ProfileModalProps) => {
 
   if (authLoading || loading) {
     return (
-      <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Loading Profile</DialogTitle>
-          </DialogHeader>
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <div className="fixed inset-0 z-50 bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
     );
   }
 
   if (!profile && !authLoading && !loading) {
     return (
-      <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Profile Not Found</DialogTitle>
-          </DialogHeader>
-          <div className="text-center py-8">
+      <div className="fixed inset-0 z-50 bg-background flex flex-col">
+        <div className="flex items-center gap-4 p-4 border-b">
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-xl font-semibold">Profile</h1>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
             <User className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">Profile not found</h3>
             <p className="text-muted-foreground">This user profile doesn't exist or is private.</p>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </div>
     );
   }
 
@@ -455,38 +451,45 @@ export const ProfileModal = ({ userId, open, onClose }: ProfileModalProps) => {
   );
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto glass-card">
-        <div className="px-6 py-4 bg-muted/50 border-b border-border -mx-6 -mt-6 mb-4">
-          <DialogTitle className="flex items-center gap-3 text-xl">
-            <div className="p-2 bg-primary/10 rounded-full">
-              <User className="h-5 w-5 text-primary" />
-            </div>
-            <span>
-              {isOwnProfile ? 'Your Profile' : `${profile.display_name || 'User'}'s Profile`}
-            </span>
-          </DialogTitle>
+    <div className="fixed inset-0 z-50 bg-background flex flex-col">
+      {/* Header */}
+      <div className="flex items-center gap-4 p-4 border-b bg-background/95 backdrop-blur-sm sticky top-0 z-10">
+        <Button variant="ghost" size="icon" onClick={onClose} className="interactive-press">
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-full">
+            <User className="h-5 w-5 text-primary" />
+          </div>
+          <h1 className="text-xl font-semibold">
+            {isOwnProfile ? 'Your Profile' : `${profile.display_name || 'User'}'s Profile`}
+          </h1>
         </div>
+      </div>
+
+      {/* Content */}
+      <ScrollArea className="flex-1">
+        <div className="container mx-auto px-4 py-6 max-w-4xl">
 
         {isEditing ? (
           renderEditProfile()
         ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="social">Social</TabsTrigger>
-              <TabsTrigger value="records">Records</TabsTrigger>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
+            <TabsList className="grid w-full grid-cols-3 h-12 bg-muted/30">
+              <TabsTrigger value="overview" className="interactive-press">Overview</TabsTrigger>
+              <TabsTrigger value="social" className="interactive-press">Social</TabsTrigger>
+              <TabsTrigger value="records" className="interactive-press">Records</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="overview" className="mt-6">
+            <TabsContent value="overview">
               {renderOverview()}
             </TabsContent>
 
-            <TabsContent value="social" className="mt-6">
+            <TabsContent value="social">
               {renderFollowers()}
             </TabsContent>
 
-            <TabsContent value="records" className="mt-6">
+            <TabsContent value="records">
               <Card>
                 <CardHeader>
                   <CardTitle>All Personal Records</CardTitle>
@@ -524,7 +527,26 @@ export const ProfileModal = ({ userId, open, onClose }: ProfileModalProps) => {
             </TabsContent>
           </Tabs>
         )}
-      </DialogContent>
-    </Dialog>
+        
+        </div>
+      </ScrollArea>
+
+      {/* Logout Dialog */}
+      <ConfirmationDialog
+        open={showLogoutDialog}
+        onOpenChange={setShowLogoutDialog}
+        title="Sign Out"
+        description="Are you sure you want to sign out?"
+        actionLabel="Sign Out"
+        cancelLabel="Cancel"
+        variant="destructive"
+        onConfirm={async () => {
+          const { error } = await signOut();
+          if (!error) {
+            onClose();
+          }
+        }}
+      />
+    </div>
   );
 };

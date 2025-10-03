@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
-import { AppleCalendar } from "@/components/AppleCalendar";
+import { ImprovedHabitCalendar } from "@/components/ImprovedHabitCalendar";
 import { StatsOverview } from "@/components/StatsOverview";
 import Community from "@/components/Community";
 import { ModernAnalytics } from "@/components/ModernAnalytics";
@@ -89,18 +89,20 @@ const Index = () => {
   const renderActiveView = () => {
     switch (activeView) {
       case "calendar":
-        return <AppleCalendar 
+        return <ImprovedHabitCalendar 
           habits={habits} 
           onClose={() => setActiveView("home")}
           onAddHabit={() => setShowAddForm(true)}
-          onDateSelect={(date) => console.log('Selected date:', date)}
+          onEditHabit={(habitId) => console.log('Edit habit:', habitId)}
+          onHabitProgress={handleHabitProgress}
+          onDeleteHabit={deleteHabit}
         />;
       case "community":
         return isMobile ? 
           <MobileCommunity onClose={() => setActiveView("home")} /> :
           <Community open={true} onClose={() => setActiveView("home")} />;
       case "analytics":
-        return <ModernAnalytics open={true} onClose={() => setActiveView("home")} />;
+        return <ModernAnalytics onClose={() => setActiveView("home")} />;
       case "settings":
         return isMobile ?
           <MobileSettings onClose={() => setActiveView("home")} /> :
@@ -208,7 +210,6 @@ const Index = () => {
       {/* Profile Modal */}
       {isProfileModalOpen && (
         <ProfileModal 
-          open={isProfileModalOpen} 
           onClose={() => setIsProfileModalOpen(false)} 
         />
       )}
