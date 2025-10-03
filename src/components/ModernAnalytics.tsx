@@ -258,7 +258,7 @@ export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <Card className="lg:col-span-2 glass-card overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <CardHeader className="relative z-10">
+                  <div className="px-6 py-4 bg-muted/50 border-b border-border relative z-10">
                     <div className="flex items-center justify-between">
                       <div>
                         <CardTitle className="flex items-center gap-2">
@@ -271,8 +271,8 @@ export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
                         Live Data
                       </Badge>
                     </div>
-                  </CardHeader>
-                  <CardContent className="relative z-10">
+                  </div>
+                  <CardContent className="relative z-10 pt-6">
                     <LiquidTubeComparison
                       data={analyticsData.weekly.map((day, idx) => ({
                         label: day.day,
@@ -286,13 +286,13 @@ export const ModernAnalytics = ({ open, onClose }: ModernAnalyticsProps) => {
 
                 {/* Radial Progress Summary */}
                 <Card className="glass-card">
-                  <CardHeader>
+                  <div className="px-6 py-4 bg-muted/50 border-b border-border">
                     <CardTitle className="flex items-center gap-2">
                       <Calendar className="w-5 h-5 text-primary" />
                       Success Rate
                     </CardTitle>
                     <CardDescription>Overall completion this week</CardDescription>
-                  </CardHeader>
+                  </div>
                   <CardContent className="flex flex-col items-center justify-center py-6 space-y-6">
                     <RadialProgressChart
                       percentage={analyticsData.overview.winRate}

@@ -189,11 +189,11 @@ export const EnhancedCalendar = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-background/90 backdrop-blur-lg flex items-center justify-center p-4">
-      <Card className="w-full max-w-7xl max-h-[95vh] overflow-hidden bg-gradient-to-br from-background via-background to-primary/5 border-primary/20 shadow-2xl">
+    <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <Card className="w-full max-w-7xl max-h-[95vh] overflow-hidden glass-card shadow-strong border-border/50">
         
         {/* Enhanced Header */}
-        <CardHeader className="pb-4 border-b bg-gradient-to-r from-background to-accent/5">
+        <CardHeader className="pb-4 border-b border-border bg-muted/30">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-3 text-xl">
               <div className="p-2 bg-primary/10 rounded-full">
@@ -250,22 +250,50 @@ export const EnhancedCalendar = ({
 
           {/* Enhanced Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-            <div className="text-center p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
-              <div className="text-2xl font-bold text-green-600">{monthStats.perfectDays}</div>
-              <div className="text-xs text-green-700 dark:text-green-400">Perfect Days</div>
-            </div>
-            <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
-              <div className="text-2xl font-bold text-blue-600">{monthStats.activeDays}</div>
-              <div className="text-xs text-blue-700 dark:text-blue-400">Active Days</div>
-            </div>
-            <div className="text-center p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
-              <div className="text-2xl font-bold text-orange-600">{monthStats.averageCompletion}%</div>
-              <div className="text-xs text-orange-700 dark:text-orange-400">Avg Rate</div>
-            </div>
-            <div className="text-center p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
-              <div className="text-2xl font-bold text-purple-600">{monthStats.currentStreak}</div>
-              <div className="text-xs text-purple-700 dark:text-purple-400">Streak</div>
-            </div>
+            <Card className="text-center p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-success">{monthStats.perfectDays}</div>
+                  <div className="text-xs text-muted-foreground">Perfect Days</div>
+                </div>
+                <div className="h-10 w-10 rounded-full bg-success/10 flex items-center justify-center">
+                  <Trophy className="h-5 w-5 text-success" />
+                </div>
+              </div>
+            </Card>
+            <Card className="text-center p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-primary">{monthStats.activeDays}</div>
+                  <div className="text-xs text-muted-foreground">Active Days</div>
+                </div>
+                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Calendar className="h-5 w-5 text-primary" />
+                </div>
+              </div>
+            </Card>
+            <Card className="text-center p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-warning">{monthStats.averageCompletion}%</div>
+                  <div className="text-xs text-muted-foreground">Avg Rate</div>
+                </div>
+                <div className="h-10 w-10 rounded-full bg-warning/10 flex items-center justify-center">
+                  <Target className="h-5 w-5 text-warning" />
+                </div>
+              </div>
+            </Card>
+            <Card className="text-center p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-accent">{monthStats.currentStreak}</div>
+                  <div className="text-xs text-muted-foreground">Streak</div>
+                </div>
+                <div className="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center">
+                  <Flame className="h-5 w-5 text-accent" />
+                </div>
+              </div>
+            </Card>
           </div>
         </CardHeader>
 
@@ -349,11 +377,14 @@ export const EnhancedCalendar = ({
             </div>
             
             {/* Enhanced Legend */}
-            <Card className="p-4 bg-gradient-to-r from-background to-muted/30">
-              <h3 className="font-semibold mb-3 flex items-center gap-2">
-                <Award className="w-4 h-4 text-primary" />
-                Progress Legend
-              </h3>
+            <Card className="glass-card">
+              <div className="px-4 py-3 bg-muted/50 border-b border-border">
+                <h3 className="font-semibold text-foreground flex items-center gap-2">
+                  <Award className="w-4 h-4 text-primary" />
+                  Progress Legend
+                </h3>
+              </div>
+              <div className="px-4 py-4">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 <div className="flex items-center gap-2 text-sm">
                   <div className="w-4 h-4 bg-green-500 rounded-full shadow-sm"></div>
@@ -380,8 +411,9 @@ export const EnhancedCalendar = ({
                   <span>Today</span>
                 </div>
               </div>
-              <div className="mt-3 p-2 bg-primary/5 rounded text-xs text-muted-foreground">
-                💡 Right-click any day for quick actions • Colored dots show individual habit progress
+                <div className="mt-3 p-2 bg-primary/5 rounded text-xs text-muted-foreground">
+                  💡 Right-click any day for quick actions • Colored dots show individual habit progress
+                </div>
               </div>
             </Card>
           </div>
@@ -402,15 +434,17 @@ export const EnhancedCalendar = ({
             />
 
             {/* Enhanced Monthly Insights */}
-            <Card className="p-4 bg-gradient-to-br from-primary/5 to-accent/5">
-              <h3 className="font-semibold mb-4 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-primary" />
-                {format(viewDate, 'MMMM')} Insights
-              </h3>
-              
-              <div className="space-y-4">
-                {/* Progress Overview */}
-                <div>
+            <Card className="glass-card">
+              <div className="px-4 py-3 bg-muted/50 border-b border-border">
+                <h3 className="font-semibold text-foreground flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                  {format(viewDate, 'MMMM')} Insights
+                </h3>
+              </div>
+              <div className="px-4 py-4">
+                <div className="space-y-4">
+                  {/* Progress Overview */}
+                  <div>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm font-medium">Monthly Progress</span>
                     <span className="text-sm text-muted-foreground">{monthStats.averageCompletion}%</span>
@@ -424,19 +458,19 @@ export const EnhancedCalendar = ({
                   </div>
                 </div>
 
-                {/* Streak Information */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center p-3 bg-background/50 rounded-lg border">
+                  {/* Streak Information */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="text-center p-3 bg-muted/30 rounded-lg border border-border">
                     <Flame className="w-5 h-5 text-orange-500 mx-auto mb-1" />
                     <div className="text-lg font-bold">{monthStats.currentStreak}</div>
-                    <div className="text-xs text-muted-foreground">Current</div>
-                  </div>
-                  <div className="text-center p-3 bg-background/50 rounded-lg border">
+                      <div className="text-xs text-muted-foreground">Current</div>
+                    </div>
+                    <div className="text-center p-3 bg-muted/30 rounded-lg border border-border">
                     <Trophy className="w-5 h-5 text-yellow-500 mx-auto mb-1" />
                     <div className="text-lg font-bold">{monthStats.longestStreak}</div>
-                    <div className="text-xs text-muted-foreground">Best</div>
+                      <div className="text-xs text-muted-foreground">Best</div>
+                    </div>
                   </div>
-                </div>
 
                 {/* Quick Actions */}
                 <div className="space-y-2">
@@ -458,6 +492,7 @@ export const EnhancedCalendar = ({
                   </Button>
                 </div>
               </div>
+            </div>
             </Card>
           </div>
         </div>

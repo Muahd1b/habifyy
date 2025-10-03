@@ -96,21 +96,21 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
 
   return (
     <div className="fixed inset-0 z-50 bg-background/60 backdrop-blur-lg animate-[fadeIn_0.3s_ease-out]">
-      <div className="fixed right-0 top-0 h-full w-full max-w-md border-l border-border/30 glass-panel shadow-[0_0_40px_rgba(0,0,0,0.2)] animate-[slideInRight_0.4s_ease-out]">
+      <div className="fixed right-0 top-0 h-full w-full max-w-md border-l border-border/30 glass-panel shadow-strong">
         <Card className="h-full rounded-none border-0 bg-transparent">
-          {/* Enhanced Header with Glassmorphism */}
-          <CardHeader className="pb-4 border-b border-border/30 backdrop-blur-xl bg-gradient-to-r from-primary/5 via-background/50 to-accent/5">
+          {/* Header */}
+          <div className="px-6 py-4 bg-muted/50 border-b border-border">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-3">
-                <div className="p-2 bg-primary/10 rounded-full animate-[float_3s_ease-in-out_infinite]">
+                <div className="p-2 bg-primary/10 rounded-full">
                   <Bell className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                  <h2 className="text-lg font-semibold">
                     Notifications
                   </h2>
                   {stats.unread > 0 && (
-                    <p className="text-sm text-muted-foreground animate-pulse">
+                    <p className="text-sm text-muted-foreground">
                       {stats.unread} unread updates
                     </p>
                   )}
@@ -120,11 +120,14 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
                 variant="ghost"
                 size="sm"
                 onClick={onClose}
-                className="h-9 w-9 p-0 hover:bg-destructive/10 hover:text-destructive active:scale-90 transition-all duration-200"
+                className="h-9 w-9 p-0 hover:bg-destructive/10 hover:text-destructive interactive-press"
               >
                 <X className="w-5 h-5" />
               </Button>
             </div>
+          </div>
+
+          <CardHeader className="pb-4">
 
             {/* Enhanced Search with Glass Effect */}
             <div className="relative group">
@@ -134,7 +137,7 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
                 placeholder="Search notifications..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 glass-card border-0 focus:ring-2 focus:ring-primary/30 focus:shadow-glow transition-all duration-300"
+                className="pl-10 glass-card border-0 focus:ring-2 focus:ring-primary/30 transition-all duration-300"
               />
             </div>
 
@@ -147,7 +150,7 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
                   size="sm"
                   onClick={action.action}
                   disabled={action.disabled}
-                  className="h-8 px-3 text-xs active:scale-95 hover:shadow-medium transition-all duration-200"
+                  className="h-8 px-3 text-xs interactive-press"
                 >
                   <action.icon className="w-3 h-3 mr-1" />
                   {action.label}

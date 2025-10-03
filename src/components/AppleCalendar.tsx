@@ -45,10 +45,10 @@ export const AppleCalendar = ({ habits, onClose, onAddHabit, onDateSelect }: App
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-white dark:bg-gray-900 shadow-2xl rounded-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <Card className="w-full max-w-md glass-card shadow-strong rounded-2xl overflow-hidden border-border/50">
         {/* Apple-style Header */}
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-4">
+        <div className="bg-gradient-to-r from-primary via-primary-glow to-accent text-primary-foreground p-4 border-b border-border/50">
           <div className="flex items-center justify-between mb-2">
             <Button
               variant="ghost"
@@ -104,7 +104,7 @@ export const AppleCalendar = ({ habits, onClose, onAddHabit, onDateSelect }: App
         </div>
 
         {/* Calendar Grid */}
-        <div className="p-4 bg-gray-50 dark:bg-gray-800">
+        <div className="p-4 bg-muted/30">
           {/* Day headers */}
           <div className="grid grid-cols-7 gap-1 mb-2">
             {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
@@ -171,7 +171,7 @@ export const AppleCalendar = ({ habits, onClose, onAddHabit, onDateSelect }: App
 
         {/* Selected date info */}
         {isSameDay(selectedDate, new Date()) && (
-          <div className="p-4 border-t bg-white dark:bg-gray-900">
+          <div className="p-4 border-t border-border bg-background/50">
             <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
               Today's Progress
             </h3>
@@ -192,10 +192,11 @@ export const AppleCalendar = ({ habits, onClose, onAddHabit, onDateSelect }: App
         )}
 
         {/* Close button */}
-        <div className="p-4 border-t bg-gray-50 dark:bg-gray-800">
+        <div className="p-4 border-t border-border bg-muted/30">
           <Button 
             onClick={onClose}
-            className="w-full bg-gray-600 hover:bg-gray-700 text-white"
+            className="w-full interactive-press"
+            variant="outline"
           >
             Close Calendar
           </Button>

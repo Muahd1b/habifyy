@@ -166,7 +166,7 @@ export const HabitCalendar = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <Card className="w-full max-w-6xl max-h-[95vh] overflow-hidden bg-gradient-card border-primary/20 shadow-strong">
+      <Card className="w-full max-w-6xl max-h-[95vh] overflow-hidden glass-card shadow-strong border-border/50">
         {/* Enhanced Toolbar */}
         <CalendarToolbar
           viewDate={viewDate}
@@ -254,8 +254,11 @@ export const HabitCalendar = ({
             </div>
             
             {/* Enhanced Legend */}
-            <Card className="p-4">
-              <h3 className="font-medium mb-3">Calendar Legend</h3>
+            <Card className="glass-card">
+              <div className="px-4 py-3 bg-muted/50 border-b border-border">
+                <h3 className="font-semibold text-foreground">Calendar Legend</h3>
+              </div>
+              <div className="px-4 py-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex items-center gap-2 text-sm">
                   <div className="w-3 h-3 bg-success rounded-full"></div>
@@ -274,8 +277,9 @@ export const HabitCalendar = ({
                   <span className="text-muted-foreground">Today</span>
                 </div>
               </div>
-              <div className="mt-3 text-xs text-muted-foreground">
-                Right-click any day for quick actions
+                <div className="mt-3 text-xs text-muted-foreground">
+                  Right-click any day for quick actions
+                </div>
               </div>
             </Card>
           </div>
@@ -296,20 +300,22 @@ export const HabitCalendar = ({
             />
 
             {/* Monthly Stats - Enhanced */}
-            <Card className="p-4">
-              <h3 className="font-semibold mb-3 flex items-center gap-2">
-                <Flame className="w-4 h-4 text-primary" />
-                {format(viewDate, 'MMMM')} Analytics
-              </h3>
-              <div className="space-y-4">
+            <Card className="glass-card">
+              <div className="px-4 py-3 bg-muted/50 border-b border-border">
+                <h3 className="font-semibold text-foreground flex items-center gap-2">
+                  <Flame className="w-4 h-4 text-primary" />
+                  {format(viewDate, 'MMMM')} Analytics
+                </h3>
+              </div>
+              <div className="px-4 py-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-3 bg-success/10 rounded-lg">
+                  <div className="text-center p-3 bg-success/10 rounded-lg border border-success/20">
                     <div className="text-2xl font-bold text-success">
                       {calendarData.filter(day => getCompletionRate(day) === 100 && day.completedHabits > 0).length}
                     </div>
                     <div className="text-xs text-muted-foreground">Perfect Days</div>
                   </div>
-                  <div className="text-center p-3 bg-primary/10 rounded-lg">
+                  <div className="text-center p-3 bg-primary/10 rounded-lg border border-primary/20">
                     <div className="text-2xl font-bold text-primary">
                       {calendarData.filter(day => day.completedHabits > 0).length}
                     </div>

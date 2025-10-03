@@ -457,16 +457,16 @@ export const ProfileModal = ({ userId, open, onClose }: ProfileModalProps) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto glass-card">
-        <DialogHeader className="backdrop-blur-sm bg-gradient-to-r from-primary/5 via-background/50 to-accent/5 -mx-6 -mt-6 px-6 pt-6 pb-4 mb-4 border-b border-border/30">
+        <div className="px-6 py-4 bg-muted/50 border-b border-border -mx-6 -mt-6 mb-4">
           <DialogTitle className="flex items-center gap-3 text-xl">
-            <div className="p-2 bg-primary/10 rounded-full animate-[float_3s_ease-in-out_infinite]">
+            <div className="p-2 bg-primary/10 rounded-full">
               <User className="h-5 w-5 text-primary" />
             </div>
-            <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+            <span>
               {isOwnProfile ? 'Your Profile' : `${profile.display_name || 'User'}'s Profile`}
             </span>
           </DialogTitle>
-        </DialogHeader>
+        </div>
 
         {isEditing ? (
           renderEditProfile()
