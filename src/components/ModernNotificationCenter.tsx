@@ -99,8 +99,8 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
       <div className="fixed right-0 top-0 h-full w-full max-w-md border-l border-border/30 bg-background shadow-strong">
         <Card className="h-full rounded-none border-0 bg-background">
           {/* Header */}
-          <div className="px-6 py-4 bg-muted/50 border-b border-border">
-            <div className="flex items-center justify-between">
+          <div className="px-6 py-4 bg-background border-b border-border">
+             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-3">
                 <div className="p-2 bg-primary/10 rounded-full">
                   <Bell className="w-5 h-5 text-primary" />
@@ -133,12 +133,12 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
             <div className="relative group">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <Input
-                type="text"
-                placeholder="Search notifications..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 glass-card border-0 focus:ring-2 focus:ring-primary/30 transition-all duration-300"
-              />
+                 type="text"
+                 placeholder="Search notifications..."
+                 value={searchQuery}
+                 onChange={(e) => setSearchQuery(e.target.value)}
+                 className="pl-10 border border-input bg-background focus:ring-2 focus:ring-primary/30 transition-all duration-300"
+               />
             </div>
 
             {/* Quick Actions with Interactive Effects */}
@@ -162,8 +162,8 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
           <CardContent className="px-0 py-0 flex-1 overflow-hidden">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
               {/* Enhanced Tab Navigation with Glass Effect */}
-              <div className="px-6 py-4 border-b border-border/30 backdrop-blur-sm">
-                <TabsList className="w-full grid grid-cols-4 h-10 glass-card">
+              <div className="px-6 py-4 border-b border-border/30 bg-background">
+                 <TabsList className="w-full grid grid-cols-4 h-10 bg-background">
                   <TabsTrigger value="all" className="text-xs font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
                     <div className="flex items-center gap-1">
                       All
@@ -202,8 +202,8 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
               {/* Enhanced Content Area */}
               <div className="flex-1 overflow-hidden">
                 <ScrollArea className="h-full">
-                  <div className="px-6 py-4">
-                    <TabsContent value={activeTab} className="mt-0">
+                  <div className="px-6 py-4 pb-app-safe">
+                     <TabsContent value={activeTab} className="mt-0">
                       {loading ? (
                         <div className="flex items-center justify-center py-12">
                           <div className="flex flex-col items-center gap-3">

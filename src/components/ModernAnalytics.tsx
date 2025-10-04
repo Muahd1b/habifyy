@@ -24,8 +24,8 @@ import {
 } from "lucide-react";
 import { LiquidTubeComparison } from '@/components/charts/LiquidTubeChart';
 import { RadialProgressChart } from '@/components/charts/RadialProgressChart';
-import { useHabits } from '@/hooks/useHabits';
-import { useHabitCompletions } from '@/hooks/useHabitCompletions';
+
+
 import { useProfile } from '@/hooks/useProfile';
 import { useAuth } from '@/hooks/useAuth';
 import { useMemo } from 'react';
@@ -33,12 +33,24 @@ import { format, startOfDay, subDays } from 'date-fns';
 
 interface ModernAnalyticsProps {
   onClose: () => void;
+  habitsData?: any[];
+  habitsLoadingExternal?: boolean;
+  completionsData?: any[];
+  getCompletionsForDateExternal?: (date: string) => any[];
+  getCompletionStatsExternal?: (habitId: string, days?: number) => any;
+  completionsLoadingExternal?: boolean;
 }
 
-export const ModernAnalytics = ({ onClose }: ModernAnalyticsProps) => {
+export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, completionsData, getCompletionsForDateExternal, getCompletionStatsExternal, completionsLoadingExternal }: ModernAnalyticsProps) => {
   const { user } = useAuth();
-  const { habits, loading: habitsLoading } = useHabits();
-  const { completions, getCompletionsForDate, getCompletionStats, loading: completionsLoading } = useHabitCompletions();
+  const { habits: habitsHookData, loading: habitsHookLoading } = useHabits();
+  const habits = habitsData ?? habitsHookData;
+  const habitsLoading = habitsData ? (habitsLoadingExternal ?? false) : habitsHookLoading;
+
+  const completions = completionsData ?? [];
+  const getCompletionsForDate = getCompletionsForDateExternal as any;
+  const getCompletionStats = getCompletionStatsExternal as any;
+  const completionsLoading = completionsLoadingExternal ?? false;
   const { profile, loading: profileLoading } = useProfile(user?.id);
   
   const isLoading = habitsLoading || completionsLoading || profileLoading;
@@ -218,7 +230,7 @@ export const ModernAnalytics = ({ onClose }: ModernAnalyticsProps) => {
 
       {/* Content */}
       <ScrollArea className="flex-1">
-        <div className="container mx-auto px-4 py-6 max-w-7xl">
+        <div className="container mx-auto px-4 py-6 pb-app-safe max-w-7xl">
           <Tabs defaultValue="overview" className="w-full">
             {/* Tab Navigation */}
             <div className="mb-6">

@@ -224,7 +224,7 @@ const Community = ({ onClose, open }: CommunityProps) => {
 
       {/* Content */}
       <ScrollArea className="flex-1">
-        <div className="container mx-auto px-4 py-6 max-w-7xl">
+        <div className="container mx-auto px-4 py-6 pb-app-safe max-w-7xl">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             {/* Tab Navigation */}
             <div className="mb-6">

@@ -43,7 +43,7 @@ const Index = () => {
   
   // Database hooks - only call when user exists
   const { habits, loading: habitsLoading, createHabit, updateHabitProgress, deleteHabit } = useHabits();
-  const { updateHabitCompletion } = useHabitCompletions();
+  const { completions, getCompletionsForDate, getCompletionStats, loading: completionsLoading, updateHabitCompletion } = useHabitCompletions();
   
   console.log("Hooks completed, habits count:", habits?.length || 0);
 
@@ -100,7 +100,17 @@ const Index = () => {
       case "community":
         return <Community open={true} onClose={() => setActiveView("home")} />;
       case "analytics":
-        return <ModernAnalytics onClose={() => setActiveView("home")} />;
+        return (
+          <ModernAnalytics 
+            onClose={() => setActiveView("home")} 
+            habitsData={habits}
+            habitsLoadingExternal={habitsLoading}
+            completionsData={completions}
+            getCompletionsForDateExternal={getCompletionsForDate}
+            getCompletionStatsExternal={getCompletionStats}
+            completionsLoadingExternal={completionsLoading}
+          />
+        );
       case "settings":
         return isMobile ?
           <MobileSettings onClose={() => setActiveView("home")} /> :

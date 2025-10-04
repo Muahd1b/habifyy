@@ -325,12 +325,20 @@
   @apply backdrop-blur-xl bg-card/80 border border-border/50 shadow-soft;
 }
 
-.glass-panel {
-  @apply backdrop-blur-lg bg-background/60 border border-border/30;
-}
-
-/* Interactive button effects - Applied globally */
-.interactive-press {
+ .glass-panel {
+   @apply backdrop-blur-lg bg-background/60 border border-border/30;
+ }
+ 
+ /* Safe area helpers and page padding to avoid bottom nav overlap */
+ .safe-area-inset-bottom {
+   padding-bottom: env(safe-area-inset-bottom);
+ }
+ .pb-app-safe {
+   padding-bottom: calc(64px + env(safe-area-inset-bottom));
+ }
+ 
+ /* Interactive button effects - Applied globally */
+ .interactive-press {
   @apply active:scale-95 active:brightness-95 transition-all duration-150;
 }
 
