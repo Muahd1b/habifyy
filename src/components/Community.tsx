@@ -9,14 +9,14 @@ import {
   Calendar,
   ChevronRight,
   Zap,
-  X
+  ArrowLeft
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useCommunity } from '@/hooks/useCommunity';
 import FriendsSection from './community/FriendsSection';
 import CompetitionsSection from './community/CompetitionsSection';
@@ -45,34 +45,17 @@ const Community = ({ onClose, open }: CommunityProps) => {
 
   if (loading) {
     return (
-      <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-                  <Users className="h-4 w-4 text-primary" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold">Community</h1>
-                </div>
-              </div>
-            </div>
-          </DialogHeader>
-          <div className="space-y-6">
-            <Skeleton className="h-12 w-64" />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <Skeleton key={i} className="h-32" />
-              ))}
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <Skeleton className="h-96 lg:col-span-2" />
-              <Skeleton className="h-96" />
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <div className="fixed inset-0 z-50 bg-background flex flex-col">
+        <div className="flex items-center gap-4 p-4 border-b bg-background/95 backdrop-blur-sm">
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-xl font-semibold">Community</h1>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </div>
     );
   }
 
@@ -217,50 +200,57 @@ const Community = ({ onClose, open }: CommunityProps) => {
   );
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
-        <div className="space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Community</h1>
-              <p className="text-muted-foreground">Connect, compete, and grow together</p>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <Badge variant="secondary" className="px-3 py-1">
-                Level {profile?.level || 1}
-              </Badge>
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground font-semibold">
-                {profile?.display_name?.[0] || profile?.username?.[0] || 'U'}
-              </div>
+    <div className="fixed inset-0 z-50 bg-background flex flex-col">
+      {/* Header */}
+      <div className="flex items-center gap-4 p-4 border-b bg-background/95 backdrop-blur-sm sticky top-0 z-10">
+        <Button variant="ghost" size="icon" onClick={onClose} className="interactive-press">
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <div className="flex-1 flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-semibold">Community</h1>
+            <p className="text-xs text-muted-foreground hidden sm:block">Connect and grow together</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="text-xs">
+              Level {profile?.level || 1}
+            </Badge>
+            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground text-sm font-semibold">
+              {profile?.display_name?.[0] || profile?.username?.[0] || 'U'}
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Navigation Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6">
-              <TabsTrigger value="overview" className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                Overview
-              </TabsTrigger>
-              <TabsTrigger value="friends" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Friends
-              </TabsTrigger>
-              <TabsTrigger value="competitions" className="flex items-center gap-2">
-                <Trophy className="h-4 w-4" />
-                Competitions
-              </TabsTrigger>
-              <TabsTrigger value="marketplace" className="flex items-center gap-2">
-                <ShoppingBag className="h-4 w-4" />
-                Marketplace
-              </TabsTrigger>
-              <TabsTrigger value="achievements" className="flex items-center gap-2">
-                <Award className="h-4 w-4" />
-                Achievements
-              </TabsTrigger>
-            </TabsList>
+      {/* Content */}
+      <ScrollArea className="flex-1">
+        <div className="container mx-auto px-4 py-6 max-w-7xl">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            {/* Tab Navigation */}
+            <div className="mb-6">
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 h-auto bg-muted/30">
+                <TabsTrigger value="overview" className="flex items-center gap-2 interactive-press py-3">
+                  <User className="h-4 w-4" />
+                  <span className="hidden sm:inline">Overview</span>
+                </TabsTrigger>
+                <TabsTrigger value="friends" className="flex items-center gap-2 interactive-press py-3">
+                  <Users className="h-4 w-4" />
+                  <span className="hidden sm:inline">Friends</span>
+                </TabsTrigger>
+                <TabsTrigger value="competitions" className="flex items-center gap-2 interactive-press py-3">
+                  <Trophy className="h-4 w-4" />
+                  <span className="hidden sm:inline">Compete</span>
+                </TabsTrigger>
+                <TabsTrigger value="marketplace" className="flex items-center gap-2 interactive-press py-3">
+                  <ShoppingBag className="h-4 w-4" />
+                  <span className="hidden sm:inline">Shop</span>
+                </TabsTrigger>
+                <TabsTrigger value="achievements" className="flex items-center gap-2 interactive-press py-3">
+                  <Award className="h-4 w-4" />
+                  <span className="hidden sm:inline">Rewards</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             <TabsContent value="overview" className="space-y-6">
               {renderOverview()}
@@ -284,8 +274,8 @@ const Community = ({ onClose, open }: CommunityProps) => {
 
           </Tabs>
         </div>
-      </DialogContent>
-    </Dialog>
+      </ScrollArea>
+    </div>
   );
 };
 

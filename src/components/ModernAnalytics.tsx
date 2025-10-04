@@ -35,9 +35,11 @@ interface ModernAnalyticsProps {
 }
 
 export const ModernAnalytics = ({ onClose }: ModernAnalyticsProps) => {
-  const { habits } = useHabits();
-  const { completions, getCompletionsForDate, getCompletionStats } = useHabitCompletions();
-  const { profile } = useProfile();
+  const { habits, loading: habitsLoading } = useHabits();
+  const { completions, getCompletionsForDate, getCompletionStats, loading: completionsLoading } = useHabitCompletions();
+  const { profile, loading: profileLoading } = useProfile();
+  
+  const isLoading = habitsLoading || completionsLoading || profileLoading;
 
   // Calculate real analytics data based on actual habit completions
   const analyticsData = useMemo(() => {
@@ -180,6 +182,22 @@ export const ModernAnalytics = ({ onClose }: ModernAnalyticsProps) => {
       />
     </div>
   );
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-50 bg-background flex flex-col">
+        <div className="flex items-center gap-4 p-4 border-b bg-background/95 backdrop-blur-sm">
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-xl font-semibold">Analytics</h1>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col">

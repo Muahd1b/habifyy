@@ -98,9 +98,7 @@ const Index = () => {
           onDeleteHabit={deleteHabit}
         />;
       case "community":
-        return isMobile ? 
-          <MobileCommunity onClose={() => setActiveView("home")} /> :
-          <Community open={true} onClose={() => setActiveView("home")} />;
+        return <Community open={true} onClose={() => setActiveView("home")} />;
       case "analytics":
         return <ModernAnalytics onClose={() => setActiveView("home")} />;
       case "settings":
