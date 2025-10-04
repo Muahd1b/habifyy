@@ -451,9 +451,9 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
   );
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col">
+    <div className="fixed inset-0 z-50 bg-background flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-4 p-4 border-b bg-background/95 backdrop-blur-sm sticky top-0 z-10">
+      <div className="flex items-center gap-4 p-4 border-b bg-background/95 backdrop-blur-sm shrink-0 z-10">
         <Button variant="ghost" size="icon" onClick={onClose} className="interactive-press">
           <ArrowLeft className="h-5 w-5" />
         </Button>

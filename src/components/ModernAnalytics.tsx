@@ -27,6 +27,7 @@ import { RadialProgressChart } from '@/components/charts/RadialProgressChart';
 import { useHabits } from '@/hooks/useHabits';
 import { useHabitCompletions } from '@/hooks/useHabitCompletions';
 import { useProfile } from '@/hooks/useProfile';
+import { useAuth } from '@/hooks/useAuth';
 import { useMemo } from 'react';
 import { format, startOfDay, subDays } from 'date-fns';
 
@@ -35,9 +36,10 @@ interface ModernAnalyticsProps {
 }
 
 export const ModernAnalytics = ({ onClose }: ModernAnalyticsProps) => {
+  const { user } = useAuth();
   const { habits, loading: habitsLoading } = useHabits();
   const { completions, getCompletionsForDate, getCompletionStats, loading: completionsLoading } = useHabitCompletions();
-  const { profile, loading: profileLoading } = useProfile();
+  const { profile, loading: profileLoading } = useProfile(user?.id);
   
   const isLoading = habitsLoading || completionsLoading || profileLoading;
 
