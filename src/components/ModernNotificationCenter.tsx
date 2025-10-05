@@ -95,8 +95,8 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-md animate-[fadeIn_0.3s_ease-out]">
-      <div className="fixed right-0 top-0 h-full w-full max-w-md border-l border-border shadow-strong bg-background">
+    <div className="fixed inset-0 z-50 bg-background animate-[fadeIn_0.3s_ease-out]">
+      <div className="fixed right-0 top-0 h-full w-full max-w-md border-l border-border shadow-2xl bg-background">
         <Card className="h-full rounded-none border-0 bg-background shadow-none">
           {/* Header */}
           <div className="px-6 py-4 bg-background border-b border-border">
