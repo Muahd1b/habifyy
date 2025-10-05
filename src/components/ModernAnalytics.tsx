@@ -43,9 +43,8 @@ interface ModernAnalyticsProps {
 
 export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, completionsData, getCompletionsForDateExternal, getCompletionStatsExternal, completionsLoadingExternal }: ModernAnalyticsProps) => {
   const { user } = useAuth();
-  const { habits: habitsHookData, loading: habitsHookLoading } = useHabits();
-  const habits = habitsData ?? habitsHookData;
-  const habitsLoading = habitsData ? (habitsLoadingExternal ?? false) : habitsHookLoading;
+  const habits = habitsData ?? [];
+  const habitsLoading = habitsLoadingExternal ?? false;
 
   const completions = completionsData ?? [];
   const getCompletionsForDate = getCompletionsForDateExternal as any;
