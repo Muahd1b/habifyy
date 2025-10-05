@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Mail, Lock, Eye, EyeOff, Zap } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Chrome, Apple } from 'lucide-react';
+import logo from '@/assets/habifyy-logo.png';
 
 interface AuthProps {
   onSuccess?: () => void;
@@ -116,32 +118,118 @@ export const Auth = ({ onSuccess }: AuthProps) => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`
+        }
+      });
+
+      if (error) {
+        toast({
+          title: "Sign in failed",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to initiate Google sign in",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+        options: {
+          redirectTo: `${window.location.origin}/`
+        }
+      });
+
+      if (error) {
+        toast({
+          title: "Sign in failed",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to initiate Apple sign in",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
-      <Card className="w-full max-w-md border-0 shadow-2xl bg-card/95 backdrop-blur-sm">
-        <CardHeader className="text-center space-y-4 pb-8">
-          <div className="flex items-center justify-center gap-2 text-primary">
-            <Zap className="h-8 w-8" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              Habifyy
-            </span>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      </div>
+
+      <Card className="w-full max-w-md border-border/50 shadow-2xl bg-background/95 backdrop-blur-xl relative z-10 animate-scale-in">
+        <CardHeader className="text-center space-y-6 pb-6">
+          <div className="flex items-center justify-center">
+            <img src={logo} alt="Habifyy" className="h-16 w-auto animate-fade-in" />
           </div>
           <div>
-            <CardTitle className="text-2xl">Welcome</CardTitle>
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent">
+              Welcome Back
+            </CardTitle>
             <CardDescription className="text-base mt-2">
               Build better habits, one day at a time
             </CardDescription>
           </div>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="space-y-6">
+          {/* Social Sign In Buttons */}
+          <div className="space-y-3">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full h-11 hover-scale border-border/50 hover:border-primary/50 transition-all"
+              onClick={handleGoogleSignIn}
+            >
+              <Chrome className="mr-2 h-5 w-5 text-[#4285F4]" />
+              Continue with Google
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full h-11 hover-scale border-border/50 hover:border-primary/50 transition-all"
+              onClick={handleAppleSignIn}
+            >
+              <Apple className="mr-2 h-5 w-5" />
+              Continue with Apple
+            </Button>
+          </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <Separator className="w-full" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">Or continue with email</span>
+            </div>
+          </div>
+
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsList className="grid w-full grid-cols-2 mb-6 h-11">
               <TabsTrigger value="signin" className="text-sm">Sign In</TabsTrigger>
               <TabsTrigger value="signup" className="text-sm">Sign Up</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="signin" className="space-y-4">
+            <TabsContent value="signin" className="space-y-4 mt-0">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signin-email">Email</Label>
@@ -190,7 +278,7 @@ export const Auth = ({ onSuccess }: AuthProps) => {
 
                 <Button 
                   type="submit" 
-                  className="w-full" 
+                  className="w-full h-11 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity" 
                   disabled={loading}
                 >
                   {loading ? "Signing in..." : "Sign In"}
@@ -198,7 +286,7 @@ export const Auth = ({ onSuccess }: AuthProps) => {
               </form>
             </TabsContent>
 
-            <TabsContent value="signup" className="space-y-4">
+            <TabsContent value="signup" className="space-y-4 mt-0">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signup-name">Display Name</Label>
@@ -259,7 +347,7 @@ export const Auth = ({ onSuccess }: AuthProps) => {
 
                 <Button 
                   type="submit" 
-                  className="w-full" 
+                  className="w-full h-11 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity" 
                   disabled={loading}
                 >
                   {loading ? "Creating account..." : "Create Account"}
@@ -269,9 +357,12 @@ export const Auth = ({ onSuccess }: AuthProps) => {
           </Tabs>
         </CardContent>
 
-        <CardFooter className="text-center">
-          <p className="text-sm text-muted-foreground">
-            Start tracking your habits and build a better you
+        <CardFooter className="flex-col space-y-4 pb-6">
+          <p className="text-sm text-muted-foreground text-center">
+            🎯 Start tracking your habits and build a better you
+          </p>
+          <p className="text-xs text-muted-foreground/60 text-center">
+            By continuing, you agree to our Terms of Service and Privacy Policy
           </p>
         </CardFooter>
       </Card>

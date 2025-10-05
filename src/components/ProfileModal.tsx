@@ -451,85 +451,88 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
   );
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center gap-4 p-4 border-b bg-background/95 backdrop-blur-sm shrink-0 z-10">
-        <Button variant="ghost" size="icon" onClick={onClose} className="interactive-press">
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-full">
-            <User className="h-5 w-5 text-primary" />
+    <>
+      <div className="fixed inset-0 z-50 bg-background md:bg-background/80 md:backdrop-blur-sm animate-fade-in" onClick={onClose} />
+      <div className="fixed inset-0 z-50 flex items-center justify-center md:p-4 pointer-events-none overflow-hidden">
+        <Card className="w-full h-full md:h-auto md:max-w-4xl md:max-h-[90vh] flex flex-col pointer-events-auto animate-scale-in shadow-2xl md:rounded-xl rounded-none border-0 md:border">
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 md:p-6 border-b bg-gradient-to-r from-primary/10 to-accent/10 sticky top-0 z-10 shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-full md:hidden">
+                <User className="h-5 w-5 text-primary" />
+              </div>
+              <h2 className="text-xl md:text-2xl font-bold">
+                {isOwnProfile ? 'Your Profile' : `${profile.display_name || 'User'}'s Profile`}
+              </h2>
+            </div>
+            <Button variant="ghost" size="icon" onClick={onClose} className="interactive-press">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
           </div>
-          <h1 className="text-xl font-semibold">
-            {isOwnProfile ? 'Your Profile' : `${profile.display_name || 'User'}'s Profile`}
-          </h1>
-        </div>
-      </div>
 
-      {/* Content */}
-      <ScrollArea className="flex-1">
-        <div className="container mx-auto px-4 py-6 pb-app-safe max-w-4xl">
+          {/* Content */}
+          <ScrollArea className="flex-1 pb-app-safe">
+            <div className="p-4 md:p-6">
+              {isEditing ? (
+                renderEditProfile()
+              ) : (
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
+                  <TabsList className="grid w-full grid-cols-3 h-12 bg-muted/30">
+                    <TabsTrigger value="overview" className="interactive-press">Overview</TabsTrigger>
+                    <TabsTrigger value="social" className="interactive-press">Social</TabsTrigger>
+                    <TabsTrigger value="records" className="interactive-press">Records</TabsTrigger>
+                  </TabsList>
 
-        {isEditing ? (
-          renderEditProfile()
-        ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
-            <TabsList className="grid w-full grid-cols-3 h-12 bg-muted/30">
-              <TabsTrigger value="overview" className="interactive-press">Overview</TabsTrigger>
-              <TabsTrigger value="social" className="interactive-press">Social</TabsTrigger>
-              <TabsTrigger value="records" className="interactive-press">Records</TabsTrigger>
-            </TabsList>
+                  <TabsContent value="overview">
+                    {renderOverview()}
+                  </TabsContent>
 
-            <TabsContent value="overview">
-              {renderOverview()}
-            </TabsContent>
+                  <TabsContent value="social">
+                    {renderFollowers()}
+                  </TabsContent>
 
-            <TabsContent value="social">
-              {renderFollowers()}
-            </TabsContent>
-
-            <TabsContent value="records">
-              <Card>
-                <CardHeader>
-                  <CardTitle>All Personal Records</CardTitle>
-                  <CardDescription>Complete history of achievements and milestones</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {userRecords.length > 0 ? (
-                    <div className="space-y-3">
-                      {userRecords.map((record) => (
-                        <div key={record.id} className="flex items-center justify-between p-4 rounded-lg border">
-                          <div>
-                            <p className="font-medium">{record.record_type.replace('_', ' ').toUpperCase()}</p>
-                            <p className="text-sm text-muted-foreground">{record.category}</p>
+                  <TabsContent value="records">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>All Personal Records</CardTitle>
+                        <CardDescription>Complete history of achievements and milestones</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        {userRecords.length > 0 ? (
+                          <div className="space-y-3">
+                            {userRecords.map((record) => (
+                              <div key={record.id} className="flex items-center justify-between p-4 rounded-lg border">
+                                <div>
+                                  <p className="font-medium">{record.record_type.replace('_', ' ').toUpperCase()}</p>
+                                  <p className="text-sm text-muted-foreground">{record.category}</p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-xl font-bold text-primary">{record.record_value}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {new Date(record.achieved_at).toLocaleDateString()}
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
                           </div>
-                          <div className="text-right">
-                            <p className="text-xl font-bold text-primary">{record.record_value}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(record.achieved_at).toLocaleDateString()}
+                        ) : (
+                          <div className="text-center py-8">
+                            <Trophy className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                            <h3 className="text-lg font-semibold mb-2">No Records Yet</h3>
+                            <p className="text-muted-foreground">
+                              {isOwnProfile ? 'Keep building habits to earn your first records!' : 'This user hasn\'t earned any records yet.'}
                             </p>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <Trophy className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">No Records Yet</h3>
-                      <p className="text-muted-foreground">
-                        {isOwnProfile ? 'Keep building habits to earn your first records!' : 'This user hasn\'t earned any records yet.'}
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        )}
-        
-        </div>
-      </ScrollArea>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
+              )}
+            </div>
+          </ScrollArea>
+        </Card>
+      </div>
 
       {/* Logout Dialog */}
       <ConfirmationDialog
@@ -547,6 +550,6 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
           }
         }}
       />
-    </div>
+    </>
   );
 };
