@@ -452,28 +452,27 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
 
   return (
     <>
-      <div className="fixed inset-0 z-50 bg-background animate-fade-in" onClick={onClose} />
-      <div className="fixed inset-0 z-50 pointer-events-none">
-        <div className="h-full w-full flex items-center justify-center pointer-events-none">
-          <Card className="w-full h-full md:w-auto md:h-auto md:max-w-4xl md:max-h-[90vh] md:min-w-[600px] flex flex-col pointer-events-auto animate-scale-in shadow-2xl md:rounded-xl rounded-none border-0 md:border bg-background">
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b bg-gradient-to-r from-primary/10 to-accent/10 shrink-0">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-primary/10 rounded-full">
-                  <User className="h-4 w-4 md:h-5 md:w-5 text-primary" />
-                </div>
-                <h2 className="text-lg md:text-2xl font-bold truncate max-w-[200px] md:max-w-none">
-                  {isOwnProfile ? 'Your Profile' : `${profile.display_name || 'User'}'s Profile`}
-                </h2>
+      <div className="fixed inset-0 z-50 bg-background md:bg-background/80 md:backdrop-blur-sm animate-fade-in" onClick={onClose} />
+      <div className="fixed inset-0 z-50 flex items-center justify-center md:p-4 pointer-events-none overflow-hidden">
+        <Card className="w-full h-full md:h-auto md:max-w-4xl md:max-h-[90vh] flex flex-col pointer-events-auto animate-scale-in shadow-2xl md:rounded-xl rounded-none border-0 md:border">
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 md:p-6 border-b bg-gradient-to-r from-primary/10 to-accent/10 sticky top-0 z-10 shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-full md:hidden">
+                <User className="h-5 w-5 text-primary" />
               </div>
-              <Button variant="ghost" size="icon" onClick={onClose} className="interactive-press shrink-0">
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
+              <h2 className="text-xl md:text-2xl font-bold">
+                {isOwnProfile ? 'Your Profile' : `${profile.display_name || 'User'}'s Profile`}
+              </h2>
             </div>
+            <Button variant="ghost" size="icon" onClick={onClose} className="interactive-press">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          </div>
 
-            {/* Content */}
-            <ScrollArea className="flex-1 pb-app-safe">
-              <div className="p-4 md:p-6 max-w-4xl mx-auto">
+          {/* Content */}
+          <ScrollArea className="flex-1 pb-app-safe">
+            <div className="p-4 md:p-6">
               {isEditing ? (
                 renderEditProfile()
               ) : (
@@ -530,10 +529,9 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
                   </TabsContent>
                 </Tabs>
               )}
-              </div>
-            </ScrollArea>
-          </Card>
-        </div>
+            </div>
+          </ScrollArea>
+        </Card>
       </div>
 
       {/* Logout Dialog */}
