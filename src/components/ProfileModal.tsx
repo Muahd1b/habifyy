@@ -136,22 +136,22 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
   };
 
   const renderOverview = () => (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Profile Header */}
       <div className="relative">
         {profile.cover_image_url && (
-          <div className="h-32 bg-gradient-primary rounded-lg mb-4" />
+          <div className="h-24 md:h-32 bg-gradient-primary rounded-lg mb-3 md:mb-4" />
         )}
-        <div className="flex items-start gap-4">
-          <Avatar className="h-20 w-20 border-4 border-background">
+        <div className="flex items-start gap-3 md:gap-4">
+          <Avatar className="h-16 w-16 md:h-20 md:w-20 border-2 md:border-4 border-background">
             <AvatarImage src={profile.avatar_url || ''} />
-            <AvatarFallback className="text-lg">
+            <AvatarFallback className="text-base md:text-lg">
               {profile.display_name?.[0] || profile.username?.[0] || 'U'}
             </AvatarFallback>
           </Avatar>
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <h2 className="text-xl font-bold">
+              <h2 className="text-lg md:text-xl font-bold truncate">
                 {profile.display_name || profile.username || 'Anonymous User'}
               </h2>
               {profile.is_verified && (
@@ -161,50 +161,52 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
                 </Badge>
               )}
             </div>
-            <p className="text-sm text-muted-foreground mb-2">
+            <p className="text-xs md:text-sm text-muted-foreground mb-2">
               Level {profile.level} • {profile.points} points
             </p>
             {profile.bio && (
-              <p className="text-sm mb-3">{profile.bio}</p>
+              <p className="text-xs md:text-sm mb-2 md:mb-3 line-clamp-2">{profile.bio}</p>
             )}
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground">
               {profile.location && (
                 <div className="flex items-center gap-1">
-                  <MapPin className="h-3 w-3" />
-                  {profile.location}
+                  <MapPin className="h-3 w-3 flex-shrink-0" />
+                  <span className="truncate">{profile.location}</span>
                 </div>
               )}
               {profile.website && (
                 <div className="flex items-center gap-1">
-                  <Globe className="h-3 w-3" />
+                  <Globe className="h-3 w-3 flex-shrink-0" />
                   <a href={profile.website} target="_blank" rel="noopener noreferrer" 
-                     className="hover:text-primary">
+                     className="hover:text-primary truncate">
                     Website
                   </a>
                 </div>
               )}
               <div className="flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
-                Joined {new Date(profile.created_at).toLocaleDateString()}
+                <Calendar className="h-3 w-3 flex-shrink-0" />
+                <span className="hidden md:inline">Joined </span>
+                {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
               </div>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-shrink-0">
             {!isOwnProfile && (
               <Button
                 onClick={toggleFollow}
                 variant={isFollowing ? "outline" : "default"}
                 size="sm"
+                className="h-8 md:h-9 px-2 md:px-3"
               >
                 {isFollowing ? (
                   <>
-                    <UserMinus className="h-4 w-4 mr-2" />
-                    Unfollow
+                    <UserMinus className="h-3 w-3 md:h-4 md:w-4 md:mr-2" />
+                    <span className="hidden md:inline">Unfollow</span>
                   </>
                 ) : (
                   <>
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Follow
+                    <UserPlus className="h-3 w-3 md:h-4 md:w-4 md:mr-2" />
+                    <span className="hidden md:inline">Follow</span>
                   </>
                 )}
               </Button>
@@ -214,9 +216,10 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
                 onClick={() => setIsEditing(true)}
                 variant="outline"
                 size="sm"
+                className="h-8 md:h-9 px-2 md:px-3"
               >
-                <Edit3 className="h-4 w-4 mr-2" />
-                Edit Profile
+                <Edit3 className="h-3 w-3 md:h-4 md:w-4 md:mr-2" />
+                <span className="hidden md:inline">Edit</span>
               </Button>
             )}
           </div>
@@ -224,53 +227,53 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
       </div>
 
       {/* Stats Grid with Glass Effect */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-3 md:gap-4">
         <Card className="glass-card group hover:shadow-strong transition-all duration-300 active:scale-95 cursor-pointer">
-          <CardContent className="p-4 text-center relative overflow-hidden">
+          <CardContent className="p-3 md:p-4 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="flex items-center justify-center mb-2 relative z-10">
-              <div className="p-2 bg-primary/10 rounded-full group-hover:scale-110 transition-transform duration-300">
-                <Target className="h-5 w-5 text-primary" />
+            <div className="flex items-center justify-center mb-1 md:mb-2 relative z-10">
+              <div className="p-1.5 md:p-2 bg-primary/10 rounded-full group-hover:scale-110 transition-transform duration-300">
+                <Target className="h-4 w-4 md:h-5 md:w-5 text-primary" />
               </div>
             </div>
-            <div className="text-2xl font-bold relative z-10 animate-[fadeInUp_0.5s_ease-out]">{stats?.totalHabits || 0}</div>
-            <div className="text-xs text-muted-foreground relative z-10">Active Habits</div>
+            <div className="text-xl md:text-2xl font-bold relative z-10 animate-[fadeInUp_0.5s_ease-out]">{stats?.totalHabits || 0}</div>
+            <div className="text-[10px] md:text-xs text-muted-foreground relative z-10">Habits</div>
           </CardContent>
         </Card>
         <Card className="glass-card group hover:shadow-strong transition-all duration-300 active:scale-95 cursor-pointer">
-          <CardContent className="p-4 text-center relative overflow-hidden">
+          <CardContent className="p-3 md:p-4 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-success/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="flex items-center justify-center mb-2 relative z-10">
-              <div className="p-2 bg-success/10 rounded-full group-hover:scale-110 transition-transform duration-300">
-                <TrendingUp className="h-5 w-5 text-success" />
+            <div className="flex items-center justify-center mb-1 md:mb-2 relative z-10">
+              <div className="p-1.5 md:p-2 bg-success/10 rounded-full group-hover:scale-110 transition-transform duration-300">
+                <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-success" />
               </div>
             </div>
-            <div className="text-2xl font-bold relative z-10 animate-[fadeInUp_0.5s_ease-out]">{stats?.currentStreak || 0}</div>
-            <div className="text-xs text-muted-foreground relative z-10">Current Streak</div>
+            <div className="text-xl md:text-2xl font-bold relative z-10 animate-[fadeInUp_0.5s_ease-out]">{stats?.currentStreak || 0}</div>
+            <div className="text-[10px] md:text-xs text-muted-foreground relative z-10">Streak</div>
           </CardContent>
         </Card>
         <Card className="glass-card group hover:shadow-strong transition-all duration-300 active:scale-95 cursor-pointer">
-          <CardContent className="p-4 text-center relative overflow-hidden">
+          <CardContent className="p-3 md:p-4 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="flex items-center justify-center mb-2 relative z-10">
-              <div className="p-2 bg-accent/10 rounded-full group-hover:scale-110 transition-transform duration-300">
-                <Users className="h-5 w-5 text-accent" />
+            <div className="flex items-center justify-center mb-1 md:mb-2 relative z-10">
+              <div className="p-1.5 md:p-2 bg-accent/10 rounded-full group-hover:scale-110 transition-transform duration-300">
+                <Users className="h-4 w-4 md:h-5 md:w-5 text-accent" />
               </div>
             </div>
-            <div className="text-2xl font-bold relative z-10 animate-[fadeInUp_0.5s_ease-out]">{stats?.followersCount || 0}</div>
-            <div className="text-xs text-muted-foreground relative z-10">Followers</div>
+            <div className="text-xl md:text-2xl font-bold relative z-10 animate-[fadeInUp_0.5s_ease-out]">{stats?.followersCount || 0}</div>
+            <div className="text-[10px] md:text-xs text-muted-foreground relative z-10">Followers</div>
           </CardContent>
         </Card>
         <Card className="glass-card group hover:shadow-strong transition-all duration-300 active:scale-95 cursor-pointer">
-          <CardContent className="p-4 text-center relative overflow-hidden">
+          <CardContent className="p-3 md:p-4 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-warning/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="flex items-center justify-center mb-2 relative z-10">
-              <div className="p-2 bg-warning/10 rounded-full group-hover:scale-110 transition-transform duration-300">
-                <Trophy className="h-5 w-5 text-warning" />
+            <div className="flex items-center justify-center mb-1 md:mb-2 relative z-10">
+              <div className="p-1.5 md:p-2 bg-warning/10 rounded-full group-hover:scale-110 transition-transform duration-300">
+                <Trophy className="h-4 w-4 md:h-5 md:w-5 text-warning" />
               </div>
             </div>
-            <div className="text-2xl font-bold relative z-10 animate-[fadeInUp_0.5s_ease-out]">{stats?.achievementsCount || 0}</div>
-            <div className="text-xs text-muted-foreground relative z-10">Achievements</div>
+            <div className="text-xl md:text-2xl font-bold relative z-10 animate-[fadeInUp_0.5s_ease-out]">{stats?.achievementsCount || 0}</div>
+            <div className="text-[10px] md:text-xs text-muted-foreground relative z-10">Awards</div>
           </CardContent>
         </Card>
       </div>
