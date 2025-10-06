@@ -96,7 +96,7 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
 
   return (
     <div className="fixed inset-0 z-50 bg-background animate-[fadeIn_0.3s_ease-out]">
-      <div className="fixed right-0 top-0 h-full w-full md:max-w-md border-l border-border shadow-strong bg-background">
+      <div className="fixed inset-0 h-full w-full bg-background">
         <Card className="h-full rounded-none border-0 bg-background shadow-none">
           {/* Header */}
           <div className="px-6 py-4 bg-background border-b border-border">
@@ -146,7 +146,7 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
               {quickActions.map((action) => (
                 <Button
                   key={action.label}
-                  variant="glass"
+                  variant="outline"
                   size="sm"
                   onClick={action.action}
                   disabled={action.disabled}
