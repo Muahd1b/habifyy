@@ -95,9 +95,9 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-background animate-[fadeIn_0.3s_ease-out]">
-      <div className="fixed inset-0 h-full w-full bg-background">
-        <Card className="h-full rounded-none border-0 bg-background shadow-none">
+    <div className="fixed inset-0 z-50 bg-gradient-to-b from-background via-background/90 to-transparent pointer-events-none animate-[fadeIn_0.3s_ease-out]">
+      <div className="max-h-[65vh] md:max-h-[70vh] w-full bg-background shadow-strong pointer-events-auto overflow-hidden">
+        <Card className="h-full rounded-none border-0 bg-background shadow-none flex flex-col">
           {/* Header */}
           <div className="px-6 py-4 bg-background border-b border-border">
              <div className="flex items-center justify-between">
