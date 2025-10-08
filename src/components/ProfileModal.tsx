@@ -228,52 +228,48 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
 
       {/* Stats Grid with Glass Effect */}
       <div className="grid grid-cols-2 gap-3 md:gap-4">
-        <Card className="glass-card group hover:shadow-strong transition-all duration-300 active:scale-95 cursor-pointer">
-          <CardContent className="p-3 md:p-4 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="flex items-center justify-center mb-1 md:mb-2 relative z-10">
-              <div className="p-1.5 md:p-2 bg-primary/10 rounded-full group-hover:scale-110 transition-transform duration-300">
+        <Card className="border border-border/60 shadow-sm transition-shadow duration-200 hover:shadow-md">
+          <CardContent className="p-3 md:p-4 text-center">
+            <div className="mb-1 flex items-center justify-center md:mb-2">
+              <div className="rounded-full bg-primary/10 p-1.5 md:p-2">
                 <Target className="h-4 w-4 md:h-5 md:w-5 text-primary" />
               </div>
             </div>
-            <div className="text-xl md:text-2xl font-bold relative z-10 animate-[fadeInUp_0.5s_ease-out]">{stats?.totalHabits || 0}</div>
-            <div className="text-[10px] md:text-xs text-muted-foreground relative z-10">Habits</div>
+            <div className="text-xl font-bold md:text-2xl">{stats?.totalHabits || 0}</div>
+            <div className="text-[10px] text-muted-foreground md:text-xs">Habits</div>
           </CardContent>
         </Card>
-        <Card className="glass-card group hover:shadow-strong transition-all duration-300 active:scale-95 cursor-pointer">
-          <CardContent className="p-3 md:p-4 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-success/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="flex items-center justify-center mb-1 md:mb-2 relative z-10">
-              <div className="p-1.5 md:p-2 bg-success/10 rounded-full group-hover:scale-110 transition-transform duration-300">
+        <Card className="border border-border/60 shadow-sm transition-shadow duration-200 hover:shadow-md">
+          <CardContent className="p-3 md:p-4 text-center">
+            <div className="mb-1 flex items-center justify-center md:mb-2">
+              <div className="rounded-full bg-success/10 p-1.5 md:p-2">
                 <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-success" />
               </div>
             </div>
-            <div className="text-xl md:text-2xl font-bold relative z-10 animate-[fadeInUp_0.5s_ease-out]">{stats?.currentStreak || 0}</div>
-            <div className="text-[10px] md:text-xs text-muted-foreground relative z-10">Streak</div>
+            <div className="text-xl font-bold md:text-2xl">{stats?.currentStreak || 0}</div>
+            <div className="text-[10px] text-muted-foreground md:text-xs">Streak</div>
           </CardContent>
         </Card>
-        <Card className="glass-card group hover:shadow-strong transition-all duration-300 active:scale-95 cursor-pointer">
-          <CardContent className="p-3 md:p-4 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="flex items-center justify-center mb-1 md:mb-2 relative z-10">
-              <div className="p-1.5 md:p-2 bg-accent/10 rounded-full group-hover:scale-110 transition-transform duration-300">
+        <Card className="border border-border/60 shadow-sm transition-shadow duration-200 hover:shadow-md">
+          <CardContent className="p-3 md:p-4 text-center">
+            <div className="mb-1 flex items-center justify-center md:mb-2">
+              <div className="rounded-full bg-accent/10 p-1.5 md:p-2">
                 <Users className="h-4 w-4 md:h-5 md:w-5 text-accent" />
               </div>
             </div>
-            <div className="text-xl md:text-2xl font-bold relative z-10 animate-[fadeInUp_0.5s_ease-out]">{stats?.followersCount || 0}</div>
-            <div className="text-[10px] md:text-xs text-muted-foreground relative z-10">Followers</div>
+            <div className="text-xl font-bold md:text-2xl">{stats?.followersCount || 0}</div>
+            <div className="text-[10px] text-muted-foreground md:text-xs">Followers</div>
           </CardContent>
         </Card>
-        <Card className="glass-card group hover:shadow-strong transition-all duration-300 active:scale-95 cursor-pointer">
-          <CardContent className="p-3 md:p-4 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-warning/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="flex items-center justify-center mb-1 md:mb-2 relative z-10">
-              <div className="p-1.5 md:p-2 bg-warning/10 rounded-full group-hover:scale-110 transition-transform duration-300">
+        <Card className="border border-border/60 shadow-sm transition-shadow duration-200 hover:shadow-md">
+          <CardContent className="p-3 md:p-4 text-center">
+            <div className="mb-1 flex items-center justify-center md:mb-2">
+              <div className="rounded-full bg-warning/10 p-1.5 md:p-2">
                 <Trophy className="h-4 w-4 md:h-5 md:w-5 text-warning" />
               </div>
             </div>
-            <div className="text-xl md:text-2xl font-bold relative z-10 animate-[fadeInUp_0.5s_ease-out]">{stats?.achievementsCount || 0}</div>
-            <div className="text-[10px] md:text-xs text-muted-foreground relative z-10">Awards</div>
+            <div className="text-xl font-bold md:text-2xl">{stats?.achievementsCount || 0}</div>
+            <div className="text-[10px] text-muted-foreground md:text-xs">Awards</div>
           </CardContent>
         </Card>
       </div>
@@ -317,7 +313,7 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
           <CardContent>
             <div className="space-y-3">
               {userRecords.slice(0, 5).map((record) => (
-                <div key={record.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                <div key={record.id} className="flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-muted/20 p-3">
                   <div>
                     <p className="font-medium">{record.record_type.replace('_', ' ').toUpperCase()}</p>
                     <p className="text-sm text-muted-foreground">{record.category}</p>
@@ -347,7 +343,7 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
           <CardContent>
             <div className="space-y-3">
               {followers.slice(0, 5).map((follower) => (
-                <div key={follower.id} className="flex items-center gap-3">
+                <div key={follower.id} className="flex items-center gap-3 rounded-lg border border-border/60 bg-muted/20 p-3">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={follower.profile?.avatar_url || ''} />
                     <AvatarFallback>
@@ -375,7 +371,7 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
           <CardContent>
             <div className="space-y-3">
               {following.slice(0, 5).map((follow) => (
-                <div key={follow.id} className="flex items-center gap-3">
+                <div key={follow.id} className="flex items-center gap-3 rounded-lg border border-border/60 bg-muted/20 p-3">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={follow.profile?.avatar_url || ''} />
                     <AvatarFallback>
@@ -459,7 +455,7 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
       <div className="fixed inset-0 z-50 flex items-center justify-center md:p-4 pointer-events-none overflow-hidden">
         <Card className="w-full h-full md:h-auto md:max-w-4xl md:max-h-[90vh] flex flex-col pointer-events-auto animate-scale-in shadow-2xl md:rounded-xl rounded-none border-0 md:border">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 md:p-6 border-b bg-gradient-to-r from-primary/10 to-accent/10 sticky top-0 z-10 shrink-0">
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-muted/20 p-4 md:p-6 shrink-0">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-primary/10 rounded-full md:hidden">
                 <User className="h-5 w-5 text-primary" />
@@ -480,10 +476,25 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
                 renderEditProfile()
               ) : (
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
-                  <TabsList className="grid w-full grid-cols-3 h-12 bg-muted/30">
-                    <TabsTrigger value="overview" className="interactive-press">Overview</TabsTrigger>
-                    <TabsTrigger value="social" className="interactive-press">Social</TabsTrigger>
-                    <TabsTrigger value="records" className="interactive-press">Records</TabsTrigger>
+                  <TabsList className="mx-auto flex w-full flex-wrap items-center justify-center gap-2 rounded-full border border-border/30 bg-background/70 p-2 shadow-[0_12px_30px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60 sm:w-auto">
+                    <TabsTrigger
+                      value="overview"
+                      className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+                    >
+                      Overview
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="social"
+                      className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+                    >
+                      Social
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="records"
+                      className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+                    >
+                      Records
+                    </TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="overview">

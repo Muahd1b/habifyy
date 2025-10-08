@@ -62,7 +62,7 @@ const FriendsSection = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Friends List */}
         <div className="lg:col-span-2 space-y-4">
-          <Card>
+          <Card className="border border-border/60 shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
@@ -74,7 +74,7 @@ const FriendsSection = () => {
               {filteredFriends.length > 0 ? (
                 <div className="space-y-4">
                   {filteredFriends.map((friend) => (
-                    <div key={friend.id} className="flex items-center justify-between p-4 rounded-lg bg-accent/5 hover:bg-accent/10 transition-colors">
+                    <div key={friend.id} className="flex items-center justify-between gap-4 rounded-lg border border-border/60 bg-muted/20 p-4 transition-colors hover:bg-muted/30">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-12 w-12">
                           <AvatarImage src={friend.profile?.avatar_url} />
@@ -136,7 +136,7 @@ const FriendsSection = () => {
 
         {/* Suggested Friends */}
         <div className="space-y-4">
-          <Card>
+          <Card className="border border-border/60 shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <UserPlus className="h-5 w-5" />
@@ -154,7 +154,7 @@ const FriendsSection = () => {
           </Card>
 
           {/* Friend Leaderboard */}
-          <Card>
+          <Card className="border border-border/60 shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Crown className="h-5 w-5" />

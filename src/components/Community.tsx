@@ -91,7 +91,7 @@ const Community = ({ onClose, open }: CommunityProps) => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => (
-          <Card key={index} className="relative overflow-hidden">
+          <Card key={index} className="border border-border/60 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -121,7 +121,7 @@ const Community = ({ onClose, open }: CommunityProps) => {
           </CardHeader>
           <CardContent className="space-y-4">
             {activityFeed.slice(0, 5).map((activity) => (
-              <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg bg-accent/5">
+              <div key={activity.id} className="flex items-start gap-3 rounded-lg border border-border/60 bg-muted/20 p-3">
                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground text-sm font-semibold">
                   {activity.profile?.display_name?.[0] || activity.profile?.username?.[0] || 'U'}
                 </div>
@@ -228,24 +228,39 @@ const Community = ({ onClose, open }: CommunityProps) => {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             {/* Tab Navigation */}
             <div className="mb-6">
-              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 h-auto bg-muted/30">
-                <TabsTrigger value="overview" className="flex items-center gap-2 interactive-press py-3">
+              <TabsList className="mx-auto flex w-full flex-wrap items-center justify-center gap-2 rounded-full border border-border/30 bg-background/70 p-2 shadow-[0_12px_30px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60 sm:w-auto">
+                <TabsTrigger
+                  value="overview"
+                  className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+                >
                   <User className="h-4 w-4" />
                   <span className="hidden sm:inline">Overview</span>
                 </TabsTrigger>
-                <TabsTrigger value="friends" className="flex items-center gap-2 interactive-press py-3">
+                <TabsTrigger
+                  value="friends"
+                  className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+                >
                   <Users className="h-4 w-4" />
                   <span className="hidden sm:inline">Friends</span>
                 </TabsTrigger>
-                <TabsTrigger value="competitions" className="flex items-center gap-2 interactive-press py-3">
+                <TabsTrigger
+                  value="competitions"
+                  className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+                >
                   <Trophy className="h-4 w-4" />
                   <span className="hidden sm:inline">Compete</span>
                 </TabsTrigger>
-                <TabsTrigger value="marketplace" className="flex items-center gap-2 interactive-press py-3">
+                <TabsTrigger
+                  value="marketplace"
+                  className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+                >
                   <ShoppingBag className="h-4 w-4" />
                   <span className="hidden sm:inline">Shop</span>
                 </TabsTrigger>
-                <TabsTrigger value="achievements" className="flex items-center gap-2 interactive-press py-3">
+                <TabsTrigger
+                  value="achievements"
+                  className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+                >
                   <Award className="h-4 w-4" />
                   <span className="hidden sm:inline">Rewards</span>
                 </TabsTrigger>

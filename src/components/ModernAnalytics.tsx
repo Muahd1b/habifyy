@@ -156,44 +156,42 @@ export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, co
   }, [habits, completions, profile, getCompletionsForDate, getCompletionStats]);
 
   const MetricCard = ({ title, value, subtitle, icon: Icon, trend }: any) => (
-    <Card className="relative overflow-hidden group hover:shadow-strong transition-all duration-300 glass-card active:scale-95 cursor-pointer">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-        <div className="p-2 bg-primary/10 rounded-full group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
+    <Card className="border border-border/60 shadow-sm transition-shadow duration-200 hover:shadow-md">
+      <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
+        <div>
+          <CardDescription className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {title}
+          </CardDescription>
+          <CardTitle className="text-2xl font-semibold text-foreground">{value}</CardTitle>
+        </div>
+        <div className="rounded-full bg-muted/40 p-2">
           <Icon className="h-4 w-4 text-primary" />
         </div>
       </CardHeader>
-      <CardContent className="relative z-10">
-        <div className="text-2xl font-bold text-foreground animate-[fadeInUp_0.5s_ease-out]">{value}</div>
-        <div className="flex items-center gap-2 mt-1">
-          <p className="text-xs text-muted-foreground">{subtitle}</p>
-          {trend && (
-            <div className={`flex items-center gap-1 animate-[bounceSoft_1s_ease-out] ${
-              trend === 'up' ? 'text-success' : trend === 'down' ? 'text-destructive' : 'text-muted-foreground'
-            }`}>
-              {trend === 'up' && <ArrowUp className="w-3 h-3" />}
-              {trend === 'down' && <ArrowDown className="w-3 h-3" />}
-              {trend === 'stable' && <Minus className="w-3 h-3" />}
-            </div>
-          )}
-        </div>
+      <CardContent className="flex items-center justify-between text-sm text-muted-foreground">
+        <span>{subtitle}</span>
+        {trend && (
+          <span
+            className={`flex items-center gap-1 text-xs font-medium ${
+              trend === 'up'
+                ? 'text-success'
+                : trend === 'down'
+                ? 'text-destructive'
+                : 'text-muted-foreground'
+            }`}
+          >
+            {trend === 'up' && <ArrowUp className="h-3 w-3" />}
+            {trend === 'down' && <ArrowDown className="h-3 w-3" />}
+            {trend === 'stable' && <Minus className="h-3 w-3" />}
+            {trend === 'up' ? 'Up' : trend === 'down' ? 'Down' : 'Stable'}
+          </span>
+        )}
       </CardContent>
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-success opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
     </Card>
   );
 
-  const AnimatedProgress = ({ value, className = "", color = "primary" }: any) => (
-    <div className={`relative ${className}`}>
-      <Progress 
-        value={value} 
-        className="h-3 bg-muted/30" 
-      />
-      <div 
-        className="absolute top-0 left-0 h-3 rounded-full bg-gradient-to-r from-primary to-primary-light transition-all duration-1000 ease-out"
-        style={{ width: `${value}%` }}
-      />
-    </div>
+  const AnimatedProgress = ({ value, className = "" }: any) => (
+    <Progress value={value} className={`h-2 ${className}`} />
   );
 
   if (isLoading) {
@@ -233,20 +231,32 @@ export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, co
           <Tabs defaultValue="overview" className="w-full">
             {/* Tab Navigation */}
             <div className="mb-6">
-              <TabsList className="grid w-full grid-cols-4 h-12 bg-muted/30">
-                <TabsTrigger value="overview" className="flex items-center gap-2 interactive-press">
+              <TabsList className="mx-auto flex w-full flex-wrap items-center justify-center gap-2 rounded-full border border-border/30 bg-background/70 p-2 shadow-[0_12px_30px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60 sm:w-auto">
+                <TabsTrigger
+                  value="overview"
+                  className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+                >
                   <Activity className="w-4 h-4" />
                   <span className="hidden sm:inline">Overview</span>
                 </TabsTrigger>
-                <TabsTrigger value="performance" className="flex items-center gap-2 interactive-press">
+                <TabsTrigger
+                  value="performance"
+                  className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+                >
                   <TrendingUp className="w-4 h-4" />
                   <span className="hidden sm:inline">Performance</span>
                 </TabsTrigger>
-                <TabsTrigger value="habits" className="flex items-center gap-2 interactive-press">
+                <TabsTrigger
+                  value="habits"
+                  className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+                >
                   <Target className="w-4 h-4" />
                   <span className="hidden sm:inline">Habits</span>
                 </TabsTrigger>
-                <TabsTrigger value="insights" className="flex items-center gap-2 interactive-press">
+                <TabsTrigger
+                  value="insights"
+                  className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+                >
                   <Zap className="w-4 h-4" />
                   <span className="hidden sm:inline">Insights</span>
                 </TabsTrigger>
@@ -288,24 +298,23 @@ export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, co
               </div>
 
               {/* Liquid Tube Charts - Modern Visualization */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card className="lg:col-span-2 glass-card overflow-hidden group">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="px-6 py-4 bg-muted/50 border-b border-border relative z-10">
-                    <div className="flex items-center justify-between">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <Card className="lg:col-span-2 border border-border/60 shadow-sm">
+                  <CardHeader className="border-b bg-muted/30">
+                    <div className="flex items-center justify-between gap-4">
                       <div>
-                        <CardTitle className="flex items-center gap-2">
+                        <CardTitle className="flex items-center gap-2 text-base">
                           <TrendingUp className="w-5 h-5 text-primary" />
                           Weekly Performance Overview
                         </CardTitle>
                         <CardDescription>Liquid tube visualization of your habit consistency</CardDescription>
                       </div>
-                      <Badge variant="outline" className="bg-primary/5 animate-pulse">
-                        Live Data
+                      <Badge variant="outline" className="text-xs uppercase tracking-wide">
+                        Live data
                       </Badge>
                     </div>
-                  </div>
-                  <CardContent className="relative z-10 pt-6">
+                  </CardHeader>
+                  <CardContent className="pt-6">
                     <LiquidTubeComparison
                       data={analyticsData.weekly.map((day, idx) => ({
                         label: day.day,
@@ -318,15 +327,15 @@ export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, co
                 </Card>
 
                 {/* Radial Progress Summary */}
-                <Card className="glass-card">
-                  <div className="px-6 py-4 bg-muted/50 border-b border-border">
-                    <CardTitle className="flex items-center gap-2">
+                <Card className="border border-border/60 shadow-sm">
+                  <CardHeader className="border-b bg-muted/30">
+                    <CardTitle className="flex items-center gap-2 text-base">
                       <Calendar className="w-5 h-5 text-primary" />
                       Success Rate
                     </CardTitle>
                     <CardDescription>Overall completion this week</CardDescription>
-                  </div>
-                  <CardContent className="flex flex-col items-center justify-center py-6 space-y-6">
+                  </CardHeader>
+                  <CardContent className="flex flex-col items-center justify-center space-y-6 py-6">
                     <RadialProgressChart
                       percentage={analyticsData.overview.winRate}
                       size={140}
@@ -336,13 +345,13 @@ export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, co
                     />
                     <div className="text-center space-y-2">
                       <p className="text-sm font-medium text-muted-foreground">
-                        {analyticsData.overview.winRate >= 80 ? 'Excellent Performance!' : 
-                         analyticsData.overview.winRate >= 50 ? 'Good Progress!' : 
-                         'Keep Going!'}
+                        {analyticsData.overview.winRate >= 80 ? 'Excellent performance' : 
+                         analyticsData.overview.winRate >= 50 ? 'Good progress' : 
+                         'Keep going'}
                       </p>
                       <div className="flex items-center justify-center gap-2">
                         <Badge variant="secondary" className="text-xs">
-                          <Flame className="w-3 h-3 mr-1" />
+                          <Flame className="mr-1 h-3 w-3" />
                           {analyticsData.overview.currentStreak} day streak
                         </Badge>
                       </div>
@@ -464,8 +473,8 @@ export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, co
             {/* Habits Tab */}
             <TabsContent value="habits" className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {analyticsData.habits.map((habit, index) => (
-                  <Card key={habit.name} className="group hover:shadow-lg transition-all duration-300">
+                {analyticsData.habits.map((habit) => (
+                  <Card key={habit.name} className="border border-border/60 shadow-sm transition-shadow duration-200 hover:shadow-md">
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -501,9 +510,9 @@ export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, co
                       </div>
 
                       <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
                       >
                         View Details
                       </Button>
@@ -555,25 +564,25 @@ export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, co
                     <CardDescription>Personalized tips to improve your habits</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="p-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg border border-primary/20">
-                      <h4 className="font-semibold mb-2">🎯 Consistency Booster</h4>
-                      <p className="text-sm text-muted-foreground mb-3">
+                    <div className="rounded-lg border border-border/60 bg-muted/30 p-4">
+                      <h4 className="mb-2 font-semibold">🎯 Consistency Booster</h4>
+                      <p className="mb-3 text-sm text-muted-foreground">
                         Schedule your habits at the same time daily for 23% better results.
                       </p>
                       <Button size="sm" variant="outline">Apply Suggestion</Button>
                     </div>
 
-                    <div className="p-4 bg-gradient-to-r from-secondary/10 to-primary/10 rounded-lg border border-secondary/20">
-                      <h4 className="font-semibold mb-2">📱 Smart Reminders</h4>
-                      <p className="text-sm text-muted-foreground mb-3">
+                    <div className="rounded-lg border border-border/60 bg-muted/30 p-4">
+                      <h4 className="mb-2 font-semibold">📱 Smart Reminders</h4>
+                      <p className="mb-3 text-sm text-muted-foreground">
                         Enable location-based reminders for 40% higher completion rates.
                       </p>
                       <Button size="sm" variant="outline">Enable Reminders</Button>
                     </div>
 
-                    <div className="p-4 bg-gradient-to-r from-accent/10 to-secondary/10 rounded-lg border border-accent/20">
-                      <h4 className="font-semibold mb-2">🏆 Challenge Mode</h4>
-                      <p className="text-sm text-muted-foreground mb-3">
+                    <div className="rounded-lg border border-border/60 bg-muted/30 p-4">
+                      <h4 className="mb-2 font-semibold">🏆 Challenge Mode</h4>
+                      <p className="mb-3 text-sm text-muted-foreground">
                         Join weekly challenges to stay motivated and engaged.
                       </p>
                       <Button size="sm" variant="outline">Join Challenge</Button>

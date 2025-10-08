@@ -86,8 +86,8 @@ const MarketplaceSection = () => {
   ];
 
   const MarketplaceItemCard = ({ item }: { item: any }) => (
-    <Card className="overflow-hidden hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
-      <div className="aspect-video bg-gradient-to-br from-accent to-accent/50 relative overflow-hidden">
+    <Card className="border border-border/60 shadow-sm transition-shadow duration-200 hover:shadow-md">
+      <div className="relative aspect-video overflow-hidden bg-muted/30">
         {item.image_url ? (
           <img 
             src={item.image_url} 
@@ -95,14 +95,14 @@ const MarketplaceSection = () => {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className={`p-4 rounded-full ${getCategoryColor(item.category)}`}>
+          <div className="flex h-full w-full items-center justify-center">
+            <div className={`rounded-full p-4 ${getCategoryColor(item.category)}`}>
               {getCategoryIcon(item.category)}
             </div>
           </div>
         )}
         {item.is_premium && (
-          <Badge className="absolute top-2 right-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white">
+          <Badge className="absolute right-2 top-2 bg-warning text-warning-foreground">
             <Crown className="h-3 w-3 mr-1" />
             Premium
           </Badge>
@@ -174,9 +174,13 @@ const MarketplaceSection = () => {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <Tabs value={filterCategory} onValueChange={setFilterCategory} className="flex-1">
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
+          <TabsList className="mx-auto flex w-full flex-wrap items-center justify-center gap-2 rounded-full border border-border/30 bg-background/70 p-2 shadow-[0_12px_30px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60 lg:w-auto">
             {categories.map((category) => (
-              <TabsTrigger key={category.value} value={category.value} className="text-xs">
+              <TabsTrigger
+                key={category.value}
+                value={category.value}
+                className="rounded-full px-3 py-2 text-xs font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+              >
                 {category.label} ({category.count})
               </TabsTrigger>
             ))}
@@ -222,7 +226,7 @@ const MarketplaceSection = () => {
       </div>
 
       {/* Earning Points Info */}
-      <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
+      <Card className="border border-border/60 shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-primary" />

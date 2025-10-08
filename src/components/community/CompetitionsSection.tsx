@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trophy, Calendar, Users, Clock, MapPin, Target, Crown, Medal, Star } from 'lucide-react';
+import { Trophy, Calendar, Users, Clock, Target, Crown, Medal } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -38,18 +38,6 @@ const CompetitionsSection = () => {
   const upcomingCompetitions = competitions.filter(c => c.status === 'upcoming');
   const completedCompetitions = competitions.filter(c => c.status === 'completed');
 
-  const getCompetitionTypeColor = (type: string) => {
-    switch (type) {
-      case 'global': return 'bg-gradient-to-r from-purple-500 to-pink-500';
-      case 'local': return 'bg-gradient-to-r from-blue-500 to-cyan-500';
-      case 'weekly': return 'bg-gradient-to-r from-green-500 to-emerald-500';
-      case 'monthly': return 'bg-gradient-to-r from-orange-500 to-red-500';
-      case 'habit_specific': return 'bg-gradient-to-r from-indigo-500 to-purple-500';
-      case 'team': return 'bg-gradient-to-r from-yellow-500 to-orange-500';
-      default: return 'bg-gradient-to-r from-gray-500 to-gray-600';
-    }
-  };
-
   const getTimeRemaining = (endDate: string) => {
     const end = new Date(endDate);
     const now = new Date();
@@ -65,13 +53,12 @@ const CompetitionsSection = () => {
   };
 
   const CompetitionCard = ({ competition, showJoinButton = true }: { competition: any, showJoinButton?: boolean }) => (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-      <div className={`h-2 ${getCompetitionTypeColor(competition.type)}`} />
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
+    <Card className="border border-border/60 shadow-sm transition-shadow duration-200 hover:shadow-md">
+      <CardHeader className="border-b bg-muted/20">
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-1">
             <CardTitle className="text-lg">{competition.title}</CardTitle>
-            <CardDescription className="mt-1">{competition.description}</CardDescription>
+            <CardDescription>{competition.description}</CardDescription>
           </div>
           <Badge variant="secondary" className="capitalize">
             {competition.type.replace('_', ' ')}
@@ -151,14 +138,23 @@ const CompetitionsSection = () => {
         {/* Competitions List */}
         <div className="lg:col-span-2">
           <Tabs defaultValue="active" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="active">
+            <TabsList className="mx-auto flex w-full flex-wrap items-center justify-center gap-2 rounded-full border border-border/30 bg-background/70 p-2 shadow-[0_12px_30px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60 sm:w-auto">
+              <TabsTrigger
+                value="active"
+                className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+              >
                 Active ({activeCompetitions.length})
               </TabsTrigger>
-              <TabsTrigger value="upcoming">
+              <TabsTrigger
+                value="upcoming"
+                className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+              >
                 Upcoming ({upcomingCompetitions.length})
               </TabsTrigger>
-              <TabsTrigger value="completed">
+              <TabsTrigger
+                value="completed"
+                className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+              >
                 Completed ({completedCompetitions.length})
               </TabsTrigger>
             </TabsList>

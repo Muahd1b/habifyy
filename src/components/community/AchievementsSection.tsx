@@ -62,32 +62,24 @@ const AchievementsSection = () => {
     const progressPercentage = Math.min(100, (progress / achievement.requirement_value) * 100);
 
     return (
-      <Card className={`relative overflow-hidden transition-all duration-200 hover:shadow-lg ${
-        isEarned ? 'bg-gradient-to-br from-accent/20 to-accent/5 border-accent/30' : 'hover:-translate-y-1'
-      }`}>
-        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-accent/30 to-transparent" />
-        
-        {isEarned && (
-          <div className="absolute top-2 right-2">
-            <div className="w-6 h-6 rounded-full bg-success flex items-center justify-center">
-              <Award className="h-3 w-3 text-success-foreground" />
-            </div>
-          </div>
-        )}
-
-        {!isEarned && progressPercentage < 100 && (
-          <div className="absolute top-2 right-2">
-            <Lock className="h-4 w-4 text-muted-foreground" />
-          </div>
-        )}
-
+      <Card className={`border border-border/60 shadow-sm transition-shadow duration-200 hover:shadow-md ${isEarned ? 'bg-muted/30' : ''}`}>
         <CardHeader className="pb-2">
-          <div className="flex items-start gap-3">
-            <div className="text-2xl">{achievement.icon || '🏆'}</div>
-            <div className="flex-1">
-              <CardTitle className="text-lg">{achievement.name}</CardTitle>
-              <CardDescription className="mt-1">{achievement.description}</CardDescription>
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <div className="text-2xl">{achievement.icon || '🏆'}</div>
+              <div>
+                <CardTitle className="text-base">{achievement.name}</CardTitle>
+                <CardDescription className="mt-1">{achievement.description}</CardDescription>
+              </div>
             </div>
+            {isEarned ? (
+              <Badge variant="secondary" className="flex items-center gap-1 text-xs">
+                <Award className="h-3 w-3" />
+                Earned
+              </Badge>
+            ) : (
+              progressPercentage < 100 && <Lock className="h-4 w-4 text-muted-foreground" />
+            )}
           </div>
         </CardHeader>
 
@@ -114,7 +106,7 @@ const AchievementsSection = () => {
           )}
 
           {isEarned && earnedDate && (
-            <div className="flex items-center gap-2 text-sm text-success">
+            <div className="flex items-center gap-2 text-sm text-primary">
               <Calendar className="h-3 w-3" />
               <span>Earned {new Date(earnedDate).toLocaleDateString()}</span>
             </div>
@@ -178,11 +170,17 @@ const AchievementsSection = () => {
 
       {/* Achievements Tabs */}
       <Tabs defaultValue="earned" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="earned">
+        <TabsList className="mx-auto flex w-full flex-wrap items-center justify-center gap-2 rounded-full border border-border/30 bg-background/70 p-2 shadow-[0_12px_30px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60 sm:w-auto">
+          <TabsTrigger
+            value="earned"
+            className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+          >
             Earned ({earnedAchievements.length})
           </TabsTrigger>
-          <TabsTrigger value="available">
+          <TabsTrigger
+            value="available"
+            className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-[0_6px_18px_rgba(15,23,42,0.12)] dark:data-[state=active]:bg-slate-950/80"
+          >
             Available ({availableAchievements.length})
           </TabsTrigger>
         </TabsList>
