@@ -95,11 +95,16 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-gradient-to-b from-background via-background/90 to-transparent pointer-events-none animate-[fadeIn_0.3s_ease-out]">
-      <div className="max-h-[65vh] md:max-h-[70vh] w-full bg-background shadow-strong pointer-events-auto overflow-hidden">
-        <Card className="h-full rounded-none border-0 bg-background shadow-none flex flex-col">
+    <div 
+      className="fixed inset-0 z-50 pointer-events-none animate-[fadeIn_0.3s_ease-out]"
+      style={{
+        background: 'linear-gradient(to bottom, hsl(0 0% 100% / 1) 0%, hsl(0 0% 100% / 0.98) 30%, hsl(0 0% 100% / 0.90) 50%, hsl(0 0% 100% / 0.70) 70%, hsl(0 0% 100% / 0.30) 90%, hsl(0 0% 100% / 0) 100%)'
+      }}
+    >
+      <div className="max-h-[70vh] md:max-h-[65vh] w-full bg-white shadow-strong pointer-events-auto overflow-hidden">
+        <Card className="h-full rounded-none border-0 bg-white shadow-none flex flex-col">
           {/* Header */}
-          <div className="px-6 py-4 bg-background border-b border-border">
+          <div className="px-6 py-4 bg-white border-b border-border">
              <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-3">
                 <div className="p-2 bg-primary/10 rounded-full">
@@ -161,9 +166,9 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
 
           <CardContent className="px-0 py-0 flex-1 overflow-hidden">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-              {/* Enhanced Tab Navigation with Glass Effect */}
-              <div className="px-6 py-4 border-b border-border/30 bg-background">
-                 <TabsList className="w-full grid grid-cols-4 h-10 bg-background">
+              {/* Enhanced Tab Navigation */}
+              <div className="px-6 py-4 border-b border-border/30 bg-white">
+                 <TabsList className="w-full grid grid-cols-4 h-10 bg-white">
                   <TabsTrigger value="all" className="text-xs font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
                     <div className="flex items-center gap-1">
                       All
@@ -199,9 +204,9 @@ export const ModernNotificationCenter: React.FC<ModernNotificationCenterProps> =
                 </TabsList>
               </div>
 
-              {/* Enhanced Content Area */}
+              {/* Content Area */}
               <div className="flex-1 overflow-hidden">
-                <ScrollArea className="h-full">
+                <ScrollArea className="h-full overflow-y-auto">
                   <div className="px-6 py-4 pb-app-safe">
                      <TabsContent value={activeTab} className="mt-0">
                       {loading ? (
