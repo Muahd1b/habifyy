@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Bell, 
+  Bell,
   Settings, 
   User, 
   Calendar,
@@ -10,9 +10,9 @@ import {
   Crown,
   TrendingUp
 } from 'lucide-react';
-import { useNotifications } from '@/hooks/useNotifications';
-import { NotificationCenter } from './NotificationCenter';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useNotifications } from '@/hooks/useNotifications';
+import { NotificationOverlay } from '@/components/notifications/NotificationOverlay';
 import logo from '@/assets/habifyy-logo.png';
 
 interface HeaderProps {
@@ -25,11 +25,12 @@ interface HeaderProps {
 }
 
 export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onAnalyticsClick, onPremiumClick, onProfileClick }: HeaderProps) => {
-  const { stats } = useNotifications();
-  const [isNotificationCenterOpen, setIsNotificationCenterOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { stats } = useNotifications();
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   
   return (
+    <>
     <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-40">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
@@ -89,11 +90,11 @@ export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onA
           {/* Actions */}
           <div className="flex items-center gap-2">
             {/* Notifications */}
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               className="relative"
-              onClick={() => setIsNotificationCenterOpen(true)}
+              onClick={() => setIsOverlayOpen(true)}
             >
               <Bell className="w-4 h-4" />
               {stats.unread > 0 && (
@@ -118,11 +119,8 @@ export const Header = ({ onCalendarClick, onSettingsClick, onCommunityClick, onA
           </div>
         </div>
       </div>
-      
-      <NotificationCenter 
-        isOpen={isNotificationCenterOpen}
-        onClose={() => setIsNotificationCenterOpen(false)}
-      />
     </header>
+    <NotificationOverlay isOpen={isOverlayOpen} onClose={() => setIsOverlayOpen(false)} />
+    </>
   );
 };

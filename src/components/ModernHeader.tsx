@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
-  Bell, 
   Calendar, 
   BarChart3, 
   Users, 
@@ -13,8 +12,6 @@ import {
   Menu,
   X
 } from 'lucide-react';
-import { ModernNotificationCenter } from './ModernNotificationCenter';
-import { useNotifications } from '@/hooks/useNotifications';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -37,11 +34,9 @@ export const ModernHeader = ({
   onPremiumClick,
   onProfileClick
 }: ModernHeaderProps) => {
-  const [isNotificationCenterOpen, setIsNotificationCenterOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user } = useAuth();
   const { profile } = useProfile();
-  const { stats } = useNotifications();
   const isMobile = useIsMobile();
 
   const navigationItems = [
@@ -183,27 +178,6 @@ export const ModernHeader = ({
                 </Button>
               )}
 
-              {/* Enhanced Notifications Button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsNotificationCenterOpen(true)}
-                className="relative hover:bg-primary/10 hover:text-primary transition-all duration-200"
-              >
-                <Bell className="w-5 h-5" />
-                {stats.unread > 0 && (
-                  <>
-                    <Badge 
-                      variant="destructive" 
-                      className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                    >
-                      {stats.unread > 9 ? '9+' : stats.unread}
-                    </Badge>
-                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-destructive rounded-full animate-ping opacity-20" />
-                  </>
-                )}
-              </Button>
-
               {/* Premium Button - Enhanced */}
               <Button
                 variant="outline"
@@ -255,12 +229,6 @@ export const ModernHeader = ({
 
       {/* Mobile Menu */}
       <MobileMenu />
-
-      {/* Modern Notification Center */}
-      <ModernNotificationCenter
-        isOpen={isNotificationCenterOpen}
-        onClose={() => setIsNotificationCenterOpen(false)}
-      />
     </>
   );
 };

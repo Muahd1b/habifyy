@@ -537,6 +537,7 @@ export type Database = {
           expires_at: string | null
           id: string
           is_delivered: boolean | null
+          is_archived: boolean | null
           is_read: boolean | null
           message: string
           notification_type: string
@@ -552,6 +553,7 @@ export type Database = {
           expires_at?: string | null
           id?: string
           is_delivered?: boolean | null
+          is_archived?: boolean | null
           is_read?: boolean | null
           message: string
           notification_type: string
@@ -567,6 +569,7 @@ export type Database = {
           expires_at?: string | null
           id?: string
           is_delivered?: boolean | null
+          is_archived?: boolean | null
           is_read?: boolean | null
           message?: string
           notification_type?: string

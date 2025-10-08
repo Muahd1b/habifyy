@@ -19,6 +19,7 @@ export interface Notification {
   priority: 'low' | 'medium' | 'high' | 'critical';
   is_read: boolean;
   is_delivered: boolean;
+  is_archived: boolean;
   scheduled_time?: string;
   expires_at?: string;
   created_at: string;

@@ -15,6 +15,12 @@ export const useNotifications = () => {
     high_priority: 0
   });
 
+  const normalizeNotification = (notification: any): Notification => ({
+    ...notification,
+    is_archived: Boolean(notification.is_archived),
+    is_read: Boolean(notification.is_read),
+  });
+
   // Fetch notifications
   const fetchNotifications = async (limit = 50, offset = 0) => {
     if (!user) return;
@@ -30,8 +36,8 @@ export const useNotifications = () => {
 
       if (error) throw error;
 
-      const typedData = (data || []) as Notification[];
-      
+      const typedData = (data || []).map(normalizeNotification);
+
       if (offset === 0) {
         setNotifications(typedData);
       } else {
@@ -39,10 +45,11 @@ export const useNotifications = () => {
       }
 
       // Update stats
-      const total = typedData.length;
-      const unread = typedData.filter(n => !n.is_read).length;
-      const high_priority = typedData.filter(n => n.priority === 'high' || n.priority === 'critical').length;
-      
+      const activeNotifications = typedData.filter(n => !n.is_archived);
+      const total = activeNotifications.length;
+      const unread = activeNotifications.filter(n => !n.is_read).length;
+      const high_priority = activeNotifications.filter(n => n.priority === 'high' || n.priority === 'critical').length;
+
       setStats({ total, unread, high_priority });
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -70,15 +77,18 @@ export const useNotifications = () => {
       if (error) throw error;
 
       // Update local state
+      const target = notifications.find(n => n.id === notificationId && !n.is_archived);
+
       setNotifications(prev =>
         prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n)
       );
 
-      // Update stats
-      setStats(prev => ({
-        ...prev,
-        unread: Math.max(0, prev.unread - 1)
-      }));
+      if (target && !target.is_read) {
+        setStats(prev => ({
+          ...prev,
+          unread: Math.max(0, prev.unread - 1)
+        }));
+      }
     } catch (error) {
       console.error('Error marking notification as read:', error);
     }
@@ -135,11 +145,15 @@ export const useNotifications = () => {
       // Update local state
       setNotifications(prev => prev.filter(n => n.id !== notificationId));
 
-      // Update stats
+      const target = notifications.find(n => n.id === notificationId);
+
       setStats(prev => ({
-        total: prev.total - 1,
-        unread: prev.unread - 1,
-        high_priority: prev.high_priority
+        total: target && !target.is_archived ? Math.max(0, prev.total - 1) : prev.total,
+        unread: target && !target.is_archived && !target.is_read ? Math.max(0, prev.unread - 1) : prev.unread,
+        high_priority:
+          target && !target.is_archived && (target.priority === 'high' || target.priority === 'critical')
+            ? Math.max(0, prev.high_priority - 1)
+            : prev.high_priority
       }));
     } catch (error) {
       console.error('Error deleting notification:', error);
@@ -148,6 +162,74 @@ export const useNotifications = () => {
         description: "Failed to delete notification",
         variant: "destructive",
       });
+    }
+  };
+
+  const archiveNotification = async (notificationId: string) => {
+    if (!user) return;
+
+    const target = notifications.find(n => n.id === notificationId && !n.is_archived);
+    if (!target) return;
+
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_archived: true, is_read: true })
+        .eq('id', notificationId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setNotifications(prev =>
+        prev.map(n =>
+          n.id === notificationId ? { ...n, is_archived: true, is_read: true } : n
+        )
+      );
+
+      setStats(prev => ({
+        total: Math.max(0, prev.total - 1),
+        unread: target.is_read ? prev.unread : Math.max(0, prev.unread - 1),
+        high_priority:
+          target.priority === 'high' || target.priority === 'critical'
+            ? Math.max(0, prev.high_priority - 1)
+            : prev.high_priority,
+      }));
+    } catch (error) {
+      console.error('Error archiving notification:', error);
+    }
+  };
+
+  const unarchiveNotification = async (notificationId: string) => {
+    if (!user) return;
+
+    const target = notifications.find(n => n.id === notificationId && n.is_archived);
+    if (!target) return;
+
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_archived: false })
+        .eq('id', notificationId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setNotifications(prev =>
+        prev.map(n =>
+          n.id === notificationId ? { ...n, is_archived: false } : n
+        )
+      );
+
+      setStats(prev => ({
+        total: prev.total + 1,
+        unread: prev.unread,
+        high_priority:
+          target.priority === 'high' || target.priority === 'critical'
+            ? prev.high_priority + 1
+            : prev.high_priority,
+      }));
+    } catch (error) {
+      console.error('Error unarchiving notification:', error);
     }
   };
 
@@ -169,7 +251,7 @@ export const useNotifications = () => {
       if (error) throw error;
 
       // Update local state
-      const typedNewNotification = newNotification as Notification;
+      const typedNewNotification = normalizeNotification(newNotification);
       setNotifications(prev => [typedNewNotification, ...prev]);
       setStats(prev => ({
         total: prev.total + 1,
@@ -201,7 +283,7 @@ export const useNotifications = () => {
           filter: `user_id=eq.${user.id}`
         },
         (payload) => {
-          const newNotification = payload.new as Notification;
+          const newNotification = normalizeNotification(payload.new);
           setNotifications(prev => [newNotification, ...prev]);
           setStats(prev => ({
             total: prev.total + 1,
@@ -243,6 +325,8 @@ export const useNotifications = () => {
     markAsRead,
     markAllAsRead,
     deleteNotification,
-    createNotification
+    createNotification,
+    archiveNotification,
+    unarchiveNotification
   };
 };

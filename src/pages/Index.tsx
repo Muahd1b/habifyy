@@ -26,7 +26,7 @@ import { useHabitCompletions } from '@/hooks/useHabitCompletions';
 export interface Habit extends HabitWithProgress {}
 
 const Index = () => {
-  console.log("Index component rendering - start");
+  if (import.meta.env.DEV) console.log("Index component rendering - start");
   
   // All hooks must be called in the same order every time
   const { user, loading, isAuthenticated } = useAuth();
@@ -38,14 +38,14 @@ const Index = () => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   
-  console.log("State initialized:", { activeView, isProfileModalOpen, showAddForm });
-  console.log("Auth state:", { user: !!user, loading, isAuthenticated });
+  if (import.meta.env.DEV) console.log("State initialized:", { activeView, isProfileModalOpen, showAddForm });
+  if (import.meta.env.DEV) console.log("Auth state:", { user: !!user, loading, isAuthenticated });
   
   // Database hooks - only call when user exists
   const { habits, loading: habitsLoading, createHabit, updateHabitProgress, deleteHabit } = useHabits();
   const { completions, getCompletionsForDate, getCompletionStats, loading: completionsLoading, updateHabitCompletion } = useHabitCompletions();
   
-  console.log("Hooks completed, habits count:", habits?.length || 0);
+  if (import.meta.env.DEV) console.log("Hooks completed, habits count:", habits?.length || 0);
 
   const handleProfileClick = () => {
     setIsProfileModalOpen(true);
