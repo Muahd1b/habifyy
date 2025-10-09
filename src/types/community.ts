@@ -20,10 +20,25 @@ export interface Friend {
   id: string;
   user_id: string;
   friend_id: string;
-  status: 'pending' | 'accepted' | 'declined' | 'blocked';
+  source_request_id?: string | null;
+  status: 'active' | 'blocked' | 'removed';
   created_at: string;
   updated_at: string;
   profile?: Profile;
+  friend_profile?: Profile;
+}
+
+export interface FriendRequest {
+  id: string;
+  requester_id: string;
+  recipient_id: string;
+  status: 'pending' | 'accepted' | 'declined' | 'blocked';
+  message?: string;
+  responded_at?: string;
+  created_at: string;
+  updated_at: string;
+  requester?: Profile;
+  recipient?: Profile;
 }
 
 export interface Community {
@@ -107,6 +122,19 @@ export interface ActivityFeed {
   is_public: boolean;
   created_at: string;
   profile?: Profile;
+}
+
+export interface CommunityInvite {
+  id: string;
+  community_id: string;
+  inviter_id: string;
+  invitee_id: string;
+  status: 'pending' | 'accepted' | 'declined' | 'expired';
+  expires_at?: string | null;
+  message?: string | null;
+  metadata?: any;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Message {

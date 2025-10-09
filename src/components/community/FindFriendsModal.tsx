@@ -63,26 +63,43 @@ export const FindFriendsModal = ({ open, onClose, onFriendRequest }: FindFriends
 
       // Check existing friendships and pending requests
       const userIds = profiles?.map(p => p.user_id) || [];
-      
+      if (userIds.length === 0) {
+        setSearchResults(profiles || []);
+        setLoading(false);
+        return;
+      }
+
       const { data: friendships } = await supabase
-        .from('friends')
+        .from('friendships')
         .select('friend_id, status')
         .eq('user_id', user.id)
         .in('friend_id', userIds);
 
-      const { data: pendingRequests } = await supabase
-        .from('friends')
-        .select('user_id')
-        .eq('friend_id', user.id)
-        .eq('status', 'pending')
-        .in('user_id', userIds);
+      const [{ data: outgoingRequests, error: outgoingError }, { data: incomingRequests, error: incomingError }] = await Promise.all([
+        supabase
+          .from('friend_requests')
+          .select('recipient_id')
+          .eq('requester_id', user.id)
+          .eq('status', 'pending')
+          .in('recipient_id', userIds),
+        supabase
+          .from('friend_requests')
+          .select('requester_id')
+          .eq('recipient_id', user.id)
+          .eq('status', 'pending')
+          .in('requester_id', userIds)
+      ]);
+
+      if (outgoingError) throw outgoingError;
+      if (incomingError) throw incomingError;
 
       // Map the results with friendship status
       const resultsWithStatus = profiles?.map(profile => ({
         ...profile,
-        is_friend: friendships?.some(f => f.friend_id === profile.user_id && f.status === 'accepted'),
-        has_pending_request: friendships?.some(f => f.friend_id === profile.user_id && f.status === 'pending') ||
-                           pendingRequests?.some(r => r.user_id === profile.user_id)
+        is_friend: friendships?.some(f => f.friend_id === profile.user_id && f.status === 'active'),
+        has_pending_request:
+          outgoingRequests?.some(r => r.recipient_id === profile.user_id) ||
+          incomingRequests?.some(r => r.requester_id === profile.user_id)
       })) || [];
 
       setSearchResults(resultsWithStatus);
