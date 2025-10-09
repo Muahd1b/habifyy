@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from '@/hooks/use-toast';
+import { format, subDays } from 'date-fns';
 
 export interface HabitCompletion {
   id: string;
@@ -203,28 +204,66 @@ export const useHabitCompletions = () => {
   };
 
   // Get habit completion statistics
-  const getCompletionStats = (habitId: string, days: number = 30) => {
+  const getCompletionStats = (habitId: string, target: number = 1, days: number = 30) => {
+    const safeTarget = Math.max(target, 1);
     const endDate = new Date();
-    const startDate = new Date(endDate.getTime() - (days * 24 * 60 * 60 * 1000));
-    
-    const habitCompletions = completions.filter(completion => {
+    const startDate = subDays(endDate, days - 1);
+
+    const habitCompletions = completions.filter((completion) => {
+      if (completion.habit_id !== habitId) return false;
       const completionDate = new Date(completion.completion_date);
-      return completion.habit_id === habitId &&
-             completionDate >= startDate &&
-             completionDate <= endDate;
+      return completionDate >= startDate && completionDate <= endDate;
     });
 
     const totalDays = days;
-    const completedDays = habitCompletions.length;
+    const progressByDate = new Map<string, number>();
+    habitCompletions.forEach((completion) => {
+      progressByDate.set(completion.completion_date, completion.progress);
+    });
+
+    const isDayComplete = (dateKey: string) =>
+      (progressByDate.get(dateKey) ?? 0) >= safeTarget;
+
+    let completedDays = 0;
+    let sumProgressRatio = 0;
+    let currentStreak = 0;
+    let longestStreak = 0;
+    let runningStreak = 0;
+
+    for (let i = 0; i < totalDays; i++) {
+      const dateKey = format(subDays(endDate, i), 'yyyy-MM-dd');
+      const progress = progressByDate.get(dateKey) ?? 0;
+      const progressRatio = Math.min(progress / safeTarget, 1);
+
+      if (isDayComplete(dateKey)) {
+        completedDays += 1;
+        runningStreak += 1;
+        if (i === 0) {
+          currentStreak = runningStreak;
+        }
+      } else {
+        if (i === 0) {
+          currentStreak = 0;
+        }
+        runningStreak = 0;
+      }
+
+      longestStreak = Math.max(longestStreak, runningStreak);
+      sumProgressRatio += progressRatio;
+    }
+
     const completionRate = totalDays > 0 ? (completedDays / totalDays) * 100 : 0;
+    const averageProgressPercent =
+      totalDays > 0 ? (sumProgressRatio / totalDays) * 100 : 0;
 
     return {
       totalDays,
       completedDays,
       completionRate,
-      averageProgress: habitCompletions.length > 0 
-        ? habitCompletions.reduce((sum, c) => sum + c.progress, 0) / habitCompletions.length 
-        : 0
+      averageProgress: averageProgressPercent,
+      averageProgressPercent,
+      currentStreak,
+      longestStreak,
     };
   };
 

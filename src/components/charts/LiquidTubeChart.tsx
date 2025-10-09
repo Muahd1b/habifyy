@@ -6,13 +6,17 @@ interface LiquidTubeChartProps {
   label: string;
   color?: 'primary' | 'success' | 'warning' | 'accent';
   height?: number;
+  className?: string;
+  labelClassName?: string;
 }
 
 export const LiquidTubeChart = ({ 
   percentage, 
   label, 
   color = 'primary',
-  height = 200 
+  height = 200,
+  className,
+  labelClassName
 }: LiquidTubeChartProps) => {
   const colorClasses = {
     primary: 'from-primary via-primary-light to-primary-dark',
@@ -31,7 +35,10 @@ export const LiquidTubeChart = ({
   return (
     <div className="flex flex-col items-center gap-3 group">
       <div 
-        className="relative w-16 rounded-full overflow-hidden border-2 border-border/50 bg-muted/30 backdrop-blur-sm"
+        className={cn(
+          "relative rounded-full overflow-hidden border-2 border-border/50 bg-muted/30 backdrop-blur-sm",
+          className ?? "w-14 sm:w-16"
+        )}
         style={{ height: `${height}px` }}
       >
         {/* Liquid fill with animation */}
@@ -63,7 +70,10 @@ export const LiquidTubeChart = ({
       </div>
 
       {/* Label */}
-      <span className="text-sm font-medium text-muted-foreground text-center group-hover:text-foreground transition-colors">
+      <span className={cn(
+        "text-sm font-medium text-muted-foreground text-center group-hover:text-foreground transition-colors",
+        labelClassName
+      )}>
         {label}
       </span>
     </div>
@@ -78,20 +88,25 @@ interface LiquidTubeComparisonProps {
     color?: 'primary' | 'success' | 'warning' | 'accent';
   }>;
   height?: number;
+  className?: string;
 }
 
-export const LiquidTubeComparison = ({ data, height = 180 }: LiquidTubeComparisonProps) => {
+export const LiquidTubeComparison = ({ data, height = 180, className }: LiquidTubeComparisonProps) => {
   return (
-    <div className="flex justify-around items-end gap-6 p-6 rounded-xl bg-gradient-to-br from-card to-card-hover border border-border/50 backdrop-blur-sm">
-      {data.map((item, index) => (
-        <LiquidTubeChart
-          key={index}
-          label={item.label}
-          percentage={item.percentage}
-          color={item.color}
-          height={height}
-        />
-      ))}
+    <div className={cn("overflow-x-auto", className)}>
+      <div className="flex w-max min-w-full items-end justify-between gap-4 rounded-2xl border border-border/50 bg-gradient-to-br from-card to-card-hover px-3 py-4 backdrop-blur-md sm:gap-6 sm:px-6 sm:py-6">
+        {data.map((item, index) => (
+          <LiquidTubeChart
+            key={index}
+            label={item.label}
+            percentage={item.percentage}
+            color={item.color}
+            height={height}
+            className="w-12 sm:w-16"
+            labelClassName="min-w-[44px]"
+          />
+        ))}
+      </div>
     </div>
   );
 };

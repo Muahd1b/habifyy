@@ -37,7 +37,7 @@ interface ModernAnalyticsProps {
   habitsLoadingExternal?: boolean;
   completionsData?: any[];
   getCompletionsForDateExternal?: (date: string) => any[];
-  getCompletionStatsExternal?: (habitId: string, days?: number) => any;
+  getCompletionStatsExternal?: (habitId: string, target: number, days?: number) => any;
   completionsLoadingExternal?: boolean;
 }
 
@@ -47,8 +47,21 @@ export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, co
   const habitsLoading = habitsLoadingExternal ?? false;
 
   const completions = completionsData ?? [];
-  const getCompletionsForDate = getCompletionsForDateExternal as any;
-  const getCompletionStats = getCompletionStatsExternal as any;
+  const getCompletionsForDate =
+    typeof getCompletionsForDateExternal === 'function'
+      ? getCompletionsForDateExternal
+      : (() => []) as (date: string) => any[];
+  const getCompletionStats =
+    typeof getCompletionStatsExternal === 'function'
+      ? getCompletionStatsExternal
+      : (() => ({
+          totalDays: 0,
+          completedDays: 0,
+          completionRate: 0,
+          averageProgress: 0,
+          currentStreak: 0,
+          longestStreak: 0,
+        })) as (habitId: string, target: number, days?: number) => any;
   const completionsLoading = completionsLoadingExternal ?? false;
   const { profile, loading: profileLoading } = useProfile(user?.id);
   
@@ -65,93 +78,95 @@ export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, co
       };
     }
 
-    const today = format(new Date(), 'yyyy-MM-dd');
-    const todaysCompletions = getCompletionsForDate(today);
-    const completedToday = todaysCompletions.filter(c => c.progress >= 100).length;
-    
-    // Calculate 30-day trend data from real completions
-    const trendData = Array.from({ length: 30 }, (_, i) => {
-      const date = startOfDay(subDays(new Date(), 29 - i));
-      const dateStr = format(date, 'yyyy-MM-dd');
+    const totalHabits = habits.length;
+    const today = new Date();
+
+    const calculateDailyCompletion = (dateStr: string) => {
       const dayCompletions = getCompletionsForDate(dateStr);
-      const completed = dayCompletions.filter(c => c.progress >= 100).length;
-      const totalHabits = habits.length;
-      const completionRate = totalHabits > 0 ? (completed / totalHabits) * 100 : 0;
-      
+
+      let completedCount = 0;
+      let progressRatioSum = 0;
+
+      habits.forEach((habit) => {
+        const completion = dayCompletions.find((c: any) => c.habit_id === habit.id);
+        const progressValue = completion?.progress ?? 0;
+        const safeTarget = Math.max(habit.target ?? 1, 1);
+        if (progressValue >= safeTarget) {
+          completedCount += 1;
+        }
+        progressRatioSum += Math.min(progressValue / safeTarget, 1);
+      });
+
+      const completionRate = totalHabits > 0 ? (completedCount / totalHabits) * 100 : 0;
+      const averageProgress = totalHabits > 0 ? (progressRatioSum / totalHabits) * 100 : 0;
+
+      return {
+        completedCount,
+        completionRate,
+        averageProgress,
+      };
+    };
+
+    const trendData = Array.from({ length: 30 }, (_, i) => {
+      const date = startOfDay(subDays(today, 29 - i));
+      const dateStr = format(date, 'yyyy-MM-dd');
+      const { completedCount, completionRate } = calculateDailyCompletion(dateStr);
+
       return {
         date: dateStr,
         completion: Math.round(completionRate),
-        habits: completed,
-        streak: completed === totalHabits ? 1 : 0
+        habits: completedCount,
+        streak: completedCount === totalHabits && totalHabits > 0 ? 1 : 0,
       };
     });
 
-    // Calculate streaks for each habit
-    const habitStats = habits.map(habit => {
-      const stats = getCompletionStats(habit.id, 30);
-      const recentCompletions = completions
-        .filter(c => c.habit_id === habit.id)
-        .sort((a, b) => new Date(b.completion_date).getTime() - new Date(a.completion_date).getTime());
-      
-      // Calculate current streak
-      let currentStreak = 0;
-      const today = new Date();
-      for (let i = 0; i < 365; i++) {
-        const checkDate = format(subDays(today, i), 'yyyy-MM-dd');
-        const completion = recentCompletions.find(c => c.completion_date === checkDate);
-        if (completion && completion.progress >= 100) {
-          currentStreak++;
-        } else if (i > 0) { // Allow missing today
-          break;
-        }
-      }
+    const habitStats = habits.map((habit) => {
+      const stats = getCompletionStats(habit.id, habit.target, 30) || {};
 
       return {
         name: habit.name,
-        completion: Math.round(stats.completionRate),
-        streak: currentStreak,
+        completion: Math.round(stats.completionRate ?? 0),
+        streak: stats.currentStreak ?? 0,
+        longestStreak: stats.longestStreak ?? habit.longestStreak ?? 0,
         target: habit.target,
         color: habit.color,
-        progress: stats.averageProgress,
-        totalDays: stats.totalDays,
-        completedDays: stats.completedDays
+        progress: Math.round(stats.averageProgress ?? 0),
+        totalDays: stats.totalDays ?? 30,
+        completedDays: stats.completedDays ?? 0,
       };
     });
 
-    // Calculate overall stats
-    const totalCompletionRate = habitStats.length > 0 ? 
-      habitStats.reduce((sum, h) => sum + h.completion, 0) / habitStats.length : 0;
-    const maxStreak = Math.max(...habitStats.map(h => h.streak), 0);
-    const perfectDays = trendData.filter(d => d.completion === 100).length;
+    const totalCompletionRate =
+      habitStats.length > 0
+        ? habitStats.reduce((sum, h) => sum + h.completion, 0) / habitStats.length
+        : 0;
+    const maxCurrentStreak = Math.max(...habitStats.map((h) => h.streak), 0);
+    const perfectDays = trendData.filter((d) => d.completion === 100).length;
 
-    // Weekly data from real completions
     const weeklyData = Array.from({ length: 7 }, (_, i) => {
-      const date = subDays(new Date(), 6 - i);
+      const date = subDays(today, 6 - i);
       const dateStr = format(date, 'yyyy-MM-dd');
-      const dayCompletions = getCompletionsForDate(dateStr);
-      const completed = dayCompletions.filter(c => c.progress >= 100).length;
-      const total = habits.length;
-      const percentage = total > 0 ? (completed / total) * 100 : 0;
+      const { completedCount, completionRate } = calculateDailyCompletion(dateStr);
 
       return {
         day: format(date, 'EEE'),
-        completed,
-        total,
-        percentage: Math.round(percentage)
+        completed: completedCount,
+        total: totalHabits,
+        percentage: Math.round(completionRate),
       };
     });
 
     return {
       overview: {
         winRate: Math.round(totalCompletionRate),
-        currentStreak: maxStreak,
+        currentStreak: maxCurrentStreak,
         totalPoints: profile?.points || 0,
-        activeHabits: habits.length,
-        perfectDays
+        activeHabits: totalHabits,
+        perfectDays,
       },
       trends: trendData,
       habits: habitStats,
-      weekly: weeklyData
+      weekly: weeklyData,
     };
   }, [habits, completions, profile, getCompletionsForDate, getCompletionStats]);
 
@@ -301,21 +316,22 @@ export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, co
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <Card className="lg:col-span-2 border border-border/60 shadow-sm">
                   <CardHeader className="border-b bg-muted/30">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="space-y-1">
                         <CardTitle className="flex items-center gap-2 text-base">
                           <TrendingUp className="w-5 h-5 text-primary" />
                           Weekly Performance Overview
                         </CardTitle>
                         <CardDescription>Liquid tube visualization of your habit consistency</CardDescription>
+                        <CardDescription className="text-xs font-medium text-muted-foreground/80">
+                          Last 7 days • updates automatically
+                        </CardDescription>
                       </div>
-                      <Badge variant="outline" className="text-xs uppercase tracking-wide">
-                        Live data
-                      </Badge>
                     </div>
                   </CardHeader>
-                  <CardContent className="pt-6">
+                  <CardContent className="pt-4 sm:pt-6">
                     <LiquidTubeComparison
+                      className="-mx-2"
                       data={analyticsData.weekly.map((day, idx) => ({
                         label: day.day,
                         percentage: day.percentage,
@@ -473,52 +489,82 @@ export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, co
             {/* Habits Tab */}
             <TabsContent value="habits" className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {analyticsData.habits.map((habit) => (
-                  <Card key={habit.name} className="border border-border/60 shadow-sm transition-shadow duration-200 hover:shadow-md">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div 
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: habit.color }}
-                          />
-                          <CardTitle className="text-base">{habit.name}</CardTitle>
-                        </div>
-                        <Badge variant={habit.streak > 7 ? "default" : "secondary"}>
-                          {habit.streak}d
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <div className="flex justify-between mb-2">
-                          <span className="text-sm text-muted-foreground">Completion</span>
-                          <span className="text-sm font-medium">{habit.completion}%</span>
-                        </div>
-                        <AnimatedProgress value={habit.completion} />
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4 text-center">
-                        <div className="p-2 bg-muted/50 rounded-lg">
-                          <div className="text-lg font-bold text-primary">{habit.streak}</div>
-                          <div className="text-xs text-muted-foreground">Current</div>
-                        </div>
-                        <div className="p-2 bg-muted/50 rounded-lg">
-                          <div className="text-lg font-bold text-secondary">{habit.target}</div>
-                          <div className="text-xs text-muted-foreground">Target</div>
-                        </div>
-                      </div>
+                {analyticsData.habits.map((habit) => {
+                  const completionBadgeVariant =
+                    habit.completion >= 80 ? "default" : habit.completion >= 50 ? "secondary" : "outline";
+                  const averageProgressPercent = Math.min(100, Math.round(habit.progress ?? 0));
 
-                      <Button 
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                      >
-                        View Details
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
+                  return (
+                    <Card
+                      key={habit.name}
+                      className="relative overflow-hidden border border-border/60 bg-background/80 shadow-sm backdrop-blur-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+                    >
+                      <div
+                        className="pointer-events-none absolute inset-0 opacity-10"
+                        style={{
+                          background: `radial-gradient(circle at top, ${habit.color} 0%, transparent 55%)`,
+                        }}
+                      />
+                      <CardHeader className="relative pb-2">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-3">
+                            <span
+                              className="mt-1 h-3 w-3 rounded-full ring-2 ring-background/70"
+                              style={{ backgroundColor: habit.color }}
+                            />
+                            <div>
+                              <CardTitle className="text-base font-semibold">{habit.name}</CardTitle>
+                              <CardDescription className="text-xs">
+                                Target {habit.target} per day
+                              </CardDescription>
+                            </div>
+                          </div>
+                          <Badge variant={completionBadgeVariant} className="text-xs">
+                            {habit.completion}% complete
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="relative space-y-5">
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-muted-foreground/80">
+                            <span>Completion</span>
+                            <span>{habit.completion}%</span>
+                          </div>
+                          <AnimatedProgress value={habit.completion} className="h-2 bg-muted/40" />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div className="rounded-lg border border-border/50 bg-background/70 p-3">
+                            <span className="text-xs text-muted-foreground">Current streak</span>
+                            <div className="mt-1 flex items-center gap-2 font-semibold text-success">
+                              <Flame className="h-4 w-4" />
+                              {habit.streak}d
+                            </div>
+                          </div>
+                          <div className="rounded-lg border border-border/50 bg-background/70 p-3">
+                            <span className="text-xs text-muted-foreground">Daily goal</span>
+                            <div className="mt-1 flex items-center gap-2 font-semibold text-primary">
+                              <Target className="h-4 w-4" />
+                              {habit.target}
+                            </div>
+                          </div>
+                          <div className="rounded-lg border border-border/50 bg-background/70 p-3">
+                            <span className="text-xs text-muted-foreground">Avg. progress</span>
+                            <div className="mt-1 text-sm font-semibold text-foreground">
+                              {averageProgressPercent}%
+                            </div>
+                          </div>
+                          <div className="rounded-lg border border-border/50 bg-background/70 p-3">
+                            <span className="text-xs text-muted-foreground">Days completed</span>
+                            <div className="mt-1 text-sm font-semibold text-foreground">
+                              {habit.completedDays}/{habit.totalDays}
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             </TabsContent>
 

@@ -38,7 +38,10 @@ export const Analytics = ({ open, onClose }: AnalyticsProps) => {
       const date = subDays(new Date(), 6 - i);
       const dateStr = format(date, 'yyyy-MM-dd');
       const dayCompletions = getCompletionsForDate(dateStr);
-      const completed = dayCompletions.filter(c => c.progress >= 100).length;
+      const completed = habits.reduce((count, habit) => {
+        const completion = dayCompletions.find(c => c.habit_id === habit.id);
+        return count + ((completion?.progress ?? 0) >= habit.target ? 1 : 0);
+      }, 0);
       const completionRate = habits.length > 0 ? (completed / habits.length) * 100 : 0;
       
       return {
@@ -49,7 +52,7 @@ export const Analytics = ({ open, onClose }: AnalyticsProps) => {
 
     // Calculate habit comparison data
     const habitComparison = habits.map(habit => {
-      const stats = getCompletionStats(habit.id, 30);
+      const stats = getCompletionStats(habit.id, habit.target, 30);
       return {
         name: habit.name.length > 10 ? habit.name.substring(0, 10) + '...' : habit.name,
         completion: Math.round(stats.completionRate),
@@ -59,7 +62,7 @@ export const Analytics = ({ open, onClose }: AnalyticsProps) => {
 
     // Calculate streak data
     const streakData = habits.map(habit => {
-      const stats = getCompletionStats(habit.id, 365);
+      const stats = getCompletionStats(habit.id, habit.target, 365);
       // Calculate current streak
       let currentStreak = 0;
       const today = new Date();
@@ -70,7 +73,7 @@ export const Analytics = ({ open, onClose }: AnalyticsProps) => {
       for (let i = 0; i < 365; i++) {
         const checkDate = format(subDays(today, i), 'yyyy-MM-dd');
         const completion = recentCompletions.find(c => c.completion_date === checkDate);
-        if (completion && completion.progress >= 100) {
+        if (completion && completion.progress >= habit.target) {
           currentStreak++;
         } else if (i > 0) {
           break;

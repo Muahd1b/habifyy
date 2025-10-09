@@ -334,65 +334,141 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
   );
 
   const renderFollowers = () => (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Followers ({stats?.followersCount || 0})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {followers.slice(0, 5).map((follower) => (
-                <div key={follower.id} className="flex items-center gap-3 rounded-lg border border-border/60 bg-muted/20 p-3">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={follower.profile?.avatar_url || ''} />
-                    <AvatarFallback>
-                      {follower.profile?.display_name?.[0] || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <p className="font-medium text-sm">
-                      {follower.profile?.display_name || 'Anonymous'}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Level {follower.profile?.level || 1} • {follower.profile?.points || 0} points
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+    <Card className="border border-border/60 shadow-sm">
+      <CardHeader className="border-b bg-muted/20">
+        <CardTitle className="flex items-center gap-2">
+          <Users className="h-5 w-5 text-primary" />
+          Social Connections
+        </CardTitle>
+        <CardDescription>Stay inspired by the people who cheer you on</CardDescription>
+      </CardHeader>
+      <CardContent className="pt-6">
+        <Tabs defaultValue="followers" className="space-y-4">
+          <TabsList className="mx-auto flex w-full max-w-md justify-center gap-2 rounded-full border border-border/40 bg-background/70 p-1 backdrop-blur-sm">
+            <TabsTrigger
+              value="followers"
+              className="flex-1 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              Followers ({stats?.followersCount || followers.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="following"
+              className="flex-1 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              Following ({stats?.followingCount || following.length})
+            </TabsTrigger>
+          </TabsList>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Following ({stats?.followingCount || 0})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {following.slice(0, 5).map((follow) => (
-                <div key={follow.id} className="flex items-center gap-3 rounded-lg border border-border/60 bg-muted/20 p-3">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={follow.profile?.avatar_url || ''} />
-                    <AvatarFallback>
-                      {follow.profile?.display_name?.[0] || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <p className="font-medium text-sm">
-                      {follow.profile?.display_name || 'Anonymous'}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Level {follow.profile?.level || 1} • {follow.profile?.points || 0} points
-                    </p>
-                  </div>
+          <TabsContent value="followers">
+            {followers.length > 0 ? (
+              <ScrollArea className="max-h-72 pr-2">
+                <div className="space-y-3">
+                  {followers.map((follower) => {
+                    const displayName = follower.profile?.display_name || follower.profile?.username || 'Anonymous';
+                    const level = follower.profile?.level || 1;
+                    const points = follower.profile?.points || 0;
+                    const connectedAt = follower.created_at
+                      ? new Date(follower.created_at).toLocaleDateString()
+                      : 'Recently';
+
+                    return (
+                      <div
+                        key={follower.id}
+                        className="flex items-center justify-between gap-3 rounded-2xl border border-border/60 bg-background/70 p-3 transition-all duration-200 hover:-translate-y-[1px] hover:border-primary/40"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={follower.profile?.avatar_url || ''} />
+                            <AvatarFallback>
+                              {displayName[0] || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="text-sm font-semibold text-foreground">{displayName}</p>
+                            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                              <Badge variant="secondary" className="px-2 py-0.5 text-[11px]">
+                                Level {level}
+                              </Badge>
+                              <span className="flex items-center gap-1">
+                                <Zap className="h-3 w-3" />
+                                {points} pts
+                              </span>
+                              <span className="text-muted-foreground/80">Since {connectedAt}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+              </ScrollArea>
+            ) : (
+              <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border/60 bg-muted/10 p-10 text-center">
+                <Users className="h-10 w-10 text-muted-foreground" />
+                <div>
+                  <p className="font-semibold">No followers yet</p>
+                  <p className="text-sm text-muted-foreground">Share your progress to build your community.</p>
+                </div>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="following">
+            {following.length > 0 ? (
+              <ScrollArea className="max-h-72 pr-2">
+                <div className="space-y-3">
+                  {following.map((follow) => {
+                    const displayName = follow.profile?.display_name || follow.profile?.username || 'Anonymous';
+                    const level = follow.profile?.level || 1;
+                    const points = follow.profile?.points || 0;
+                    const connectedAt = follow.created_at
+                      ? new Date(follow.created_at).toLocaleDateString()
+                      : 'Recently';
+
+                    return (
+                      <div
+                        key={follow.id}
+                        className="flex items-center justify-between gap-3 rounded-2xl border border-border/60 bg-background/70 p-3 transition-all duration-200 hover:-translate-y-[1px] hover:border-primary/40"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={follow.profile?.avatar_url || ''} />
+                            <AvatarFallback>
+                              {displayName[0] || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="text-sm font-semibold text-foreground">{displayName}</p>
+                            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                              <Badge variant="secondary" className="px-2 py-0.5 text-[11px]">
+                                Level {level}
+                              </Badge>
+                              <span className="flex items-center gap-1">
+                                <Zap className="h-3 w-3" />
+                                {points} pts
+                              </span>
+                              <span className="text-muted-foreground/80">Since {connectedAt}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </ScrollArea>
+            ) : (
+              <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border/60 bg-muted/10 p-10 text-center">
+                <UserPlus className="h-10 w-10 text-muted-foreground" />
+                <div>
+                  <p className="font-semibold">You’re not following anyone yet</p>
+                  <p className="text-sm text-muted-foreground">Discover and follow creators to get inspired.</p>
+                </div>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 
   const renderEditProfile = () => (
