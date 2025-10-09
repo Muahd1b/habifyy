@@ -23,11 +23,11 @@ Empower individuals to build sustainable routines by combining intuitive trackin
 ## 2. Scope Overview
 | Area | Description | Feature Doc |
 |------|-------------|-------------|
-| Core Habit Tracking | Create, edit, and progress individual habits with streak logic and visual feedback. | [Habit Tracking](features/habit-tracking.md) |
-| Calendar | Visualize progress across days, complete tasks in context, and surface quick stats. | [Habit Calendar](features/calendar.md) |
-| Analytics | Deliver weekly performance overviews, habit comparisons, and recommendations. | [Analytics Dashboard](features/analytics.md) |
-| Community | Friends, competitions, marketplace, and achievements to drive engagement. | [Community Hub](features/community.md) |
-| Profile | Personalized dashboard with stats, followers, following, and records. | [Profile & Social Presence](features/profile.md) |
+| Core Habit Tracking | Create, edit, and progress individual habits with streak logic, Supabase persistence, and realtime sync. | [Habit Tracking](features/habit-tracking.md) |
+| Calendar | Visualize progress across days, complete tasks in context, and surface quick stats (backed by `habit_completions`). | [Habit Calendar](features/calendar.md) |
+| Analytics | Deliver weekly performance overviews, habit comparisons, and recommendations generated from Supabase aggregations/RPCs. | [Analytics Dashboard](features/analytics.md) |
+| Community | Friends, competitions, marketplace, achievements, notifications, all powered by dedicated Supabase schema and edge functions. | [Community Hub](features/community.md) |
+| Profile | Personalized dashboard with stats, followers, following, and records computed via materialized views. | [Profile & Social Presence](features/profile.md) |
 | Settings | Account-level configuration, premium entry points, support links. | [Settings & Preferences](features/settings.md) |
 | Premium | Tiered offering, upgrade flow, and access gating. | [Premium Experience](features/premium.md) |
 | Authentication | Supabase-powered auth flows for sign-up, sign-in, and recovery. | [Authentication & Access Control](features/auth.md) |
@@ -78,35 +78,41 @@ Out of scope: native mobile apps, full push-notification infrastructure, deep in
 
 ### 4.4 Community Hub
 - Tabbed navigation for Overview, Friends, Competitions, Marketplace, Achievements.
-- Overview: stats cards, activity feed with avatars, and quick actions.
-- Friends: searchable list, suggested friends state, leaderboard, friend requests (future).
-- Competitions: active/upcoming/completed sections with join CTA and time remaining.
-- Marketplace: filterable catalog, purchase flow consuming points, empty-state messaging.
-- Achievements: earned vs available tabs with progress bars, category stats.
+- Overview: stats cards, activity feed with avatars, and quick actions backed by `community_activity_feed` populated via triggers from competitions, achievements, and follow events.
+- Friends: searchable list, suggested friends state, leaderboard, friend requests, implemented with `followers`, `friend_requests`, and a `friend_leaderboard_view`.
+- Competitions: active/upcoming/completed sections with join CTA and time remaining driven by `competitions`, `competition_stages`, `competition_participants`, plus RPC `join_competition`.
+- Marketplace: filterable catalog (`marketplace_items`), purchase flow consuming points via `point_transactions` and `user_inventory` with transactional RPC to ensure atomic debits.
+- Achievements: earned vs available tabs with progress bars referencing `achievements`, `user_achievements`, and `achievement_progress_view`.
+- Notifications: community events enqueue entries in `notifications` and `notification_recipients`, surfaced through `useNotifications` hook (in-app) and optional email/push edge function.
+- Realtime: Supabase channel subscriptions broadcast updates for friends, competitions, and marketplace purchases; fallback polling available.
 
 ### 4.5 Profile Modal
-- Overview: avatar, bio, location, website, stats grid, social links, personal records.
-- Social tab: glass-styled tab list between followers/following, scrollable card list with metadata.
-- Records tab: chronological list of achievements with timestamps.
-- Edit mode: forms for display name, bio, location, website.
-- Permissions: only owner can edit or manage social links; follow/unfollow CTA for other profiles.
+- Overview: avatar, bio, location, website, stats grid, social links, personal records aggregated via `profiles`, `profile_stats_view`, `social_links`, `user_records`.
+- Social tab: glass-styled tab list between followers/following, scrollable card list with metadata from `followers` and `following_view`.
+- Records tab: chronological list of achievements with timestamps from `user_records` and `user_achievements`.
+- Edit mode: forms for display name, bio, location, website writing to `profiles`; validation handled client-side and via database constraints.
+- Permissions: only owner can edit or manage social links; follow/unfollow CTA for other profiles triggers RPC `toggle_follow` which manages `followers`, notifications, and prevents duplicates.
+- Background jobs: Supabase Edge Function recomputes `profile_stats_view` nightly and on relevant events.
 
 ### 4.6 Settings & Premium
-- Settings modal responsive to device: toggles, premium CTA, support/legal links.
-- Premium page highlights plan features, risk-reversal messaging, and upgrade button (integration placeholder).
-- Premium flag gating inside analytics or marketplace for exclusive content (future).
+- Settings modal responsive to device: toggles persisted to `user_settings` table, premium CTA, support/legal links.
+- Premium page highlights plan features, risk-reversal messaging, and upgrade button integrated with Stripe (webhook updates `user_subscriptions`).
+- Premium flag gating inside analytics or marketplace for exclusive content; server checks `user_subscriptions` and RLS for premium-only rows.
 
 ### 4.7 Authentication
 - Initial screen gating: show Auth component if `useAuth` indicates not authenticated.
-- Sign-in/up flows via Supabase email/password.
+- Sign-in/up flows via Supabase email/password and optional OAuth providers.
+- Session management handled by Supabase Auth helpers; refresh tokens stored securely; auto refresh via `onAuthStateChange`.
 - Loading states while Auth verifies session tokens.
-- Logout from profile modal with confirmation dialog.
+- Logout from profile modal with confirmation dialog and Supabase sign-out call.
+- RLS policies ensure users only access own data; service role keys limited to backend functions.
 
 ### 4.8 Mobile Experience
 - Bottom navigation (Home, Calendar, Community, Analytics, Premium).
 - Mobile-specific community/settings modals (`MobileCommunity`, `MobileSettings`).
 - Safe-area padding and scrollable card layouts.
 - Chart and calendar components shrink gracefully; horizontal scroll wrappers to prevent clipping.
+- Edge caching and selective Supabase queries reduce mobile data consumption (e.g., feed pagination default 20 items).
 
 ---
 
@@ -161,7 +167,7 @@ Instrumentation via Supabase events or client analytics (PostHog/Segment) to be 
 ---
 
 ## 8. Dependencies & Integrations
-- **Supabase**: Auth, Postgres DB, realtime channels.
+- **Supabase**: Auth, Postgres DB, realtime channels, Edge Functions (notifications, nightly aggregates), migrations.
 - **Shadcn/UI + Tailwind**: Component library used throughout.
 - **Vite + React**: Build environment.
 - **Lucide Icons**: UI iconography.
