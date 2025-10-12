@@ -24,3 +24,10 @@
 - Friend request acceptance rate.
 - Competition participation and completion.
 - Marketplace purchase conversion.
+
+## Backend Alignment
+- **Tables**: Migrate from legacy `friends` usage to `friend_requests`, `friendships`, `community_invites`, `competition_rounds`, `competition_scores`, `activity_events`, and `marketplace_transactions`.
+- **RPCs**: Ship `community.handle_friend_request(request_id, action)`, `community.join_competition(competition_id)`, and `community.purchase_item(item_id)` to enforce validation, capacity, and transactional point deductions.
+- **Realtime**: Broadcast competition leaderboard deltas through `realtime.broadcast_changes` once scoring RPCs are in place; use filtered channels for invites and activity feed.
+- **Edge Functions**: Extend `notification-processor` to enqueue social notifications (friend accepted, competition starting) rather than inserting rows directly from the client.
+- **Open Tasks**: Backfill new tables from existing data, deprecate direct `.from()` calls in hooks, and add pgTAP tests for reciprocity, blocking, and invite expiry flows.

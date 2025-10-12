@@ -162,11 +162,45 @@ Instrumentation via Supabase events or client analytics (PostHog/Segment) to be 
 - ✅ Supabase schema migrations
 - 🔄 Analytics instrumentation (pending)
 - 🔄 Premium billing integration
+- 🔄 Notification queue instrumentation (pending)
+- 🔄 RPC + pgTAP coverage (pending)
 - ✅ Responsive QA (desktop/mobile)
 
----
 
-## 8. Dependencies & Integrations
+## 8. Backend Architecture Roadmap
+
+### 8.1 Guiding Principles
+- Treat each domain (habits, analytics, community, notifications, monetization) as a self-contained module with documented tables, views, and RPC contracts.
+- Keep row-level security enabled everywhere and encapsulate privileged changes in `SECURITY DEFINER` routines per Supabase guidance on declarative schemas and safe function execution.
+- Prefer RPCs, views, and edge functions over direct table mutations from the client to reduce duplicated business logic and to enable test coverage and observability.
+- Broadcast realtime changes through database triggers only after the write path is validated, using `realtime.broadcast_changes` where live updates are required (e.g., competition leaderboards).
+
+### 8.2 Domain Blueprint
+| Domain | Current Assets | Immediate Gaps | Backend Actions |
+|--------|----------------|----------------|-----------------|
+| Auth & Profiles | `profiles` trigger (`handle_new_user`), privacy flags, `profile_stats_daily` MV | Counts recalculated client-side; no consolidated settings surface | Add RPCs for profile updates (privacy, themes), hydrate follower/following counts via triggers, refresh `profile_stats_daily` on schedule. |
+| Habit Tracking | `habits`, `habit_completions`, `streak_history` (new) | Streak math runs in React; no batched copy/undo; analytics tables unused | Introduce `habit_increment`, `habit_bulk_complete`, `habit_clone_day` RPCs, backfill `streak_history`, add `habit_daily_summary` view for charts. |
+| Calendar & Analytics | `profile_stats_daily`, planned weekly rollups | Dashboard aggregates recomputed in hooks | Materialize `habit_weekly_summary` and `profile_trends_weekly`, refresh nightly via `task_runs`, expose read-only analytics RPCs. |
+| Community & Social | New `friend_requests`, `friendships`, `community_invites`, `competition_*`, `activity_events` | Hooks still write to legacy `friends`, no validation, no pagination | Replace client inserts with `community.handle_friend_request()` RPC, add competition enrollment function with capacity checks, surface paginated views for feed/invites. |
+| Notifications | `notifications`, `notification_events`, `notification_queue`, `notification_preferences`, edge function `notification-processor` | Client inserts bypass queue, no retry/delivery audit | Route all notification creation through `notification_events` + queue, extend edge function to dequeue, add metrics in `task_runs`, auto-archive >90 day rows. |
+| Points & Marketplace | `point_transactions`, `marketplace_inventory`, `marketplace_transactions` | UI still uses missing `user_purchases`, no transactional guard | Ship `commerce.spend_points()` RPC to atomically insert transaction + debit balance, expose `point_balances` view, add fulfillment status workflow. |
+| Premium & Billing | Stripe-ready `create-payment` reference, premium flags on tables | Edge function missing, no entitlement sync | Implement `create-payment` edge function + webhook handler, store entitlements on `profiles`, guard premium-only resources via RLS. |
+
+### 8.3 Implementation Phases
+| Phase | Target Milestone | Scope |
+|-------|------------------|-------|
+| Foundation | Late MVP | Apply outstanding migrations (inventory, queue tables), create missing edge function scaffolds, generate RPCs for friend workflow, habit updates, and points ledger. |
+| Service Layer | Beta | Migrate React hooks to RPC/edge functions, deprecate direct table writes, add pgTAP coverage, and refresh materialized views with scheduled tasks. |
+| Event & Analytics | GA | Finalize notification queue processors, enable realtime broadcasts for competitions, automate aggregation refresh (`task_runs`), and backfill analytics/history tables. |
+| Sustainment | Post-GA | Add retention policies, archive jobs, GDPR export routines, and operational runbooks per domain. |
+
+### 8.4 Testing & Observability
+- Add pgTAP suites for every new RPC (habit completion, friend requests, marketplace spending).
+- Record synthetic events in staging to validate `notification_queue` retries and realtime feeds.
+- Monitor with Supabase logs + custom metrics: queue depth, job success rate, RPC latency, and aggregated KPI drifts.
+- Backstop with React Query integration tests mocking RPC contracts before front-end migration.
+
+## 9. Dependencies & Integrations
 - **Supabase**: Auth, Postgres DB, realtime channels, Edge Functions (notifications, nightly aggregates), migrations.
 - **Shadcn/UI + Tailwind**: Component library used throughout.
 - **Vite + React**: Build environment.
@@ -176,9 +210,8 @@ Instrumentation via Supabase events or client analytics (PostHog/Segment) to be 
 
 Risks include Supabase rate limits, realtime channel reliability, and data consistency across hooks.
 
----
 
-## 9. Analytics & Telemetry Plan
+## 10. Analytics & Telemetry Plan
 - Track habit CRUD events, daily completion, streak resets.
 - Calendar and analytics page views with dwell time.
 - Community actions (friend request, competition join, marketplace purchase).
@@ -187,9 +220,8 @@ Risks include Supabase rate limits, realtime channel reliability, and data consi
 
 Instrumentation will be centralized once final analytics provider chosen; until then, maintain event interface wrappers.
 
----
 
-## 10. Risks & Mitigations
+## 11. Risks & Mitigations
 | Risk | Impact | Mitigation |
 |------|--------|------------|
 | Supabase schema drift | Data inconsistency | Maintain migrations, add integration tests checking hook outputs. |

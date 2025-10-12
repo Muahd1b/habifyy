@@ -21,3 +21,9 @@
 - Upgrade conversion rate.
 - Trial-to-paid activation.
 - Churn and downgrades.
+
+## Backend Alignment
+- **Tables**: `marketplace_items`, `marketplace_inventory`, `marketplace_transactions`, `point_transactions`, and premium flags on `profiles`.
+- **Edge Functions**: Implement `create-payment` (Stripe Checkout) plus webhook handler to persist entitlements, award bonuses, and update `profiles.is_premium`.
+- **RPCs**: Expose `commerce.spend_points()` and `commerce.grant_premium(user_id, tier)` to coordinate marketplace items and subscription state transitions.
+- **Open Tasks**: Add transactional tests covering double-spend prevention, ensure RLS restricts premium-only items, and queue post-payment notifications through `notification_events`.

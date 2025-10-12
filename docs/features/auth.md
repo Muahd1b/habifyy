@@ -22,3 +22,9 @@
 - Conversion from sign-up to active user.
 - Failed vs successful sign-in attempts.
 - Recovery flow completion rate.
+
+## Backend Alignment
+- **Tables & Triggers**: `auth.users` trigger `handle_new_user` seeds `profiles` + `notification_preferences`; ensure trigger remains `SECURITY DEFINER` with `search_path` scoped to `public`.
+- **Session APIs**: Wrap sign-in/out and token refresh inside the Supabase JS client; surface pass-through RPCs only when additional auditing is required.
+- **Edge Functions**: Use `notification-processor` for welcome nudges and to queue verification reminders once the queue processor lands.
+- **Open Tasks**: Add monitoring for trigger failures, document recovery limits, and ensure auth hooks respect updated backend RPC contracts.

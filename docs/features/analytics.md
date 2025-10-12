@@ -23,3 +23,9 @@
 - Weekly success rate.
 - Average habit completion percentage.
 - Perfect day count and current streak.
+
+## Backend Alignment
+- **Materialized Views**: `profile_stats_daily` (current), `habit_weekly_summary` (planned), and `community_metrics_daily` feed overview, comparison, and community cards; refresh nightly via `task_runs`.
+- **RPCs**: Expose read-only endpoints `analytics.get_overview(user_id)` and `analytics.get_habit_trends(user_id, range)` to reduce client joins; honour RLS with `SECURITY DEFINER` wrappers.
+- **Edge Functions**: Use the notification processor to push highlights when thresholds are met (e.g., streak milestones), once queue processing is in place.
+- **Instrumentation**: Log RPC latency, view refresh duration, and chart load failures; integrate with analytics events defined in the PRD.

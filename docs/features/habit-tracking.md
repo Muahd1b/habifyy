@@ -22,3 +22,10 @@
 - Daily completion rate per habit.
 - Average streak length and longest streak.
 - Habit retention (active vs archived).
+
+## Backend Alignment
+- **Tables**: `habits`, `habit_completions`, `streak_history` (new) remain the single source of truth for definitions, daily entries, and historical streak windows.
+- **RPCs (planned)**: `habit_increment`, `habit_bulk_complete`, and `habit_clone_day` will encapsulate all mutations; React hooks should migrate away from direct `.from('habit_completions')` calls once these ship.
+- **Views**: Introduce `habit_daily_summary` (chart-ready rollups per habit/day) and reuse `profile_stats_daily` for cross-habit totals.
+- **Realtime & Jobs**: Use supabase channel broadcasts only after RPC success; schedule nightly refreshes for streak rollups via `task_runs`.
+- **Open Tasks**: Add pgTAP coverage for new RPCs, wire up optimistic UI updates to RPC responses, and document failure modes (validation, rate limiting).
