@@ -38,7 +38,7 @@ import {
   Facebook,
   ArrowLeft
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { FindFriendsModal } from '@/components/community/FindFriendsModal';
 
 interface ProfileModalProps {
   userId?: string;
@@ -49,6 +49,7 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isEditing, setIsEditing] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [showFindFriendsModal, setShowFindFriendsModal] = useState(false);
   const [editForm, setEditForm] = useState({
     display_name: '',
     bio: '',
@@ -133,6 +134,42 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
       facebook: Facebook,
     };
     return icons[platform.toLowerCase()] || LinkIcon;
+  };
+
+  const handleSendFriendRequest = async (friendId: string, friendName: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Log in to send friend requests.",
+        variant: "destructive",
+      });
+      throw new Error("Authentication required");
+    }
+
+    const { error } = await supabase
+      .from('friend_requests')
+      .insert([{ requester_id: user.id, recipient_id: friendId, status: 'pending' }]);
+
+    if (error) {
+      const message =
+        error.code === '23505'
+          ? "You already have a pending request with this user."
+          : error.message ?? "Unable to send friend request.";
+
+      toast({
+        title: "Unable to send request",
+        description: message,
+        variant: "destructive",
+      });
+
+      throw new Error(message);
+    }
+
+    toast({
+      title: "Friend request sent",
+      description: `Your request to ${friendName} is on the way.`,
+    });
   };
 
   const renderOverview = () => (
@@ -336,11 +373,25 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
   const renderFollowers = () => (
     <Card className="border border-border/60 shadow-sm">
       <CardHeader className="border-b bg-muted/20">
-        <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-primary" />
-          Social Connections
-        </CardTitle>
-        <CardDescription>Stay inspired by the people who cheer you on</CardDescription>
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-primary" />
+              Social Connections
+            </CardTitle>
+            <CardDescription>Stay inspired by the people who cheer you on</CardDescription>
+          </div>
+          {isOwnProfile && (
+            <Button
+              size="sm"
+              onClick={() => setShowFindFriendsModal(true)}
+              className="w-full md:w-auto"
+            >
+              <UserPlus className="mr-2 h-4 w-4" />
+              Find Friends
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="pt-6">
         <Tabs defaultValue="followers" className="space-y-4">
@@ -409,6 +460,17 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
                   <p className="font-semibold">No followers yet</p>
                   <p className="text-sm text-muted-foreground">Share your progress to build your community.</p>
                 </div>
+                {isOwnProfile && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowFindFriendsModal(true)}
+                    className="mt-2"
+                  >
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Find Friends
+                  </Button>
+                )}
               </div>
             )}
           </TabsContent>
@@ -463,6 +525,17 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
                   <p className="font-semibold">You’re not following anyone yet</p>
                   <p className="text-sm text-muted-foreground">Discover and follow creators to get inspired.</p>
                 </div>
+                {isOwnProfile && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowFindFriendsModal(true)}
+                    className="mt-2"
+                  >
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Find Friends
+                  </Button>
+                )}
               </div>
             )}
           </TabsContent>
@@ -639,6 +712,11 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
             onClose();
           }
         }}
+      />
+      <FindFriendsModal
+        open={showFindFriendsModal}
+        onClose={() => setShowFindFriendsModal(false)}
+        onFriendRequest={handleSendFriendRequest}
       />
     </>
   );

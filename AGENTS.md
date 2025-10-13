@@ -8,6 +8,12 @@ References
 - When tasks touch Supabase, connect through the project MCP server; do not bypass it with alternate credentials.
 - Use Context7 to confirm the technical structure or API surface relevant to the change, and note any access limitations.
 
+MCP servers
+- Supabase MCP connection: use it for all database schema introspection, data validation, and administrative queries; never attempt direct credential use or alternate clients - say `Supabase MCP:` and here the needed element
+- Context7 MCP connection: route every documentation or API-surface lookup through this server, including framework/libraries related to Supabase or the frontend stack. - say `Context 7 MCP:` and here the needed element
+- Playwright MCP connection: rely on it for any browser-based testing, recordings, or DOM inspections instead of launching local browsers. - say `Playwright MCP:` and here the needed element
+- Whenever the programmer requests research or verification involving Supabase data, documentation queries, or browser testing flows, access the corresponding MCP server to perform the lookup before responding.
+
 Project overview
 - Habifyy is a Vite + React + TypeScript SPA for habit tracking with authenticated experiences powered by Supabase.
 - Core flows cover habit management (creation, editing, completion logging), progress visualizations, social/community widgets, and premium upsell pages.

@@ -619,18 +619,21 @@ export type Database = {
           follower_id: string
           following_id: string
           id: string
+          updated_at: string
         }
         Insert: {
           created_at?: string
           follower_id: string
           following_id: string
           id?: string
+          updated_at?: string
         }
         Update: {
           created_at?: string
           follower_id?: string
           following_id?: string
           id?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1708,6 +1711,17 @@ export type Database = {
       }
     }
     Views: {
+      follow_network: {
+        Row: {
+          created_at: string | null
+          follower_id: string | null
+          following_id: string | null
+          id: string | null
+          updated_at: string | null
+        }
+        Insert: never
+        Update: never
+      }
       community_metrics_daily: {
         Row: {
           active_members: number
@@ -1747,6 +1761,13 @@ export type Database = {
       }
     }
     Functions: {
+      "community.handle_friend_request": {
+        Args: {
+          action: string
+          request_id: string
+        }
+        Returns: Json
+      }
       create_payment_function: {
         Args: Record<PropertyKey, never>
         Returns: string

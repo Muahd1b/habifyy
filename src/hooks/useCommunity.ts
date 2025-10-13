@@ -72,58 +72,29 @@ export const useCommunity = () => {
 
   const respondToFriendRequest = async (requestId: string, action: 'accepted' | 'declined' | 'blocked') => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const actionMap: Record<typeof action, 'accept' | 'decline' | 'block'> = {
+        accepted: 'accept',
+        declined: 'decline',
+        blocked: 'block'
+      };
 
-      const { data: request, error: requestError } = await supabase
-        .from('friend_requests')
-        .select('*')
-        .eq('id', requestId)
-        .single();
+      const { data, error } = await supabase.rpc('community.handle_friend_request', {
+        request_id: requestId,
+        action: actionMap[action]
+      });
 
-      if (requestError) throw requestError;
-      if (!request) return;
+      if (error) throw error;
 
-      const { error: updateError } = await supabase
-        .from('friend_requests')
-        .update({
-          status: action,
-          responded_at: new Date().toISOString()
-        })
-        .eq('id', requestId);
-
-      if (updateError) throw updateError;
-
-      if (action === 'accepted') {
-        const payload = [
-          {
-            user_id: request.requester_id,
-            friend_id: request.recipient_id,
-            source_request_id: request.id,
-            status: 'active'
-          },
-          {
-            user_id: request.recipient_id,
-            friend_id: request.requester_id,
-            source_request_id: request.id,
-            status: 'active'
-          }
-        ];
-
-        const { error: friendshipError } = await supabase
-          .from('friendships')
-          .upsert(payload, {
-            onConflict: 'user_id,friend_id'
-          });
-
-        if (friendshipError) throw friendshipError;
-      }
+      const responseStatus =
+        (data as { status?: string } | null)?.status ?? (action === 'accepted' ? 'accepted' : action === 'declined' ? 'declined' : 'blocked');
 
       toast({
-        title: action === 'accepted' ? "Friend request accepted" : "Friend request updated",
-        description: action === 'accepted'
+        title: responseStatus === 'accepted' ? "Friend request accepted" : "Friend request updated",
+        description: responseStatus === 'accepted'
           ? "You're now connected."
-          : "The friend request has been resolved."
+          : responseStatus === 'declined'
+            ? "The friend request has been declined."
+            : "The user has been blocked."
       });
 
       fetchFriendRequests();
@@ -140,20 +111,18 @@ export const useCommunity = () => {
 
   const cancelFriendRequest = async (requestId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase
-        .from('friend_requests')
-        .delete()
-        .eq('id', requestId)
-        .eq('requester_id', user.id);
+      const { data, error } = await supabase.rpc('community.handle_friend_request', {
+        request_id: requestId,
+        action: 'cancel'
+      });
 
       if (error) throw error;
 
       toast({
         title: "Friend request cancelled",
-        description: "The outgoing friend request was cancelled.",
+        description: (data as { status?: string } | null)?.status === 'cancelled'
+          ? "The outgoing friend request was cancelled."
+          : "Any pending friend request has been cleared.",
       });
 
       fetchFriendRequests();
