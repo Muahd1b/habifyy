@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useCommunity } from "@/hooks/useCommunity";
 import type { Notification } from "@/types/notifications";
 import { useIsMobile } from "@/hooks/use-mobile";
 import logo from "@/assets/habifyy-logo.png";
@@ -35,9 +36,26 @@ export const NotificationOverlay: React.FC<NotificationOverlayProps> = ({
     markAsRead,
     archiveNotification,
     unarchiveNotification,
+    respondToFriendRequestNotification,
   } = useNotifications();
+  const { refetch } = useCommunity();
   const [activeTab, setActiveTab] = useState<"inbox" | "archived">("inbox");
   const isMobile = useIsMobile();
+
+  const handleFriendRequestAction = async (
+    notificationId: string,
+    action: 'accept' | 'decline' | 'block'
+  ) => {
+    try {
+      await respondToFriendRequestNotification(notificationId, action);
+      await refetch.friendRequests?.();
+      if (action === 'accept') {
+        await refetch.friends?.();
+      }
+    } catch {
+      // errors surfaced via hook toast; no-op here
+    }
+  };
 
   const { inboxNotifications, archivedNotifications } = useMemo(() => {
     const inbox: Notification[] = [];
@@ -88,6 +106,7 @@ export const NotificationOverlay: React.FC<NotificationOverlayProps> = ({
         emptyLabel="No notifications yet"
         onMarkRead={markAsRead}
         onArchive={archiveNotification}
+        onFriendRequestAction={handleFriendRequestAction}
         className={
           isMobile
             ? "h-full px-4 pb-24"
@@ -101,6 +120,7 @@ export const NotificationOverlay: React.FC<NotificationOverlayProps> = ({
         loading={loading}
         emptyLabel="No archived notifications"
         onUnarchive={unarchiveNotification}
+        onFriendRequestAction={handleFriendRequestAction}
         className={
           isMobile
             ? "h-full px-4 pb-24"
@@ -213,6 +233,7 @@ interface NotificationListProps {
   onArchive?: (id: string) => Promise<void> | void;
   onUnarchive?: (id: string) => Promise<void> | void;
   onMarkRead?: (id: string) => Promise<void> | void;
+  onFriendRequestAction?: (id: string, action: 'accept' | 'decline' | 'block') => Promise<void> | void;
 }
 
 const NotificationList: React.FC<NotificationListProps> = ({
@@ -223,6 +244,7 @@ const NotificationList: React.FC<NotificationListProps> = ({
   onArchive,
   onUnarchive,
   onMarkRead,
+  onFriendRequestAction,
 }) => {
   return (
     <ScrollArea className={className}>
@@ -245,6 +267,7 @@ const NotificationList: React.FC<NotificationListProps> = ({
               onArchive={onArchive}
               onUnarchive={onUnarchive}
               onMarkRead={onMarkRead}
+              onFriendRequestAction={onFriendRequestAction}
             />
           ))}
         </div>
@@ -258,6 +281,7 @@ interface NotificationCardProps {
   onArchive?: (id: string) => Promise<void> | void;
   onUnarchive?: (id: string) => Promise<void> | void;
   onMarkRead?: (id: string) => Promise<void> | void;
+  onFriendRequestAction?: (id: string, action: 'accept' | 'decline' | 'block') => Promise<void> | void;
 }
 
 const NotificationCard: React.FC<NotificationCardProps> = ({
@@ -265,10 +289,12 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
   onArchive,
   onUnarchive,
   onMarkRead,
+  onFriendRequestAction,
 }) => {
   const timestamp = formatDistanceToNow(new Date(notification.created_at), {
     addSuffix: true,
   });
+  const isFriendRequest = notification.notification_type === 'friend_request_received';
 
   return (
     <div className="rounded-2xl border border-border/40 bg-white/90 backdrop-blur-sm shadow-soft p-4 transition hover:shadow-medium">
@@ -285,6 +311,31 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
           <p className="text-sm text-muted-foreground leading-relaxed">
             {notification.message}
           </p>
+          {isFriendRequest && onFriendRequestAction && (
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <Button
+                size="sm"
+                onClick={() => void onFriendRequestAction(notification.id, 'accept')}
+              >
+                Accept
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void onFriendRequestAction(notification.id, 'decline')}
+              >
+                Decline
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-destructive"
+                onClick={() => void onFriendRequestAction(notification.id, 'block')}
+              >
+                Block
+              </Button>
+            </div>
+          )}
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span>{timestamp}</span>
             <span className="uppercase tracking-wide text-[10px] bg-muted/60 px-1.5 py-0.5 rounded-full">

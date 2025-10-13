@@ -19,6 +19,7 @@ export const useNotifications = () => {
     ...notification,
     is_archived: Boolean(notification.is_archived),
     is_read: Boolean(notification.is_read),
+    friend_request_id: notification.friend_request_id ?? null,
   });
 
   // Fetch notifications
@@ -162,6 +163,67 @@ export const useNotifications = () => {
         description: "Failed to delete notification",
         variant: "destructive",
       });
+    }
+  };
+
+  const respondToFriendRequestNotification = async (
+    notificationId: string,
+    action: 'accept' | 'decline' | 'block'
+  ) => {
+    if (!user) return;
+
+    const target = notifications.find(n => n.id === notificationId);
+    if (!target) return;
+
+    try {
+      const { data, error } = await supabase.rpc('community.respond_to_friend_request_notification', {
+        notification_id: notificationId,
+        action
+      });
+
+      if (error) throw error;
+
+      setNotifications(prev =>
+        prev.map(n =>
+          n.id === notificationId
+            ? { ...n, is_read: true, is_archived: true }
+            : n
+        )
+      );
+
+      setStats(prev => ({
+        total: target.is_archived ? prev.total : Math.max(0, prev.total - 1),
+        unread: (!target.is_archived && !target.is_read) ? Math.max(0, prev.unread - 1) : prev.unread,
+        high_priority:
+          (!target.is_archived && (target.priority === 'high' || target.priority === 'critical'))
+            ? Math.max(0, prev.high_priority - 1)
+            : prev.high_priority,
+      }));
+
+      toast({
+        title:
+          action === 'accept'
+            ? 'Friend request accepted'
+            : action === 'decline'
+              ? 'Friend request declined'
+              : 'User blocked',
+        description:
+          action === 'accept'
+            ? 'You are now connected.'
+            : action === 'decline'
+              ? 'The request has been declined.'
+              : 'Future requests from this user are blocked.',
+      });
+
+      return data;
+    } catch (error: any) {
+      console.error('Error responding to friend request notification:', error);
+      toast({
+        title: 'Unable to update request',
+        description: error.message ?? 'Please try again.',
+        variant: 'destructive',
+      });
+      throw error;
     }
   };
 
@@ -327,6 +389,7 @@ export const useNotifications = () => {
     deleteNotification,
     createNotification,
     archiveNotification,
-    unarchiveNotification
+    unarchiveNotification,
+    respondToFriendRequestNotification,
   };
 };

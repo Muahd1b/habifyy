@@ -1301,6 +1301,7 @@ export type Database = {
           message: string
           notification_type: string
           priority: string | null
+          friend_request_id: string | null
           read_at: string | null
           scheduled_time: string | null
           title: string
@@ -1322,6 +1323,7 @@ export type Database = {
           message: string
           notification_type: string
           priority?: string | null
+          friend_request_id?: string | null
           read_at?: string | null
           scheduled_time?: string | null
           title: string
@@ -1343,13 +1345,22 @@ export type Database = {
           message?: string
           notification_type?: string
           priority?: string | null
+          friend_request_id?: string | null
           read_at?: string | null
           scheduled_time?: string | null
           title?: string
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "notifications_friend_request_id_fkey"
+            columns: ["friend_request_id"]
+            isOneToOne: false
+            referencedRelation: "friend_requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       point_transactions: {
         Row: {
@@ -1765,6 +1776,13 @@ export type Database = {
         Args: {
           action: string
           request_id: string
+        }
+        Returns: Json
+      }
+      "community.respond_to_friend_request_notification": {
+        Args: {
+          action: string
+          notification_id: string
         }
         Returns: Json
       }

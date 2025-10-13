@@ -20,19 +20,30 @@ interface User {
   bio: string;
   is_friend?: boolean;
   has_pending_request?: boolean;
+  pending_request_id?: string | null;
+  has_incoming_request?: boolean;
 }
 
 interface FindFriendsModalProps {
   open: boolean;
   onClose: () => void;
   onFriendRequest: (friendId: string, friendName: string) => Promise<void>;
+  onCancelFriendRequest: (requestId: string) => Promise<void>;
+  onPreviewProfile?: (userId: string) => void;
 }
 
-export const FindFriendsModal = ({ open, onClose, onFriendRequest }: FindFriendsModalProps) => {
+export const FindFriendsModal = ({
+  open,
+  onClose,
+  onFriendRequest,
+  onCancelFriendRequest,
+  onPreviewProfile,
+}: FindFriendsModalProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [sendingRequest, setSendingRequest] = useState<string | null>(null);
+  const [cancellingRequest, setCancellingRequest] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -78,13 +89,13 @@ export const FindFriendsModal = ({ open, onClose, onFriendRequest }: FindFriends
       const [{ data: outgoingRequests, error: outgoingError }, { data: incomingRequests, error: incomingError }] = await Promise.all([
         supabase
           .from('friend_requests')
-          .select('recipient_id')
+          .select('id, recipient_id')
           .eq('requester_id', user.id)
           .eq('status', 'pending')
           .in('recipient_id', userIds),
         supabase
           .from('friend_requests')
-          .select('requester_id')
+          .select('id, requester_id')
           .eq('recipient_id', user.id)
           .eq('status', 'pending')
           .in('requester_id', userIds)
@@ -99,7 +110,10 @@ export const FindFriendsModal = ({ open, onClose, onFriendRequest }: FindFriends
         is_friend: friendships?.some(f => f.friend_id === profile.user_id && f.status === 'active'),
         has_pending_request:
           outgoingRequests?.some(r => r.recipient_id === profile.user_id) ||
-          incomingRequests?.some(r => r.requester_id === profile.user_id)
+          incomingRequests?.some(r => r.requester_id === profile.user_id),
+        pending_request_id:
+          outgoingRequests?.find(r => r.recipient_id === profile.user_id)?.id ?? null,
+        has_incoming_request: incomingRequests?.some(r => r.requester_id === profile.user_id) ?? false,
       })) || [];
 
       setSearchResults(resultsWithStatus);
@@ -124,18 +138,29 @@ export const FindFriendsModal = ({ open, onClose, onFriendRequest }: FindFriends
     setSendingRequest(friendId);
     try {
       await onFriendRequest(friendId, friendName);
-      // Update the local state to reflect the sent request
-      setSearchResults(prev => 
-        prev.map(user => 
-          user.user_id === friendId 
-            ? { ...user, has_pending_request: true }
-            : user
-        )
-      );
+      await searchUsers(searchQuery);
     } catch (error) {
       console.error('Error sending friend request:', error);
     } finally {
       setSendingRequest(null);
+    }
+  };
+
+  const handleCancelFriendRequest = async (requestId: string | null, friendId: string) => {
+    if (!requestId) return;
+    setCancellingRequest(friendId);
+    try {
+      await onCancelFriendRequest(requestId);
+      await searchUsers(searchQuery);
+    } catch (error) {
+      console.error('Error cancelling friend request:', error);
+      toast({
+        title: "Unable to cancel request",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setCancellingRequest(null);
     }
   };
 
@@ -179,9 +204,13 @@ export const FindFriendsModal = ({ open, onClose, onFriendRequest }: FindFriends
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h4 className="font-semibold text-foreground">
+                      <button
+                        type="button"
+                        className="font-semibold text-foreground hover:text-primary transition-colors"
+                        onClick={() => onPreviewProfile?.(user.user_id)}
+                      >
                         {user.display_name || user.username || 'Anonymous'}
-                      </h4>
+                      </button>
                       {user.username && user.display_name !== user.username && (
                         <p className="text-sm text-muted-foreground">@{user.username}</p>
                       )}
@@ -203,7 +232,20 @@ export const FindFriendsModal = ({ open, onClose, onFriendRequest }: FindFriends
                     {user.is_friend ? (
                       <Badge variant="default">Friends</Badge>
                     ) : user.has_pending_request ? (
-                      <Badge variant="outline">Request Sent</Badge>
+                      user.pending_request_id ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleCancelFriendRequest(user.pending_request_id, user.user_id)}
+                          disabled={cancellingRequest === user.user_id}
+                        >
+                          {cancellingRequest === user.user_id ? 'Cancelling...' : 'Cancel Request'}
+                        </Button>
+                      ) : (
+                        <Badge variant="outline">
+                          {user.has_incoming_request ? 'Request Pending' : 'Request Sent'}
+                        </Badge>
+                      )
                     ) : (
                       <Button 
                         size="sm"

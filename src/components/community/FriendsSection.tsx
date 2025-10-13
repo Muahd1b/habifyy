@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { useCommunity } from '@/hooks/useCommunity';
 import { useToast } from '@/hooks/use-toast';
 import { FindFriendsModal } from './FindFriendsModal';
+import { ProfileModal } from '@/components/ProfileModal';
 
 const FriendsSection = () => {
   const {
@@ -23,6 +24,7 @@ const FriendsSection = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [showFindFriendsModal, setShowFindFriendsModal] = useState(false);
+  const [previewProfileUserId, setPreviewProfileUserId] = useState<string | null>(null);
   const [pendingRespondId, setPendingRespondId] = useState<string | null>(null);
   const [pendingCancelId, setPendingCancelId] = useState<string | null>(null);
 
@@ -418,7 +420,15 @@ const FriendsSection = () => {
         open={showFindFriendsModal}
         onClose={() => setShowFindFriendsModal(false)}
         onFriendRequest={handleSendFriendRequest}
+        onCancelFriendRequest={cancelFriendRequest}
+        onPreviewProfile={(userId) => setPreviewProfileUserId(userId)}
       />
+      {previewProfileUserId && (
+        <ProfileModal
+          userId={previewProfileUserId}
+          onClose={() => setPreviewProfileUserId(null)}
+        />
+      )}
     </div>
   );
 };

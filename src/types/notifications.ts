@@ -6,7 +6,10 @@ export interface Notification {
     | 'streak_milestone'
     | 'streak_risk'
     | 'habit_completion'
-    | 'friend_request'
+    | 'friend_request_received'
+    | 'friend_request_accepted'
+    | 'friend_request_declined'
+    | 'friend_request_blocked'
     | 'friend_activity'
     | 'challenge_invitation'
     | 'competition_update'
@@ -22,6 +25,7 @@ export interface Notification {
   is_archived: boolean;
   scheduled_time?: string;
   expires_at?: string;
+  friend_request_id?: string | null;
   created_at: string;
   updated_at: string;
 }
