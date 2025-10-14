@@ -28,7 +28,7 @@ interface FindFriendsModalProps {
   open: boolean;
   onClose: () => void;
   onFriendRequest: (friendId: string, friendName: string) => Promise<void>;
-  onCancelFriendRequest: (requestId: string) => Promise<void>;
+  onCancelFriendRequest?: (requestId: string) => Promise<void>;
   onPreviewProfile?: (userId: string) => void;
 }
 
@@ -147,7 +147,7 @@ export const FindFriendsModal = ({
   };
 
   const handleCancelFriendRequest = async (requestId: string | null, friendId: string) => {
-    if (!requestId) return;
+    if (!requestId || !onCancelFriendRequest) return;
     setCancellingRequest(friendId);
     try {
       await onCancelFriendRequest(requestId);
@@ -232,7 +232,7 @@ export const FindFriendsModal = ({
                     {user.is_friend ? (
                       <Badge variant="default">Friends</Badge>
                     ) : user.has_pending_request ? (
-                      user.pending_request_id ? (
+                      user.pending_request_id && onCancelFriendRequest ? (
                         <Button
                           variant="outline"
                           size="sm"

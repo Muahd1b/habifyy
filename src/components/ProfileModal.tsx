@@ -226,6 +226,14 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
                 {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
               </div>
             </div>
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-xs md:text-sm">
+              <span className="font-semibold text-foreground">
+                {stats?.followersCount ?? followers.length} <span className="text-muted-foreground font-normal">followers</span>
+              </span>
+              <span className="font-semibold text-foreground">
+                {stats?.followingCount ?? following.length} <span className="text-muted-foreground font-normal">following</span>
+              </span>
+            </div>
           </div>
           <div className="flex gap-2 flex-shrink-0">
             {!isOwnProfile && (
