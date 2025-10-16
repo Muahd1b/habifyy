@@ -27,6 +27,44 @@ export const useProfile = (userId?: string) => {
     }
   }, [targetUserId]);
 
+  useEffect(() => {
+    if (!targetUserId) return;
+
+    const channel = supabase
+      .channel(`profile-social-${targetUserId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'followers',
+          filter: `following_id=eq.${targetUserId}`
+        },
+        () => {
+          void fetchFollowers();
+          void fetchStats();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'followers',
+          filter: `follower_id=eq.${targetUserId}`
+        },
+        () => {
+          void fetchFollowing();
+          void fetchStats();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [targetUserId]);
+
   const fetchProfile = async () => {
     if (!targetUserId) return;
 

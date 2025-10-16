@@ -48,7 +48,15 @@ export type Database = {
           requirement_type?: string
           requirement_value?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "activity_feed_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       achievement_progress: {
         Row: {
@@ -126,7 +134,15 @@ export type Database = {
           is_public?: boolean | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "activity_feed_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          }
+        ]
       }
       activity_events: {
         Row: {
@@ -1302,6 +1318,7 @@ export type Database = {
           notification_type: string
           priority: string | null
           friend_request_id: string | null
+          community_invite_id: string | null
           read_at: string | null
           scheduled_time: string | null
           title: string
@@ -1324,6 +1341,7 @@ export type Database = {
           notification_type: string
           priority?: string | null
           friend_request_id?: string | null
+          community_invite_id?: string | null
           read_at?: string | null
           scheduled_time?: string | null
           title: string
@@ -1346,6 +1364,7 @@ export type Database = {
           notification_type?: string
           priority?: string | null
           friend_request_id?: string | null
+          community_invite_id?: string | null
           read_at?: string | null
           scheduled_time?: string | null
           title?: string
@@ -1358,6 +1377,13 @@ export type Database = {
             columns: ["friend_request_id"]
             isOneToOne: false
             referencedRelation: "friend_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_community_invite_id_fkey"
+            columns: ["community_invite_id"]
+            isOneToOne: false
+            referencedRelation: "community_invites"
             referencedColumns: ["id"]
           },
         ]
@@ -1772,6 +1798,34 @@ export type Database = {
       }
     }
     Functions: {
+      handle_friend_request: {
+        Args: {
+          request_id: string
+          action: string
+        }
+        Returns: Json
+      }
+      handle_community_invite: {
+        Args: {
+          invite_id: string
+          action: string
+        }
+        Returns: Json
+      }
+      respond_to_friend_request_notification: {
+        Args: {
+          notification_id: string
+          action: string
+        }
+        Returns: Json
+      }
+      respond_to_community_invite_notification: {
+        Args: {
+          notification_id: string
+          action: string
+        }
+        Returns: Json
+      }
       "community.handle_friend_request": {
         Args: {
           action: string
@@ -1779,10 +1833,24 @@ export type Database = {
         }
         Returns: Json
       }
+      "community.handle_community_invite": {
+        Args: {
+          invite_id: string
+          action: string
+        }
+        Returns: Json
+      }
       "community.respond_to_friend_request_notification": {
         Args: {
           action: string
           notification_id: string
+        }
+        Returns: Json
+      }
+      "community.respond_to_community_invite_notification": {
+        Args: {
+          notification_id: string
+          action: string
         }
         Returns: Json
       }

@@ -11,6 +11,7 @@ export interface Notification {
     | 'friend_request_declined'
     | 'friend_request_blocked'
     | 'friend_activity'
+    | 'community_invite'
     | 'challenge_invitation'
     | 'competition_update'
     | 'marketplace_purchase'
@@ -18,7 +19,7 @@ export interface Notification {
     | 'security_alert';
   title: string;
   message: string;
-  action_data?: any;
+  action_data?: Record<string, unknown> | null;
   priority: 'low' | 'medium' | 'high' | 'critical';
   is_read: boolean;
   is_delivered: boolean;
@@ -26,6 +27,7 @@ export interface Notification {
   scheduled_time?: string;
   expires_at?: string;
   friend_request_id?: string | null;
+  community_invite_id?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -51,7 +53,7 @@ export interface NotificationTemplate {
   template_key: string;
   title_template: string;
   message_template: string;
-  action_data_schema?: any;
+  action_data_schema?: Record<string, unknown> | null;
   created_at: string;
 }
 
@@ -65,7 +67,7 @@ export interface CreateNotificationData {
   notification_type: Notification['notification_type'];
   title: string;
   message: string;
-  action_data?: any;
+  action_data?: Record<string, unknown>;
   priority?: Notification['priority'];
   scheduled_time?: string;
   expires_at?: string;

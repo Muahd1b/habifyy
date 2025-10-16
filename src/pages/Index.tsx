@@ -23,7 +23,7 @@ import { useHabits, type HabitWithProgress } from '@/hooks/useHabits';
 import { useHabitCompletions } from '@/hooks/useHabitCompletions';
 
 // Re-export for compatibility with existing components
-export interface Habit extends HabitWithProgress {}
+export type Habit = HabitWithProgress;
 
 const Index = () => {
   if (import.meta.env.DEV) console.log("Index component rendering - start");

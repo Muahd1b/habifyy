@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCommunity } from '@/hooks/useCommunity';
 import { useToast } from '@/hooks/use-toast';
+import type { MarketplaceItem } from '@/types/community';
 
 const MarketplaceSection = () => {
   const { marketplaceItems, profile, purchaseItem, loading } = useCommunity();
@@ -85,7 +86,7 @@ const MarketplaceSection = () => {
     { value: 'premium', label: 'Premium', count: marketplaceItems.filter(i => i.category === 'premium').length },
   ];
 
-  const MarketplaceItemCard = ({ item }: { item: any }) => (
+  const MarketplaceItemCard = ({ item }: { item: MarketplaceItem }) => (
     <Card className="border border-border/60 shadow-sm transition-shadow duration-200 hover:shadow-md">
       <div className="relative aspect-video overflow-hidden bg-muted/30">
         {item.image_url ? (

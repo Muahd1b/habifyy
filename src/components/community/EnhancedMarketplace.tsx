@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ShoppingCart, Palette, Shield, Star, Crown, Sparkles, Coins } from 'lucide-react';
 import { useCommunity } from '@/hooks/useCommunity';
 import { usePoints } from '@/hooks/usePoints';
+import type { MarketplaceItem } from '@/types/community';
 
 export const EnhancedMarketplace = () => {
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -23,7 +24,7 @@ export const EnhancedMarketplace = () => {
     { id: 'premium', name: 'Premium', icon: Crown }
   ];
 
-  const enhancedMarketplaceItems = [
+  const enhancedMarketplaceItems: MarketplaceItem[] = [
     {
       id: '1',
       name: 'Ocean Theme',
@@ -86,7 +87,7 @@ export const EnhancedMarketplace = () => {
     }
   ];
 
-  const allItems = [...marketplaceItems, ...enhancedMarketplaceItems];
+  const allItems: MarketplaceItem[] = [...marketplaceItems, ...enhancedMarketplaceItems];
 
   const filteredItems = allItems.filter(item => {
     if (filterCategory === 'all') return true;
@@ -106,7 +107,7 @@ export const EnhancedMarketplace = () => {
     }
   });
 
-  const handlePurchase = async (item: any) => {
+  const handlePurchase = async (item: MarketplaceItem) => {
     const success = await spendPoints(
       item.price_points,
       'marketplace_purchase',

@@ -5,15 +5,18 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCommunity } from '@/hooks/useCommunity';
+import type { Achievement, UserAchievement } from '@/types/community';
 
 const AchievementsSection = () => {
   const { achievements, userAchievements, profile } = useCommunity();
 
-  const earnedAchievements = userAchievements.map(ua => ua.achievement).filter(Boolean);
+  const earnedAchievements = userAchievements
+    .map((ua) => ua.achievement)
+    .filter((achievement): achievement is Achievement => Boolean(achievement));
   const unlockedAchievementIds = new Set(userAchievements.map(ua => ua.achievement_id));
-  const availableAchievements = achievements.filter(a => !unlockedAchievementIds.has(a.id));
+  const availableAchievements = achievements.filter((achievement) => !unlockedAchievementIds.has(achievement.id));
 
-  const getCategoryIcon = (category: string) => {
+  const getCategoryIcon = (category: Achievement['category']) => {
     switch (category) {
       case 'streaks': return <Target className="h-4 w-4" />;
       case 'habits': return <Zap className="h-4 w-4" />;
@@ -24,7 +27,7 @@ const AchievementsSection = () => {
     }
   };
 
-  const getCategoryColor = (category: string) => {
+  const getCategoryColor = (category: Achievement['category']) => {
     switch (category) {
       case 'streaks': return 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300';
       case 'habits': return 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300';
@@ -35,7 +38,7 @@ const AchievementsSection = () => {
     }
   };
 
-  const getProgressForAchievement = (achievement: any) => {
+  const getProgressForAchievement = (achievement: Achievement) => {
     // Mock progress calculation - in a real app, this would come from user data
     switch (achievement.requirement_type) {
       case 'streak':
@@ -53,11 +56,13 @@ const AchievementsSection = () => {
     }
   };
 
-  const AchievementCard = ({ achievement, isEarned = false, earnedDate }: { 
-    achievement: any, 
-    isEarned?: boolean, 
-    earnedDate?: string 
-  }) => {
+  interface AchievementCardProps {
+    achievement: Achievement;
+    isEarned?: boolean;
+    earnedDate?: string;
+  }
+
+  const AchievementCard = ({ achievement, isEarned = false, earnedDate }: AchievementCardProps) => {
     const progress = isEarned ? achievement.requirement_value : getProgressForAchievement(achievement);
     const progressPercentage = Math.min(100, (progress / achievement.requirement_value) * 100);
 
@@ -124,17 +129,16 @@ const AchievementsSection = () => {
     );
   };
 
-  const categoryStats = achievements.reduce((acc, achievement) => {
+  const categoryStats = achievements.reduce<Record<Achievement['category'], { total: number; earned: number }>>((acc, achievement) => {
     const category = achievement.category;
-    if (!acc[category]) {
-      acc[category] = { total: 0, earned: 0 };
-    }
-    acc[category].total++;
+    const stats = acc[category] ?? { total: 0, earned: 0 };
+    stats.total += 1;
     if (unlockedAchievementIds.has(achievement.id)) {
-      acc[category].earned++;
+      stats.earned += 1;
     }
+    acc[category] = stats;
     return acc;
-  }, {} as Record<string, { total: number; earned: number }>);
+  }, {} as Record<Achievement['category'], { total: number; earned: number }>);
 
   return (
     <div className="space-y-6">

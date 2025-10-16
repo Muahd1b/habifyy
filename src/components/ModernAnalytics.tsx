@@ -4,14 +4,14 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  Trophy, 
-  Target, 
-  TrendingUp, 
-  Calendar, 
-  Award, 
-  Zap, 
-  BarChart3, 
+import {
+  Trophy,
+  Target,
+  TrendingUp,
+  Calendar,
+  Award,
+  Zap,
+  BarChart3,
   Activity,
   Flame,
   Star,
@@ -25,19 +25,74 @@ import {
 import { LiquidTubeComparison } from '@/components/charts/LiquidTubeChart';
 import { RadialProgressChart } from '@/components/charts/RadialProgressChart';
 
-
 import { useProfile } from '@/hooks/useProfile';
 import { useAuth } from '@/hooks/useAuth';
-import { useMemo } from 'react';
+import { useMemo, type ComponentType, type SVGProps } from 'react';
 import { format, startOfDay, subDays } from 'date-fns';
+import type { HabitWithProgress } from '@/hooks/useHabits';
+import type { HabitCompletion } from '@/hooks/useHabitCompletions';
+
+interface HabitCompletionSummary {
+  totalDays: number;
+  completedDays: number;
+  completionRate: number;
+  averageProgress: number;
+  averageProgressPercent?: number;
+  currentStreak: number;
+  longestStreak: number;
+}
+
+type GetCompletionsForDate = (date: string) => HabitCompletion[];
+type GetCompletionStats = (habitId: string, target: number, days?: number) => HabitCompletionSummary | undefined;
+
+interface TrendPoint {
+  date: string;
+  completion: number;
+  habits: number;
+  streak: number;
+}
+
+interface HabitAnalytics {
+  name: string;
+  completion: number;
+  streak: number;
+  longestStreak: number;
+  target: number;
+  color: string;
+  progress: number;
+  totalDays: number;
+  completedDays: number;
+}
+
+interface WeeklySummary {
+  day: string;
+  completed: number;
+  total: number;
+  percentage: number;
+}
+
+interface AnalyticsOverview {
+  winRate: number;
+  currentStreak: number;
+  totalPoints: number;
+  activeHabits: number;
+  perfectDays: number;
+}
+
+interface AnalyticsData {
+  overview: AnalyticsOverview;
+  trends: TrendPoint[];
+  habits: HabitAnalytics[];
+  weekly: WeeklySummary[];
+}
 
 interface ModernAnalyticsProps {
   onClose: () => void;
-  habitsData?: any[];
+  habitsData?: HabitWithProgress[];
   habitsLoadingExternal?: boolean;
-  completionsData?: any[];
-  getCompletionsForDateExternal?: (date: string) => any[];
-  getCompletionStatsExternal?: (habitId: string, target: number, days?: number) => any;
+  completionsData?: HabitCompletion[];
+  getCompletionsForDateExternal?: GetCompletionsForDate;
+  getCompletionStatsExternal?: GetCompletionStats;
   completionsLoadingExternal?: boolean;
 }
 
@@ -50,7 +105,7 @@ export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, co
   const getCompletionsForDate =
     typeof getCompletionsForDateExternal === 'function'
       ? getCompletionsForDateExternal
-      : (() => []) as (date: string) => any[];
+      : (() => []) as GetCompletionsForDate;
   const getCompletionStats =
     typeof getCompletionStatsExternal === 'function'
       ? getCompletionStatsExternal
@@ -61,14 +116,14 @@ export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, co
           averageProgress: 0,
           currentStreak: 0,
           longestStreak: 0,
-        })) as (habitId: string, target: number, days?: number) => any;
+        })) as GetCompletionStats;
   const completionsLoading = completionsLoadingExternal ?? false;
   const { profile, loading: profileLoading } = useProfile(user?.id);
   
   const isLoading = habitsLoading || completionsLoading || profileLoading;
 
   // Calculate real analytics data based on actual habit completions
-  const analyticsData = useMemo(() => {
+  const analyticsData = useMemo<AnalyticsData>(() => {
     if (!completions.length || !habits.length) {
       return {
         overview: { winRate: 0, currentStreak: 0, totalPoints: profile?.points || 0, activeHabits: habits.length, perfectDays: 0 },
@@ -88,7 +143,7 @@ export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, co
       let progressRatioSum = 0;
 
       habits.forEach((habit) => {
-        const completion = dayCompletions.find((c: any) => c.habit_id === habit.id);
+        const completion = dayCompletions.find((c) => c.habit_id === habit.id);
         const progressValue = completion?.progress ?? 0;
         const safeTarget = Math.max(habit.target ?? 1, 1);
         if (progressValue >= safeTarget) {
@@ -170,7 +225,17 @@ export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, co
     };
   }, [habits, completions, profile, getCompletionsForDate, getCompletionStats]);
 
-  const MetricCard = ({ title, value, subtitle, icon: Icon, trend }: any) => (
+  type TrendDirection = 'up' | 'down' | 'stable';
+
+  interface MetricCardProps {
+    title: string;
+    value: string | number;
+    subtitle: string;
+    icon: ComponentType<SVGProps<SVGSVGElement>>;
+    trend?: TrendDirection;
+  }
+
+  const MetricCard = ({ title, value, subtitle, icon: Icon, trend }: MetricCardProps) => (
     <Card className="border border-border/60 shadow-sm transition-shadow duration-200 hover:shadow-md">
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
         <div>
@@ -205,7 +270,7 @@ export const ModernAnalytics = ({ onClose, habitsData, habitsLoadingExternal, co
     </Card>
   );
 
-  const AnimatedProgress = ({ value, className = "" }: any) => (
+  const AnimatedProgress = ({ value, className = "" }: { value: number; className?: string }) => (
     <Progress value={value} className={`h-2 ${className}`} />
   );
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ComponentType, type SVGProps } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,6 +14,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 import { 
   User, 
   UserPlus, 
@@ -30,6 +31,7 @@ import {
   Edit3,
   Edit2,
   LogOut,
+  Zap,
   Twitter,
   Instagram,
   Linkedin,
@@ -61,7 +63,7 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
   const { toast } = useToast();
 
   // Get current user to determine if this is own profile
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<SupabaseUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   
   useEffect(() => {
@@ -125,7 +127,7 @@ export const ProfileModal = ({ userId, onClose }: ProfileModalProps) => {
   };
 
   const getSocialIcon = (platform: string) => {
-    const icons: Record<string, any> = {
+    const icons: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
       twitter: Twitter,
       instagram: Instagram,
       linkedin: Linkedin,

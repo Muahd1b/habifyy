@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useCommunity } from '@/hooks/useCommunity';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import type { Competition } from '@/types/community';
 
 const CompetitionsSection = () => {
   const { competitions, joinCompetition, loading } = useCommunity();
@@ -52,7 +53,7 @@ const CompetitionsSection = () => {
     return `${hours}h left`;
   };
 
-  const CompetitionCard = ({ competition, showJoinButton = true }: { competition: any, showJoinButton?: boolean }) => (
+  const CompetitionCard = ({ competition, showJoinButton = true }: { competition: Competition; showJoinButton?: boolean }) => (
     <Card className="border border-border/60 shadow-sm transition-shadow duration-200 hover:shadow-md">
       <CardHeader className="border-b bg-muted/20">
         <div className="flex items-start justify-between gap-4">

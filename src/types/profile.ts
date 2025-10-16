@@ -6,9 +6,9 @@ export interface Follower {
   profile?: {
     id: string;
     user_id: string;
-    username?: string;
-    display_name?: string;
-    avatar_url?: string;
+    username?: string | null;
+    display_name?: string | null;
+    avatar_url?: string | null;
     points: number;
     level: number;
   };
@@ -19,7 +19,7 @@ export interface SocialLink {
   user_id: string;
   platform: string;
   url: string;
-  display_name?: string;
+  display_name?: string | null;
   is_verified: boolean;
   created_at: string;
   updated_at: string;
@@ -31,7 +31,7 @@ export interface UserRecord {
   category: string;
   record_type: string;
   record_value: number;
-  habit_id?: string;
+  habit_id?: string | null;
   achieved_at: string;
   created_at: string;
 }
@@ -39,23 +39,23 @@ export interface UserRecord {
 export interface ExtendedProfile {
   id: string;
   user_id: string;
-  username?: string;
-  display_name?: string;
-  avatar_url?: string;
-  bio?: string;
-  location?: string;
-  latitude?: number;
-  longitude?: number;
+  username?: string | null;
+  display_name?: string | null;
+  avatar_url?: string | null;
+  bio?: string | null;
+  location?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   privacy_location: boolean;
   privacy_profile: boolean;
   points: number;
   level: number;
-  website?: string;
+  website?: string | null;
   theme: string;
   is_verified: boolean;
-  cover_image_url?: string;
-  status?: string;
-  timezone?: string;
+  cover_image_url?: string | null;
+  status?: string | null;
+  timezone?: string | null;
   created_at: string;
   updated_at: string;
 }

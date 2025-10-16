@@ -1,13 +1,13 @@
 export interface Profile {
   id: string;
   user_id: string;
-  username?: string;
-  display_name?: string;
-  avatar_url?: string;
-  bio?: string;
-  location?: string;
-  latitude?: number;
-  longitude?: number;
+  username?: string | null;
+  display_name?: string | null;
+  avatar_url?: string | null;
+  bio?: string | null;
+  location?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   privacy_location: boolean;
   privacy_profile: boolean;
   points: number;
@@ -33,8 +33,8 @@ export interface FriendRequest {
   requester_id: string;
   recipient_id: string;
   status: 'pending' | 'accepted' | 'declined' | 'blocked';
-  message?: string;
-  responded_at?: string;
+  message?: string | null;
+  responded_at?: string | null;
   created_at: string;
   updated_at: string;
   requester?: Profile;
@@ -44,11 +44,11 @@ export interface FriendRequest {
 export interface Community {
   id: string;
   name: string;
-  description?: string;
+  description?: string | null;
   type: 'city' | 'state' | 'country' | 'global' | 'habit';
-  location?: string;
+  location?: string | null;
   member_count: number;
-  created_by?: string;
+  created_by?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -56,15 +56,15 @@ export interface Community {
 export interface Competition {
   id: string;
   title: string;
-  description?: string;
+  description?: string | null;
   type: 'local' | 'global' | 'weekly' | 'monthly' | 'habit_specific' | 'team';
-  habit_category?: string;
+  habit_category?: string | null;
   start_date: string;
   end_date: string;
-  max_participants?: number;
+  max_participants?: number | null;
   prize_points: number;
   status: 'upcoming' | 'active' | 'completed' | 'cancelled';
-  created_by?: string;
+  created_by?: string | null;
   created_at: string;
   updated_at: string;
   participants?: CompetitionParticipant[];
@@ -74,9 +74,9 @@ export interface CompetitionParticipant {
   id: string;
   competition_id: string;
   user_id: string;
-  team_name?: string;
+  team_name?: string | null;
   score: number;
-  rank?: number;
+  rank?: number | null;
   joined_at: string;
   profile?: Profile;
 }
@@ -84,10 +84,10 @@ export interface CompetitionParticipant {
 export interface MarketplaceItem {
   id: string;
   name: string;
-  description?: string;
+  description?: string | null;
   category: 'themes' | 'badges' | 'customizations' | 'streak_insurance' | 'premium';
   price_points: number;
-  image_url?: string;
+  image_url?: string | null;
   is_premium: boolean;
   is_active: boolean;
   created_at: string;
@@ -97,9 +97,9 @@ export interface MarketplaceItem {
 export interface Achievement {
   id: string;
   name: string;
-  description?: string;
+  description?: string | null;
   category: 'streaks' | 'habits' | 'social' | 'competitions' | 'milestones';
-  icon?: string;
+  icon?: string | null;
   points_reward: number;
   requirement_type: 'streak' | 'habit_count' | 'friend_count' | 'competition_win' | 'community_participation';
   requirement_value: number;
@@ -118,7 +118,7 @@ export interface ActivityFeed {
   id: string;
   user_id: string;
   activity_type: 'habit_completed' | 'streak_milestone' | 'achievement_earned' | 'competition_joined' | 'friend_added';
-  content: any;
+  content: string | Record<string, unknown>;
   is_public: boolean;
   created_at: string;
   profile?: Profile;
@@ -132,7 +132,7 @@ export interface CommunityInvite {
   status: 'pending' | 'accepted' | 'declined' | 'expired';
   expires_at?: string | null;
   message?: string | null;
-  metadata?: any;
+  metadata?: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;
 }

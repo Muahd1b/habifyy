@@ -25,6 +25,8 @@ interface NotificationOverlayProps {
   onClose: () => void;
 }
 
+type NotificationActionType = 'accept' | 'decline' | 'block';
+
 export const NotificationOverlay: React.FC<NotificationOverlayProps> = ({
   isOpen,
   onClose,
@@ -37,23 +39,74 @@ export const NotificationOverlay: React.FC<NotificationOverlayProps> = ({
     archiveNotification,
     unarchiveNotification,
     respondToFriendRequestNotification,
+    respondToCommunityInviteNotification,
   } = useNotifications();
   const { refetch } = useCommunity();
-  const [activeTab, setActiveTab] = useState<"inbox" | "archived">("inbox");
+  type NotificationTab = "inbox" | "archived";
+  const [activeTab, setActiveTab] = useState<NotificationTab>("inbox");
   const isMobile = useIsMobile();
+  const [pendingActions, setPendingActions] = useState<Record<string, boolean>>({});
 
-  const handleFriendRequestAction = async (
-    notificationId: string,
-    action: 'accept' | 'decline' | 'block'
-  ) => {
-    try {
-      await respondToFriendRequestNotification(notificationId, action);
-      await refetch.friendRequests?.();
-      if (action === 'accept') {
-        await refetch.friends?.();
+  const handleTabChange = (value: string) => {
+    if (value === "inbox" || value === "archived") {
+      setActiveTab(value);
+    }
+  };
+
+  const setPendingState = (notificationId: string, isPending: boolean) => {
+    setPendingActions((prev) => {
+      if (isPending) {
+        return { ...prev, [notificationId]: true };
       }
-    } catch {
-      // errors surfaced via hook toast; no-op here
+
+      const { [notificationId]: _removed, ...rest } = prev;
+      return rest;
+    });
+  };
+
+  const runWithPending = async (notificationId: string, task: () => Promise<void>) => {
+    setPendingState(notificationId, true);
+    try {
+      await task();
+    } finally {
+      setPendingState(notificationId, false);
+    }
+  };
+
+  const handleNotificationAction = async (
+    notification: Notification,
+    action: NotificationActionType
+  ) => {
+    if (pendingActions[notification.id]) return;
+
+    if (notification.notification_type === 'friend_request_received') {
+      try {
+        await runWithPending(notification.id, async () => {
+          await respondToFriendRequestNotification(notification.id, action);
+          await refetch.friendRequests?.();
+          if (action === 'accept') {
+            await refetch.friends?.();
+            await refetch.profile?.();
+          }
+        });
+      } catch {
+        // errors surfaced via hook toast; no-op here
+      }
+      return;
+    }
+
+    if (notification.notification_type === 'community_invite' && action !== 'block') {
+      try {
+        await runWithPending(notification.id, async () => {
+          await respondToCommunityInviteNotification(notification.id, action);
+          await refetch.communityInvites?.();
+          if (action === 'accept') {
+            await refetch.profile?.();
+          }
+        });
+      } catch {
+        // errors surfaced via hook toast; no-op here
+      }
     }
   };
 
@@ -75,7 +128,7 @@ export const NotificationOverlay: React.FC<NotificationOverlayProps> = ({
   if (!isOpen) return null;
 
   const tabs = (
-    <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+    <Tabs value={activeTab} onValueChange={handleTabChange}>
       <TabsList
         className={`${
           isMobile ? "mx-4" : "mx-4 sm:mx-6"
@@ -106,7 +159,8 @@ export const NotificationOverlay: React.FC<NotificationOverlayProps> = ({
         emptyLabel="No notifications yet"
         onMarkRead={markAsRead}
         onArchive={archiveNotification}
-        onFriendRequestAction={handleFriendRequestAction}
+        onAction={handleNotificationAction}
+        pendingActionIds={pendingActions}
         className={
           isMobile
             ? "h-full px-4 pb-24"
@@ -120,7 +174,8 @@ export const NotificationOverlay: React.FC<NotificationOverlayProps> = ({
         loading={loading}
         emptyLabel="No archived notifications"
         onUnarchive={unarchiveNotification}
-        onFriendRequestAction={handleFriendRequestAction}
+        onAction={handleNotificationAction}
+        pendingActionIds={pendingActions}
         className={
           isMobile
             ? "h-full px-4 pb-24"
@@ -233,7 +288,8 @@ interface NotificationListProps {
   onArchive?: (id: string) => Promise<void> | void;
   onUnarchive?: (id: string) => Promise<void> | void;
   onMarkRead?: (id: string) => Promise<void> | void;
-  onFriendRequestAction?: (id: string, action: 'accept' | 'decline' | 'block') => Promise<void> | void;
+  onAction?: (notification: Notification, action: NotificationActionType) => Promise<void> | void;
+  pendingActionIds?: Record<string, boolean>;
 }
 
 const NotificationList: React.FC<NotificationListProps> = ({
@@ -244,7 +300,8 @@ const NotificationList: React.FC<NotificationListProps> = ({
   onArchive,
   onUnarchive,
   onMarkRead,
-  onFriendRequestAction,
+  onAction,
+  pendingActionIds,
 }) => {
   return (
     <ScrollArea className={className}>
@@ -267,7 +324,8 @@ const NotificationList: React.FC<NotificationListProps> = ({
               onArchive={onArchive}
               onUnarchive={onUnarchive}
               onMarkRead={onMarkRead}
-              onFriendRequestAction={onFriendRequestAction}
+              onAction={onAction}
+              isActionPending={Boolean(pendingActionIds?.[notification.id])}
             />
           ))}
         </div>
@@ -281,7 +339,8 @@ interface NotificationCardProps {
   onArchive?: (id: string) => Promise<void> | void;
   onUnarchive?: (id: string) => Promise<void> | void;
   onMarkRead?: (id: string) => Promise<void> | void;
-  onFriendRequestAction?: (id: string, action: 'accept' | 'decline' | 'block') => Promise<void> | void;
+  onAction?: (notification: Notification, action: NotificationActionType) => Promise<void> | void;
+  isActionPending?: boolean;
 }
 
 const NotificationCard: React.FC<NotificationCardProps> = ({
@@ -289,12 +348,29 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
   onArchive,
   onUnarchive,
   onMarkRead,
-  onFriendRequestAction,
+  onAction,
+  isActionPending = false,
 }) => {
   const timestamp = formatDistanceToNow(new Date(notification.created_at), {
     addSuffix: true,
   });
   const isFriendRequest = notification.notification_type === 'friend_request_received';
+  const isCommunityInvite = notification.notification_type === 'community_invite';
+  const actionData = notification.action_data as Record<string, unknown> | null;
+  const rawInviteStatus =
+    actionData && typeof actionData['status'] === 'string'
+      ? (actionData['status'] as string)
+      : undefined;
+  const inviteStatusLabel = rawInviteStatus
+    ? rawInviteStatus.charAt(0).toUpperCase() + rawInviteStatus.slice(1)
+    : undefined;
+  const showFriendActions = isFriendRequest && !notification.is_archived && !!onAction;
+  const showCommunityInviteActions =
+    isCommunityInvite &&
+    !notification.is_archived &&
+    !!onAction &&
+    !rawInviteStatus &&
+    Boolean(notification.community_invite_id);
 
   return (
     <div className="rounded-2xl border border-border/40 bg-white/90 backdrop-blur-sm shadow-soft p-4 transition hover:shadow-medium">
@@ -311,18 +387,20 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
           <p className="text-sm text-muted-foreground leading-relaxed">
             {notification.message}
           </p>
-          {isFriendRequest && onFriendRequestAction && (
+          {showFriendActions && (
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <Button
                 size="sm"
-                onClick={() => void onFriendRequestAction(notification.id, 'accept')}
+                disabled={isActionPending}
+                onClick={() => void onAction?.(notification, 'accept')}
               >
                 Accept
               </Button>
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => void onFriendRequestAction(notification.id, 'decline')}
+                disabled={isActionPending}
+                onClick={() => void onAction?.(notification, 'decline')}
               >
                 Decline
               </Button>
@@ -330,11 +408,42 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
                 size="sm"
                 variant="ghost"
                 className="text-destructive"
-                onClick={() => void onFriendRequestAction(notification.id, 'block')}
+                disabled={isActionPending}
+                onClick={() => void onAction?.(notification, 'block')}
               >
                 Block
               </Button>
+              {isActionPending && (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" aria-hidden="true" />
+              )}
             </div>
+          )}
+          {showCommunityInviteActions && (
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <Button
+                size="sm"
+                disabled={isActionPending}
+                onClick={() => void onAction?.(notification, 'accept')}
+              >
+                Accept
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={isActionPending}
+                onClick={() => void onAction?.(notification, 'decline')}
+              >
+                Decline
+              </Button>
+              {isActionPending && (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" aria-hidden="true" />
+              )}
+            </div>
+          )}
+          {isCommunityInvite && inviteStatusLabel && (
+            <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+              {inviteStatusLabel}
+            </Badge>
           )}
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span>{timestamp}</span>
@@ -350,6 +459,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
               variant="ghost"
               size="icon"
               className="h-8 w-8"
+              disabled={isActionPending}
               onClick={() => void onMarkRead?.(notification.id)}
               aria-label="Mark notification as read"
             >
@@ -361,6 +471,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
               variant="ghost"
               size="icon"
               className="h-8 w-8"
+              disabled={isActionPending}
               onClick={() => void onUnarchive?.(notification.id)}
               aria-label="Move notification to inbox"
             >
@@ -371,6 +482,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
               variant="ghost"
               size="icon"
               className="h-8 w-8"
+              disabled={isActionPending}
               onClick={() => void onArchive?.(notification.id)}
               aria-label="Archive notification"
             >

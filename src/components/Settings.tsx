@@ -16,6 +16,7 @@ import {
   LogOut,
   Edit3
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -123,7 +124,7 @@ export const Settings = ({ onClose }: SettingsProps) => {
 
   const TabButton = ({ id, icon: Icon, label, isActive, onClick }: {
     id: string;
-    icon: React.ComponentType<any>;
+    icon: LucideIcon;
     label: string;
     isActive: boolean;
     onClick: (id: string) => void;

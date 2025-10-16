@@ -1,8 +1,14 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 import { useAuth } from './useAuth';
 import type { Notification, NotificationStats, CreateNotificationData } from '@/types/notifications';
 import { useToast } from './use-toast';
+
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : 'An unexpected error occurred';
+
+type NotificationRow = Database['public']['Tables']['notifications']['Row'];
 
 export const useNotifications = () => {
   const { user } = useAuth();
@@ -15,11 +21,12 @@ export const useNotifications = () => {
     high_priority: 0
   });
 
-  const normalizeNotification = (notification: any): Notification => ({
+  const normalizeNotification = (notification: NotificationRow): Notification => ({
     ...notification,
     is_archived: Boolean(notification.is_archived),
     is_read: Boolean(notification.is_read),
     friend_request_id: notification.friend_request_id ?? null,
+    community_invite_id: notification.community_invite_id ?? null,
   });
 
   // Fetch notifications
@@ -176,7 +183,7 @@ export const useNotifications = () => {
     if (!target) return;
 
     try {
-      const { data, error } = await supabase.rpc('community.respond_to_friend_request_notification', {
+      const { data, error } = await supabase.rpc('respond_to_friend_request_notification', {
         notification_id: notificationId,
         action
       });
@@ -216,11 +223,76 @@ export const useNotifications = () => {
       });
 
       return data;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error responding to friend request notification:', error);
       toast({
         title: 'Unable to update request',
-        description: error.message ?? 'Please try again.',
+        description: getErrorMessage(error),
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
+
+  const respondToCommunityInviteNotification = async (
+    notificationId: string,
+    action: 'accept' | 'decline'
+  ) => {
+    if (!user) return;
+
+    const target = notifications.find(n => n.id === notificationId);
+    if (!target) return;
+
+    try {
+      const { data, error } = await supabase.rpc('respond_to_community_invite_notification', {
+        notification_id: notificationId,
+        action
+      });
+
+      if (error) throw error;
+
+      const status =
+        (data as { status?: string } | null)?.status ??
+        (action === 'accept' ? 'accepted' : 'declined');
+
+      setNotifications(prev =>
+        prev.map(n =>
+          n.id === notificationId
+            ? {
+                ...n,
+                is_read: true,
+                is_archived: true,
+                action_data: {
+                  ...(typeof n.action_data === 'object' && n.action_data !== null ? n.action_data : {}),
+                  status
+                }
+              }
+            : n
+        )
+      );
+
+      setStats(prev => ({
+        total: target.is_archived ? prev.total : Math.max(0, prev.total - 1),
+        unread: (!target.is_archived && !target.is_read) ? Math.max(0, prev.unread - 1) : prev.unread,
+        high_priority:
+          (!target.is_archived && (target.priority === 'high' || target.priority === 'critical'))
+            ? Math.max(0, prev.high_priority - 1)
+            : prev.high_priority,
+      }));
+
+      toast({
+        title: status === 'accepted' ? 'Invitation accepted' : 'Invitation declined',
+        description: status === 'accepted'
+          ? 'You have joined the community.'
+          : 'The invitation has been declined.',
+      });
+
+      return data;
+    } catch (error) {
+      console.error('Error responding to community invite notification:', error);
+      toast({
+        title: 'Unable to update invitation',
+        description: getErrorMessage(error),
         variant: 'destructive',
       });
       throw error;
@@ -391,5 +463,6 @@ export const useNotifications = () => {
     archiveNotification,
     unarchiveNotification,
     respondToFriendRequestNotification,
+    respondToCommunityInviteNotification,
   };
 };

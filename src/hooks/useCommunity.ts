@@ -12,6 +12,15 @@ import {
   CommunityInvite
 } from '@/types/community';
 import { useToast } from '@/components/ui/use-toast';
+import type { TablesInsert } from '@/integrations/supabase/types';
+
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : 'An unexpected error occurred';
+
+const getErrorCode = (error: unknown): string | undefined =>
+  typeof error === 'object' && error !== null && 'code' in error && typeof (error as { code?: unknown }).code === 'string'
+    ? (error as { code: string }).code
+    : undefined;
 
 export const useCommunity = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -65,7 +74,7 @@ export const useCommunity = () => {
       } else {
         setProfile(data);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching profile:', error);
     }
   };
@@ -78,7 +87,7 @@ export const useCommunity = () => {
         blocked: 'block'
       };
 
-      const { data, error } = await supabase.rpc('community.handle_friend_request', {
+      const { data, error } = await supabase.rpc('handle_friend_request', {
         request_id: requestId,
         action: actionMap[action]
       });
@@ -99,11 +108,11 @@ export const useCommunity = () => {
 
       fetchFriendRequests();
       fetchFriendships();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error responding to friend request:', error);
       toast({
         title: "Unable to update request",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     }
@@ -111,7 +120,7 @@ export const useCommunity = () => {
 
   const cancelFriendRequest = async (requestId: string) => {
     try {
-      const { data, error } = await supabase.rpc('community.handle_friend_request', {
+      const { data, error } = await supabase.rpc('handle_friend_request', {
         request_id: requestId,
         action: 'cancel'
       });
@@ -126,11 +135,11 @@ export const useCommunity = () => {
       });
 
       fetchFriendRequests();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error cancelling friend request:', error);
       toast({
         title: "Unable to cancel request",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     }
@@ -152,12 +161,15 @@ export const useCommunity = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      const normalized = (data || []).map((entry: any) => ({
-        ...entry,
-        profile: entry.friend_profile ?? entry.profile
-      }));
-      setFriends(normalized as Friend[]);
-    } catch (error: any) {
+      const normalized = (data ?? []).map((entry) => {
+        const friendEntry = entry as Friend & { friend_profile?: Profile; profile?: Profile };
+        return {
+          ...friendEntry,
+          profile: friendEntry.friend_profile ?? friendEntry.profile,
+        };
+      });
+      setFriends(normalized);
+    } catch (error) {
       console.error('Error fetching friendships:', error);
     }
   };
@@ -191,9 +203,9 @@ export const useCommunity = () => {
       if (incomingError) throw incomingError;
       if (outgoingError) throw outgoingError;
 
-      setIncomingFriendRequests((incoming || []) as FriendRequest[]);
-      setOutgoingFriendRequests((outgoing || []) as FriendRequest[]);
-    } catch (error: any) {
+      setIncomingFriendRequests((incoming ?? []) as FriendRequest[]);
+      setOutgoingFriendRequests((outgoing ?? []) as FriendRequest[]);
+    } catch (error) {
       console.error('Error fetching friend requests:', error);
     }
   };
@@ -210,8 +222,8 @@ export const useCommunity = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setCommunityInvites((data || []) as CommunityInvite[]);
-    } catch (error: any) {
+      setCommunityInvites((data ?? []) as CommunityInvite[]);
+    } catch (error) {
       console.error('Error fetching community invites:', error);
     }
   };
@@ -224,8 +236,8 @@ export const useCommunity = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setCompetitions((data || []) as Competition[]);
-    } catch (error: any) {
+      setCompetitions((data ?? []) as Competition[]);
+    } catch (error) {
       console.error('Error fetching competitions:', error);
     }
   };
@@ -239,8 +251,8 @@ export const useCommunity = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setMarketplaceItems((data || []) as MarketplaceItem[]);
-    } catch (error: any) {
+      setMarketplaceItems((data ?? []) as MarketplaceItem[]);
+    } catch (error) {
       console.error('Error fetching marketplace items:', error);
     }
   };
@@ -253,8 +265,8 @@ export const useCommunity = () => {
         .order('points_reward', { ascending: false });
 
       if (error) throw error;
-      setAchievements((data || []) as Achievement[]);
-    } catch (error: any) {
+      setAchievements((data ?? []) as Achievement[]);
+    } catch (error) {
       console.error('Error fetching achievements:', error);
     }
   };
@@ -274,8 +286,8 @@ export const useCommunity = () => {
         .order('earned_at', { ascending: false });
 
       if (error) throw error;
-      setUserAchievements((data || []) as UserAchievement[]);
-    } catch (error: any) {
+      setUserAchievements((data ?? []) as UserAchievement[]);
+    } catch (error) {
       console.error('Error fetching user achievements:', error);
     }
   };
@@ -293,9 +305,9 @@ export const useCommunity = () => {
         .limit(20);
 
       if (error) throw error;
-      setActivityFeed((data || []) as ActivityFeed[]);
+      setActivityFeed((data ?? []) as ActivityFeed[]);
       setLoading(false);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching activity feed:', error);
       setLoading(false);
     }
@@ -306,14 +318,16 @@ export const useCommunity = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      const newRequest: TablesInsert<'friend_requests'> = {
+        requester_id: user.id,
+        recipient_id: friendId,
+        message: message ?? null,
+        status: 'pending',
+      };
+
       const { error } = await supabase
         .from('friend_requests')
-        .insert([{
-          requester_id: user.id,
-          recipient_id: friendId,
-          message,
-          status: 'pending'
-        }]);
+        .insert(newRequest);
 
       if (error) throw error;
 
@@ -323,10 +337,11 @@ export const useCommunity = () => {
       });
 
       fetchFriendRequests();
-    } catch (error: any) {
-      const description = error.code === '23505'
+    } catch (error) {
+      const code = getErrorCode(error);
+      const description = code === '23505'
         ? "You already have a pending request with this user."
-        : error.message;
+        : getErrorMessage(error);
       toast({
         title: "Error sending friend request",
         description,
@@ -356,10 +371,10 @@ export const useCommunity = () => {
       });
 
       fetchCompetitions();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error joining competition",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     }
@@ -403,10 +418,10 @@ export const useCommunity = () => {
       });
 
       fetchUserProfile();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Purchase failed",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     }

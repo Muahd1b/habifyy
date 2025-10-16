@@ -3,6 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { useCommunity } from './useCommunity';
 
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : 'An unexpected error occurred';
+
 export interface PointTransaction {
   id: string;
   user_id: string;
@@ -34,7 +37,7 @@ export const usePoints = () => {
 
       if (error) throw error;
       setTransactions(data || []);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching transactions:', error);
     } finally {
       setLoading(false);
@@ -79,10 +82,10 @@ export const usePoints = () => {
 
       fetchTransactions();
       refetch.profile();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error awarding points",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     }
@@ -133,10 +136,10 @@ export const usePoints = () => {
       fetchTransactions();
       refetch.profile();
       return true;
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error spending points",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
       return false;
