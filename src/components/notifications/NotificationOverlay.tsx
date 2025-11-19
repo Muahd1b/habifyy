@@ -110,6 +110,20 @@ export const NotificationOverlay: React.FC<NotificationOverlayProps> = ({
     }
   };
 
+  const handleArchiveNotification = async (notificationId: string) => {
+    const archived = await archiveNotification(notificationId);
+    if (archived) {
+      setActiveTab("archived");
+    }
+  };
+
+  const handleUnarchiveNotification = async (notificationId: string) => {
+    const restored = await unarchiveNotification(notificationId);
+    if (restored) {
+      setActiveTab("inbox");
+    }
+  };
+
   const { inboxNotifications, archivedNotifications } = useMemo(() => {
     const inbox: Notification[] = [];
     const archived: Notification[] = [];
@@ -158,7 +172,7 @@ export const NotificationOverlay: React.FC<NotificationOverlayProps> = ({
         loading={loading}
         emptyLabel="No notifications yet"
         onMarkRead={markAsRead}
-        onArchive={archiveNotification}
+        onArchive={handleArchiveNotification}
         onAction={handleNotificationAction}
         pendingActionIds={pendingActions}
         className={
@@ -173,7 +187,7 @@ export const NotificationOverlay: React.FC<NotificationOverlayProps> = ({
         notifications={archivedNotifications}
         loading={loading}
         emptyLabel="No archived notifications"
-        onUnarchive={unarchiveNotification}
+        onUnarchive={handleUnarchiveNotification}
         onAction={handleNotificationAction}
         pendingActionIds={pendingActions}
         className={
@@ -285,8 +299,8 @@ interface NotificationListProps {
   loading: boolean;
   emptyLabel: string;
   className?: string;
-  onArchive?: (id: string) => Promise<void> | void;
-  onUnarchive?: (id: string) => Promise<void> | void;
+  onArchive?: (id: string) => Promise<boolean | void> | boolean | void;
+  onUnarchive?: (id: string) => Promise<boolean | void> | boolean | void;
   onMarkRead?: (id: string) => Promise<void> | void;
   onAction?: (notification: Notification, action: NotificationActionType) => Promise<void> | void;
   pendingActionIds?: Record<string, boolean>;
@@ -336,8 +350,8 @@ const NotificationList: React.FC<NotificationListProps> = ({
 
 interface NotificationCardProps {
   notification: Notification;
-  onArchive?: (id: string) => Promise<void> | void;
-  onUnarchive?: (id: string) => Promise<void> | void;
+  onArchive?: (id: string) => Promise<boolean | void> | boolean | void;
+  onUnarchive?: (id: string) => Promise<boolean | void> | boolean | void;
   onMarkRead?: (id: string) => Promise<void> | void;
   onAction?: (notification: Notification, action: NotificationActionType) => Promise<void> | void;
   isActionPending?: boolean;

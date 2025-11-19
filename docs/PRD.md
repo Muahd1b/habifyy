@@ -10,13 +10,14 @@
 Habifyy is a habit-building platform focused on blending personal productivity with social motivation. The product enables users to create and track habits, visualize progress, and stay accountable through analytics and community features. This PRD captures the end-to-end scope for achieving a feature-complete web application that is performant on desktop and mobile browsers.
 
 ### 1.1 Vision
-Empower individuals to build sustainable routines by combining intuitive tracking, actionable insights, and a supportive community.
+Empower individuals to build sustainable routines by combining intuitive tracking, actionable insights, and a supportive community, reinforced by a transparent level-and-point progression that celebrates streaks and healthy competition while permitting optional real-money point bundles.
 
 ### 1.2 Strategic Objectives
 1. **Onboard quickly:** Enable new users to define their first habit and understand the value proposition within the first session.
 2. **Promote consistency:** Provide daily feedback loops (calendar, streaks, analytics) that reinforce positive behavior.
 3. **Leverage community:** Encourage collaboration and light competition to increase retention and virality.
 4. **Enable monetization:** Offer premium capabilities that enhance insights and customization without blocking core usage.
+5. **Celebrate progression:** Tie habit streaks, competitions, and optional point purchases to a level ladder that surfaces timely alerts and keeps motivation high.
 
 ---
 
@@ -47,9 +48,9 @@ Out of scope: native mobile apps, full push-notification infrastructure, deep in
 ### 3.2 Core Use Cases
 | Persona | Scenario | Expected Outcome |
 |---------|----------|------------------|
-| Routine Builder | Signs up, creates first habit, logs daily completion. | Understands progress and sees streak badges within 3 days. |
-| Data-Driven Achiever | Reviews weekly performance on mobile. | Identifies underperforming habits and receives actionable insights. |
-| Social Motivator | Joins community competitions, follows friends. | Increased engagement, shared accomplishments in feed. |
+| Routine Builder | Signs up, creates first habit, logs daily completion. | Understands progress, receives streak alerts, and sees early level-ups within 3 days. |
+| Data-Driven Achiever | Reviews weekly performance on mobile. | Identifies underperforming habits, toggles deeper analysis levels, and receives actionable insights. |
+| Social Motivator | Joins community competitions, follows friends. | Increased engagement, shared accomplishments in feed, and levels up through competitions and streak bonuses. |
 | Premium Pro | Upgrades plan to unlock advanced analytics. | Access to premium content, minimal friction during billing. |
 
 ---
@@ -59,11 +60,13 @@ Out of scope: native mobile apps, full push-notification infrastructure, deep in
 - CRUD operations for habits with target units, colors, descriptions, and categories.
 - Increment/decrement controls update Supabase `habit_completions` table and refresh streak calculations.
 - Real-time visual indicators (progress bar, streak badge) respond to completion state.
+- Habit completions award points and experience toward user levels, with proactive alerts when streak momentum is at risk.
 - Zero-state card nudges new users to create a first habit.
 
 ### 4.2 Calendar Experience
 - Monthly grid with day headers, selection state, and coloring for completion percentage.
 - Day briefing summarizing achievements, motivational copy, and quick stats.
+- Alert banners highlight upcoming streak breaks, point bonuses, and level milestones tied to the selected day.
 - Inline habit list allows completing tasks for selected day (including past/future states with constraints).
 - Legend clarifies color coding (perfect, partial, none, today).
 - Responsive adaptation: horizontal scroll or compressed cards on mobile; keyboard support on desktop.
@@ -73,6 +76,8 @@ Out of scope: native mobile apps, full push-notification infrastructure, deep in
 - Performance tab: list each habit with completion percent, streak metrics, and average progress.
 - Habits tab: card deck with detailed insights, goal callouts, and progress grid.
 - Insights tab: achievements display and recommendations with CTA buttons.
+- Insight depth toggles (Snapshot, Guided, Deep Dive) tailor the technical rigour of charts and narratives to the user’s appetite.
+- Impact statements cover work, personal, health, mental wellbeing, and other chosen domains, annotating why a habit helps or harms each area.
 - Backend integration: analytics derived from `habits` and `habit_completions` via hooks (`useHabits`, `useHabitCompletions`).
 - Mobile layout: tab list adopts glass pill UI, charts overflow gracefully with horizontal scroll.
 
@@ -80,23 +85,23 @@ Out of scope: native mobile apps, full push-notification infrastructure, deep in
 - Tabbed navigation for Overview, Friends, Competitions, Marketplace, Achievements.
 - Overview: stats cards, activity feed with avatars, and quick actions backed by `community_activity_feed` populated via triggers from competitions, achievements, and follow events.
 - Friends: searchable list, suggested friends state, leaderboard, friend requests, implemented with `followers`, `friend_requests`, and a `friend_leaderboard_view`.
-- Competitions: active/upcoming/completed sections with join CTA and time remaining driven by `competitions`, `competition_stages`, `competition_participants`, plus RPC `join_competition`.
-- Marketplace: filterable catalog (`marketplace_items`), purchase flow consuming points via `point_transactions` and `user_inventory` with transactional RPC to ensure atomic debits.
-- Achievements: earned vs available tabs with progress bars referencing `achievements`, `user_achievements`, and `achievement_progress_view`.
+- Competitions: active/upcoming/completed sections with join CTA and time remaining driven by `competitions`, `competition_stages`, `competition_participants`, plus RPC `join_competition`, awarding points and experience toward levels based on placement.
+- Marketplace: filterable catalog (`marketplace_items`), purchase flow consuming points via `point_transactions` and `user_inventory` with transactional RPC to ensure atomic debits, and optional point top-ups purchased through premium billing.
+- Achievements: earned vs available tabs with progress bars referencing `achievements`, `user_achievements`, and `achievement_progress_view`, spotlighting the next level milestone.
 - Notifications: community events enqueue entries in `notifications` and `notification_recipients`, surfaced through `useNotifications` hook (in-app) and optional email/push edge function.
 - Realtime: Supabase channel subscriptions broadcast updates for friends, competitions, and marketplace purchases; fallback polling available.
 
 ### 4.5 Profile Modal
-- Overview: avatar, bio, location, website, stats grid, social links, personal records aggregated via `profiles`, `profile_stats_view`, `social_links`, `user_records`.
+- Overview: avatar, bio, location, website, stats grid (including current level, points, and streak alerts), social links, personal records aggregated via `profiles`, `profile_stats_view`, `social_links`, `user_records`.
 - Social tab: glass-styled tab list between followers/following, scrollable card list with metadata from `followers` and `following_view`.
-- Records tab: chronological list of achievements with timestamps from `user_records` and `user_achievements`.
+- Records tab: chronological list of achievements with timestamps from `user_records` and `user_achievements`, annotated with the domain (work, personal, health, mental) each habit affects.
 - Edit mode: forms for display name, bio, location, website writing to `profiles`; validation handled client-side and via database constraints.
 - Permissions: only owner can edit or manage social links; follow/unfollow CTA for other profiles triggers RPC `toggle_follow` which manages `followers`, notifications, and prevents duplicates.
 - Background jobs: Supabase Edge Function recomputes `profile_stats_view` nightly and on relevant events.
 
 ### 4.6 Settings & Premium
-- Settings modal responsive to device: toggles persisted to `user_settings` table, premium CTA, support/legal links.
-- Premium page highlights plan features, risk-reversal messaging, and upgrade button integrated with Stripe (webhook updates `user_subscriptions`).
+- Settings modal responsive to device: toggles persisted to `user_settings` table, premium CTA, support/legal links, and granular alert cadence/preferences.
+- Premium page highlights plan features, risk-reversal messaging, upgrade button integrated with Stripe (webhook updates `user_subscriptions`), and optional point bundle purchases.
 - Premium flag gating inside analytics or marketplace for exclusive content; server checks `user_subscriptions` and RLS for premium-only rows.
 
 ### 4.7 Authentication
@@ -142,6 +147,7 @@ Out of scope: native mobile apps, full push-notification infrastructure, deep in
 | Day-7 habit completion rate | ≥ 40% of active users | Indicates ongoing habit engagement. |
 | Weekly community interactions | ≥ 2 actions/user | Includes friend additions, competition joins, or marketplace visits. |
 | Analytics dashboard usage | ≥ 50% of weekly actives | Measures insight feature relevance. |
+| Level advancement rate | ≥ 60% reach Level 3 within first 30 days | Validates that the progression loop sustains motivation. |
 | Premium upgrade conversion | ≥ 3% of monthly actives | Assess monetization effectiveness. |
 | Retention D30 | ≥ 25% | Baseline for further iterations. |
 
@@ -217,6 +223,7 @@ Risks include Supabase rate limits, realtime channel reliability, and data consi
 - Community actions (friend request, competition join, marketplace purchase).
 - Profile follow/unfollow actions.
 - Premium CTA impressions vs conversions.
+- Level progression milestones, alert interactions, and point purchase conversions.
 
 Instrumentation will be centralized once final analytics provider chosen; until then, maintain event interface wrappers.
 

@@ -7,21 +7,25 @@
 - Create and edit habit definitions with targets, colors, and categories.
 - Track daily progress with quick increment/decrement controls.
 - Visualize streak health and overall completion rate.
+- Earn points and experience from completions to climb the Habifyy level ladder.
 
 ## Core Flows
 1. Add new habit with target and metadata.
 2. Update progress via card controls or calendar completion.
 3. View streak badges and habit-level statistics.
+4. Respond to alerts warning about streak break risk or highlighting bonus point opportunities.
 
 ## Key States & Edge Cases
 - Zero habits / onboarding state.
 - Habit completed before end of day.
 - Targets > 1 unit, partial progress, and reset conditions.
+- Maintaining accurate alerts and point payouts when editing or backdating completions.
 
 ## Metrics
 - Daily completion rate per habit.
 - Average streak length and longest streak.
 - Habit retention (active vs archived).
+- Experience points earned per habit and levels achieved.
 
 ## Backend Alignment
 - **Tables**: `habits`, `habit_completions`, `streak_history` (new) remain the single source of truth for definitions, daily entries, and historical streak windows.

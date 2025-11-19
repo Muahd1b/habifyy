@@ -299,11 +299,11 @@ export const useNotifications = () => {
     }
   };
 
-  const archiveNotification = async (notificationId: string) => {
-    if (!user) return;
+  const archiveNotification = async (notificationId: string): Promise<boolean> => {
+    if (!user) return false;
 
     const target = notifications.find(n => n.id === notificationId && !n.is_archived);
-    if (!target) return;
+    if (!target) return false;
 
     try {
       const { error } = await supabase
@@ -328,16 +328,19 @@ export const useNotifications = () => {
             ? Math.max(0, prev.high_priority - 1)
             : prev.high_priority,
       }));
+
+      return true;
     } catch (error) {
       console.error('Error archiving notification:', error);
+      return false;
     }
   };
 
-  const unarchiveNotification = async (notificationId: string) => {
-    if (!user) return;
+  const unarchiveNotification = async (notificationId: string): Promise<boolean> => {
+    if (!user) return false;
 
     const target = notifications.find(n => n.id === notificationId && n.is_archived);
-    if (!target) return;
+    if (!target) return false;
 
     try {
       const { error } = await supabase
@@ -362,8 +365,11 @@ export const useNotifications = () => {
             ? prev.high_priority + 1
             : prev.high_priority,
       }));
+
+      return true;
     } catch (error) {
       console.error('Error unarchiving notification:', error);
+      return false;
     }
   };
 

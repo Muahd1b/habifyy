@@ -7,16 +7,18 @@
 - Connect with other users, track community activity, and manage friendships.
 - Join or create competitions to compete on habit performance.
 - Spend earned points in the marketplace and view achievement progress.
+- Advance their level by stacking streak bonuses, competition placements, and optional point top-ups.
 
 ## Core Sub-Features
 1. **Friends** – search, request, leaderboard, messaging entry points.
-2. **Competitions** – browse active/upcoming events, join, and track status.
-3. **Marketplace** – filter, sort, and purchase rewards with points.
+2. **Competitions** – browse active/upcoming events, join, track status, and earn point/XP rewards toward higher levels.
+3. **Marketplace** – filter, sort, and purchase rewards with points (earned or optionally bought through real-money premium billing).
 4. **Achievements** – browse earned vs available badges with progress.
 
 ## Key States & Edge Cases
 - Empty states for each sub-section (no activity, friends, items, etc.).
 - Handling limited points, joining in-progress competitions, or request failures.
+- Reflecting purchases or bonus point drops immediately so level state stays accurate.
 - Real-time updates vs polling trade-offs.
 
 ## Metrics
@@ -24,6 +26,7 @@
 - Friend request acceptance rate.
 - Competition participation and completion.
 - Marketplace purchase conversion.
+- Level progression attributed to community interactions.
 
 ## Backend Alignment
 - **Tables**: Migrate from legacy `friends` usage to `friend_requests`, `friendships`, `community_invites`, `competition_rounds`, `competition_scores`, `activity_events`, and `marketplace_transactions`.
